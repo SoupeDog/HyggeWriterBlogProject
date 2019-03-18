@@ -13,6 +13,7 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
             <version>2.1.0.RELEASE</version>
+            <!--runtime 的依赖冲突，直接剔除-->
             <exclusions>
                 <exclusion>
                     <artifactId>gson</artifactId>
