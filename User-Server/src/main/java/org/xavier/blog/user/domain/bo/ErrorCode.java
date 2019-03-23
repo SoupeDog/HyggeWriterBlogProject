@@ -1,0 +1,67 @@
+package org.xavier.blog.user.domain.bo;
+
+/**
+ * 描述信息：<br/>
+ * 公用错误码
+ *
+ * @author Xavier
+ * @version 1.0
+ * @date 2018/1/14
+ * @since Jdk 1.8
+ */
+public enum ErrorCode {
+    TARGETDATA_EMPTY(400.1F),
+    UPDATEDATA_EMPTY(400.2F),
+
+    UNEXPECTED_TOKEN(403.01F),
+    TOKEN_OVERDUE(403.02F),
+    UNEXPECTED_TOKEN_REFRESH_KEY(403.03F),
+    UNEXPECTED_TOKEN_SCOPE(403.04F),
+    UNEXPECTED_PASSWORD_OR_UID(403.05F),
+
+    INSUFFICIENT_PERMISSIONS(403.1F),
+
+
+    USER_NOTFOUND(404.1F),
+    ARTICLE_NOTFOUND(404.2F),
+    BOARD_NOTFOUND(404.3F),
+    STATEMENT_NOTFOUND(404.4F),
+    ARTICLECATEGORY_NOTFOUND(404.5F),
+    TOKEN_NOTFOUND(404.6F),
+
+    USER_EXISTS(409.1F),
+    ARTICLE_EXISTS(409.2F),
+    BOARD_EXISTS(409.3F),
+    STATEMENT_EXISTS(409.4F),
+    ARTICLECATEGORY_EXISTS(409.5F),
+
+    TOKEN_REFRESH_CONFLICT(409.01F),
+    TOKEN_CREATE_CONFLICT(409.02F),
+    USER_DELETE_CONFLICT(409.11F),
+    USER_UPDATE_CONFLICT(409.12F),
+    ARTICLE_DELETE_CONFLICT(409.21F),
+    BOARD_DELETE_CONFLICT(409.31F),
+    STATEMENT_DELETE_CONFLICT(409.41F),
+    STATEMENT_UPDATE_CONFLICT(409.42F),
+    ARTICLE_CATEGORY_DELETE_CONFLICT(409.51F),
+    ARTICLE_CATEGORY_UPDATE_CONFLICT(409.52F),
+
+
+    DATEBASE_FALL_TO_SAVE(500.1F),
+    DATEBASE_FALL_TO_UPDATE(500.2F),
+    DATEBASE_FALL_TO_DELETE(500.3F);
+
+    private Float errorCod;
+
+    ErrorCode(Float errorCod) {
+        this.errorCod = errorCod;
+    }
+
+    public Float getErrorCod() {
+        return errorCod;
+    }
+
+    public void setErrorCod(Float errorCod) {
+        this.errorCod = errorCod;
+    }
+}

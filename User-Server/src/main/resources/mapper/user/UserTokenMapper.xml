@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.user.dao.UserTokenMapper">
+
+    <sql id="Base_Column_List">
+    </sql>
+
+    <sql id="All_Column_List">
+        uId, token, deadLine, scope, lastToken, lastDeadLine, refreshKey, ts, lastUpdateTs
+    </sql>
+
+    <insert id="saveUserToken_Single" parameterType="UserToken">
+        INSERT INTO `userToken`(<include refid="Base_Column_List"/>)VALUES (
+        #{userToken.uId},
+        #{userToken.token},
+        #{userToken.deadLine},
+        #{userToken.scope},
+        #{userToken.lastToken},
+        #{userToken.lastDeadLine},
+        #{userToken.refreshKey},
+        #{userToken.ts},
+        #{userToken.lastUpdateTs}
+        )
+    </insert>
+
+    <delete id="removeUserToken">
+        DELETE FROM `userToken` where uId=#{uId} AND scope=#{scope}
+    </delete>
+
+    <update id="refreshToken_CAS">
+        UPDATE `userToken`
+        SET token        = #{token},
+            deadLine     = #{deadLine},
+            lastToken    = #{lastToken},
+            lastDeadLine = #{lastDeadLine},
+            refreshKey   = #{refreshKey}
+        WHERE scope = #{scope} AND uId = #{uId} AND #{ts_CAS} &gt; lastUpdateTs
+    </update>
+
+    <update id="updateUserTokenByUIdAndScope">
+        UPDATE `userToken`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE scope=#{scope} AND uId=#{uId}
+    </update>
+
+    <select id="queryUserByUIdAndScope" resultType="UserToken">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `userToken` WHERE scope=#{scope} AND uId=#{uId} LIMIT 1
+    </select>
+
+</mapper>

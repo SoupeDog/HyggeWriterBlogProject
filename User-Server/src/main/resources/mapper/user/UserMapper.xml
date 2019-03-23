@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.user.dao.UserMapper">
+
+    <sql id="Base_Column_List">
+        uId, pw, headIcon, userType, uName, sex, birthday, phone, email, biography, exp, properties, legal_Flag, registerTs, lastUpdateTs
+    </sql>
+
+    <sql id="All_Column_List">
+        id, uId, pw, headIcon, userType, uName, sex, birthday, phone, email, biography, exp, properties, legal_Flag, registerTs, lastUpdateTs
+    </sql>
+
+    <insert id="saveUser_Single" parameterType="User" useGeneratedKeys="true" keyProperty="user.id">
+        INSERT INTO `user`(<include refid="Base_Column_List"/>)VALUES (
+        #{user.uId},
+        #{user.pw},
+        #{user.headIcon},
+        #{user.userType},
+        #{user.uName},
+        #{user.sex},
+        #{user.birthday},
+        #{user.phone},
+        #{user.email},
+        #{user.biography},
+        #{user.exp},
+        #{user.properties},
+        #{user.legal_Flag},
+        #{user.registerTs},
+        #{user.lastUpdateTs}
+        )
+    </insert>
+
+    <update id="removeUserByUId_Logically_Multiple">
+        UPDATE `user`
+        SET legal_Flag = FALSE, lastUpdateTs = #{lastUpdateTs}
+        WHERE uId IN
+        <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateByUId_CASByLastUpdateTs">
+        UPDATE `user`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE lastUpdateTs &lt; #{lastUpdateTs_CAS} AND uId=#{uId}
+    </update>
+
+    <update id="updateById_CASByLastUpdateTs">
+        UPDATE `user`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE lastUpdateTs &lt; #{lastUpdateTs_CAS} AND id=#{id}
+    </update>
+
+    <select id="queryUserByUId" resultType="User">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `user` WHERE legal_Flag=TRUE AND uId=#{uId} LIMIT 1
+    </select>
+
+    <select id="queryUserListByUId" resultType="User">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `user` WHERE legal_Flag=TRUE AND uId IN
+        <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryUserMapByUId" resultType="User">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `user` WHERE legal_Flag=TRUE AND uId IN
+        <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryMaxId" resultType="integer">
+        SELECT MAX(id)
+        FROM `user`
+    </select>
+</mapper>
