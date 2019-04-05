@@ -42,5 +42,4 @@ public class SpringBootVFS extends VFS {
         int start = uriStr.indexOf(rootPath);
         return uriStr.substring(start);
     }
-
 }

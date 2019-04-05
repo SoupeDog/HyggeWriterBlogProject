@@ -136,7 +136,7 @@ public class UserServiceImpl extends DefaultService {
      * @throws Universal_400_X_Exception uId 列表项为空
      */
     public ArrayList<User> queryUserListByUId(List<String> uIdList) {
-        ArrayList<String> uIdListForQuery = listHelper.filterStringListNotEmpty(uIdList, "uIdList", 32, 32);
+        ArrayList<String> uIdListForQuery = listHelper.filterStringListNotEmpty(uIdList, "uIdList", 9, 32);
         ArrayList<User> targetUser = userMapper.queryUserListByUId(uIdListForQuery);
         return targetUser;
     }
