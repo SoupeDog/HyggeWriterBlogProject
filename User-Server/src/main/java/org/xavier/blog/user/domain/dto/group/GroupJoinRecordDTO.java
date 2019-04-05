@@ -11,6 +11,10 @@ package org.xavier.blog.user.domain.dto.group;
  */
 public class GroupJoinRecordDTO {
     /**
+     * 自增 id
+     */
+    private Integer id;
+    /**
      * 群组唯一标识
      */
     private String gId;
@@ -22,6 +26,14 @@ public class GroupJoinRecordDTO {
      * 创建时间 utc 毫秒级时间戳
      */
     private Long ts;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getgId() {
         return gId;
