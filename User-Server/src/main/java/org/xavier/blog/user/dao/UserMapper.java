@@ -81,11 +81,4 @@ public interface UserMapper {
      */
     @MapKey("uId")
     HashMap<String, User> queryUserMapByUId(@Param("uIdList") ArrayList<String> uIdList);
-
-    /**
-     * 查询数据库主键最大自增值
-     */
-    Integer queryMaxId();
-
-
 }

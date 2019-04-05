@@ -3,9 +3,9 @@ package org.xavier.blog.user.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.user.dao.UserMapper;
-import org.xavier.blog.user.domain.bo.ErrorCode;
-import org.xavier.blog.user.domain.bo.UserValidateBO;
+import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.user.domain.dto.user.UserDTO;
+import org.xavier.blog.user.domain.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.enums.StringFormatMode;
@@ -60,7 +60,6 @@ public class UserServiceImpl extends DefaultService {
         user.setRegisterTs(serviceTs);
         user.setLastUpdateTs(serviceTs);
         user.init();
-
         Integer saveUser_affectedLine = userMapper.saveUser_Single(user);
         Boolean saveUser_Flag = saveUser_affectedLine == 1;
         if (!saveUser_Flag) {
@@ -85,8 +84,11 @@ public class UserServiceImpl extends DefaultService {
     /**
      * 根据 uId 批量逻辑删除用户
      */
-    public Boolean removeUserByUId_Logically_Multiple(String operatorUId, List<String> uIdList, Long serviceTs) throws Universal_403_X_Exception {
-        checkUserRight(operatorUId, null);
+    public Boolean removeUserByUId_Logically_Multiple(String operatorUId, List<String> uIdList, Long serviceTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
+        User currentOperator = queryUserByUId_WithExistValidate(operatorUId);
+        if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
+            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions");
+        }
         ArrayList<String> uIdListForQuery = listHelper.filterStringListNotEmpty(uIdList, "uIdList", 32, 32);
         Integer remove_AffectedLine = userMapper.removeUserByUId_Logically_Multiple(uIdListForQuery, serviceTs);
         Boolean removeResult = remove_AffectedLine == uIdList.size();
@@ -103,8 +105,13 @@ public class UserServiceImpl extends DefaultService {
      */
     public Boolean updateUser(String operatorUId, String uId, Map rowData, Long serviceTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
         propertiesHelper.stringNotNull(uId, 1, 10, "User(" + uId + ") was not found.");
-        User targetUser = queryUserByUId_WithExistValidate(uId);
-        checkUserRight(operatorUId, null);
+        // 当前操作、目标用户是否都存在
+        User currentOperator = queryUserByUId_WithExistValidate(operatorUId);
+        User targetUser = queryUserByUId_WithExistValidate(operatorUId);
+        // 当前操作权限是否足够
+        if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
+            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions");
+        }
         HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
         mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
         Integer update_AffectedLine = userMapper.updateByUId_CASByLastUpdateTs(uId, data, serviceTs);
@@ -113,18 +120,6 @@ public class UserServiceImpl extends DefaultService {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("update_AffectedLine", "1", update_AffectedLine, rowData));
         }
         return updateResult;
-    }
-
-    /**
-     * 根据 uId 查询单个用户
-     */
-    public UserValidateBO queryUserValidateBOByUId(String uId, String secretKey) {
-        UserValidateBO result = new UserValidateBO();
-        result.setSecretKey(secretKey);
-        User targetUser = this.queryUserByUId(uId);
-        result.setUser(targetUser);
-        //TODO 查询组信息
-        return result;
     }
 
     /**
@@ -142,7 +137,6 @@ public class UserServiceImpl extends DefaultService {
      */
     public ArrayList<User> queryUserListByUId(List<String> uIdList) {
         ArrayList<String> uIdListForQuery = listHelper.filterStringListNotEmpty(uIdList, "uIdList", 32, 32);
-        String uIdListStringVal = sqlHelper.listToSQLRange(ColumnType.STRING, 1, 10, uIdList);
         ArrayList<User> targetUser = userMapper.queryUserListByUId(uIdListForQuery);
         return targetUser;
     }
@@ -174,13 +168,4 @@ public class UserServiceImpl extends DefaultService {
         }
         return result;
     }
-
-    public void checkUserRight(String operatorUId, String targetUId) throws Universal_403_X_Exception {
-        if (!targetUId.equals(operatorUId)) {
-            if (!"U00000001".equals(operatorUId)) {
-                throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Permission denied.");
-            }
-        }
-    }
-
 }

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.user.dao.UserTokenMapper;
-import org.xavier.blog.user.domain.bo.ErrorCode;
+import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.user.domain.bo.UserLoginBO;
 import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
 import org.xavier.blog.user.domain.po.user.User;

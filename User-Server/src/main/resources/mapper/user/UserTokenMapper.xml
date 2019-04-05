@@ -37,14 +37,6 @@
         WHERE scope = #{scope} AND uId = #{uId} AND #{ts_CAS} &gt; lastUpdateTs
     </update>
 
-    <update id="updateUserTokenByUIdAndScope">
-        UPDATE `userToken`
-        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
-            ${key}=#{val}
-        </foreach>
-        WHERE scope=#{scope} AND uId=#{uId}
-    </update>
-
     <select id="queryUserByUIdAndScope" resultType="UserToken">
         SELECT
         <include refid="All_Column_List"/>

@@ -1,4 +1,4 @@
-package org.xavier.blog.user.extend;
+package org.xavier.blog.common;
 
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
@@ -97,6 +97,4 @@ public class HyggeWriterController extends DefaultController {
         result.setTs(System.currentTimeMillis());
         return builder.body(result);
     }
-
-
 }

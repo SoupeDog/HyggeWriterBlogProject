@@ -6,10 +6,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.xavier.blog.user.domain.bo.ErrorCode;
+import org.xavier.blog.common.HyggeWriterController;
+import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.user.domain.dto.user.UserDTO;
 import org.xavier.blog.user.domain.po.user.User;
-import org.xavier.blog.user.extend.HyggeWriterController;
 import org.xavier.blog.user.service.UserServiceImpl;
 import org.xavier.common.exception.PropertiesException_Runtime;
 import org.xavier.common.exception.Universal_403_X_Exception;
@@ -35,14 +35,8 @@ public class UserController extends HyggeWriterController {
     @Autowired
     UserServiceImpl userService;
 
-
-    @GetMapping("/extra")
-    public ResponseEntity<?> saveUser(@RequestHeader HttpHeaders httpHeaders) {
-        return success(jsonHelper.format(httpHeaders));
-    }
-
     @EnableControllerLog
-    @PostMapping(value = "/extra/user")
+    @PostMapping(value = "/main/user")
     public ResponseEntity<?> saveUser(@RequestBody User user) {
         try {
             userService.saveUser(user, System.currentTimeMillis());
@@ -66,6 +60,8 @@ public class UserController extends HyggeWriterController {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (Universal_403_X_Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
+        } catch (Universal_404_X_Exception e) {
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         } catch (Universal_409_X_Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
@@ -90,7 +86,6 @@ public class UserController extends HyggeWriterController {
         } catch (Universal_409_X_Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
-
     }
 
     @EnableControllerLog

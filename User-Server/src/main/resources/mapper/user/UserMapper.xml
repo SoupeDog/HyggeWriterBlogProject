@@ -78,9 +78,4 @@
             #{item}
         </foreach>
     </select>
-
-    <select id="queryMaxId" resultType="integer">
-        SELECT MAX(id)
-        FROM `user`
-    </select>
 </mapper>
