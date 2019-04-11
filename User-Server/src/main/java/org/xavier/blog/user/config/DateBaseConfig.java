@@ -40,7 +40,6 @@ public class DateBaseConfig {
 
     @Bean(name = "mySQLDataSource")
     public DataSource mySQLDataSource() {
-
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://" + dbProperties.getHost() + "/" + dbProperties.getDbName() + "?serverTimezone=UTC&useSSL=false&allowMultiQueries=true");
@@ -54,7 +53,8 @@ public class DateBaseConfig {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(mySQLDataSource);
         VFS.addImplClass(SpringBootVFS.class);
-        String typeAliasesPackage = "org.xavier.blog.user.domain.po.user";
+        String typeAliasesPackage = "org.xavier.blog.user.domain.po.user;"
+                + "org.xavier.blog.user.domain.po.group";
         // 扫描Mybatis所用到的返回entity类型
         bean.setTypeAliasesPackage(typeAliasesPackage);
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
