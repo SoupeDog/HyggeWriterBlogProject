@@ -1,5 +1,8 @@
 package org.xavier.blog.user.domain.po.group;
 
+import org.xavier.common.utils.PropertiesHelper;
+import org.xavier.common.utils.UtilsCreator;
+
 /**
  * 描述信息：<br/>
  * 群组加入记录
@@ -81,5 +84,11 @@ public class GroupJoinRecord {
 
     public void setTs(Long ts) {
         this.ts = ts;
+    }
+
+    public void validate() {
+        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        propertiesHelper.stringNotNull(uId, 9, 32, "Length of [uId] should within 9~32");
+        propertiesHelper.stringNotNull(gId, 32, 32, "Length of [gId] should be 32");
     }
 }

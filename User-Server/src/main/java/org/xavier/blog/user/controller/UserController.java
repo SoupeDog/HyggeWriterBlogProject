@@ -15,6 +15,7 @@ import org.xavier.common.exception.PropertiesException_Runtime;
 import org.xavier.common.exception.Universal_403_X_Exception;
 import org.xavier.common.exception.Universal_404_X_Exception;
 import org.xavier.common.exception.Universal_409_X_Exception;
+import org.xavier.common.utils.UtilsCreator;
 import org.xavier.web.annotation.EnableControllerLog;
 
 import java.util.ArrayList;
@@ -52,7 +53,8 @@ public class UserController extends HyggeWriterController {
     @DeleteMapping(value = "/main/user/{uIds}")
     public ResponseEntity<?> removeUserMultiple(@RequestHeader HttpHeaders headers, @PathVariable("uIds") ArrayList<String> uIdList) {
         try {
-            if (!userService.removeUserByUId_Logically_Multiple(headers.getFirst("uId"), uIdList, System.currentTimeMillis())) {
+            Long currentTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
+            if (!userService.removeUserByUId_Logically_Multiple(headers.getFirst("uId"), uIdList, currentTs)) {
                 throw new Universal_409_X_Exception(ErrorCode.USER_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
             }
             return success();
@@ -60,8 +62,6 @@ public class UserController extends HyggeWriterController {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (Universal_403_X_Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
-            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         } catch (Universal_409_X_Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }

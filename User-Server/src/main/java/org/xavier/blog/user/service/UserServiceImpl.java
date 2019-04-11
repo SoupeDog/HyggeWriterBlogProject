@@ -84,10 +84,10 @@ public class UserServiceImpl extends DefaultService {
     /**
      * 根据 uId 批量逻辑删除用户
      */
-    public Boolean removeUserByUId_Logically_Multiple(String operatorUId, List<String> uIdList, Long serviceTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
-        User currentOperator = queryUserByUId_WithExistValidate(operatorUId);
-        if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
-            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions");
+    public Boolean removeUserByUId_Logically_Multiple(String operatorUId, List<String> uIdList, Long serviceTs) throws Universal_403_X_Exception {
+        User currentOperator = queryUserByUId(operatorUId);
+        if (currentOperator == null || !currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
+            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
         }
         ArrayList<String> uIdListForQuery = listHelper.filterStringListNotEmpty(uIdList, "uIdList", 32, 32);
         Integer remove_AffectedLine = userMapper.removeUserByUId_Logically_Multiple(uIdListForQuery, serviceTs);
