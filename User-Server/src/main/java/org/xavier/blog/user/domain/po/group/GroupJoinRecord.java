@@ -46,27 +46,27 @@ public class GroupJoinRecord {
         this.id = id;
     }
 
-    public String getGId() {
+    public String getgId() {
         return gId;
     }
 
-    public void setGId(String gId) {
+    public void setgId(String gId) {
         this.gId = gId;
     }
 
-    public String getUId() {
+    public String getuId() {
         return uId;
     }
 
-    public void setUId(String uId) {
+    public void setuId(String uId) {
         this.uId = uId;
     }
 
-    public Boolean getActive() {
+    public Boolean getisActive() {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
+    public void setisActive(Boolean active) {
         isActive = active;
     }
 
@@ -88,7 +88,7 @@ public class GroupJoinRecord {
 
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
-        propertiesHelper.stringNotNull(uId, 9, 32, "Length of [uId] should within 9~32");
+        propertiesHelper.stringNotNull(uId, 9, 10, "Length of [uId] should within 9~10");
         propertiesHelper.stringNotNull(gId, 32, 32, "Length of [gId] should be 32");
     }
 }

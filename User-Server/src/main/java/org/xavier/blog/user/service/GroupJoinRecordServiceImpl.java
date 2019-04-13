@@ -30,7 +30,7 @@ public class GroupJoinRecordServiceImpl extends DefaultService {
     UserServiceImpl userService;
 
     public Boolean saveGroupJoinRecord(GroupJoinRecord groupJoinRecord) {
-        groupJoinRecord.setActive(false);
+        groupJoinRecord.setisActive(false);
         Long currentTs = System.currentTimeMillis();
         groupJoinRecord.setLastUpdateTs(currentTs);
         groupJoinRecord.setTs(currentTs);
@@ -42,19 +42,21 @@ public class GroupJoinRecordServiceImpl extends DefaultService {
         return saveGroupJoinRecord_Flag;
     }
 
-    public Boolean removeGroupJoinRecord(String operatorUId, String gId, String targetUId, Long currentTs) throws Universal_403_X_Exception {
-        User currentOperator = userService.queryUserByUId(operatorUId);
-        if (currentOperator == null || !currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
-            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+    public Boolean removeGroupJoinRecord(String operatorUId, String gId, String targetUId, Long upTs) throws Universal_403_X_Exception {
+        if (!operatorUId.equals(targetUId)) {
+            User currentOperator = userService.queryUserByUId(operatorUId);
+            if (currentOperator == null || !currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
+                throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+            }
         }
-        Integer remove_AffectedLine = groupJoinRecordMapper.removeGroupJoinRecordByUIdAndGId(targetUId, gId, currentTs);
+        Integer remove_AffectedLine = groupJoinRecordMapper.removeGroupJoinRecordByUIdAndGId(targetUId, gId, upTs);
         Boolean removeResult = remove_AffectedLine == 1;
         if (!removeResult) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("remove_AffectedLine", remove_AffectedLine.toString(), remove_AffectedLine, new LinkedHashMap<String, Object>() {{
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("remove_AffectedLine", String.valueOf(1), remove_AffectedLine, new LinkedHashMap<String, Object>() {{
                 put("operatorUId", operatorUId);
                 put("gId", gId);
                 put("targetUId", targetUId);
-                put("currentTs", currentTs);
+                put("currentTs", upTs);
             }}));
         }
         return removeResult;

@@ -32,15 +32,17 @@ public class GroupJoinRecordController extends HyggeWriterController {
 
     @EnableControllerLog
     @PostMapping(value = "/main/group/record")
-    public ResponseEntity<?> addGroupJoinRecord(@RequestBody GroupJoinRecord groupJoinRecord) {
+    public ResponseEntity<?> addGroupJoinRecord(@RequestHeader HttpHeaders headers,@RequestBody GroupJoinRecord groupJoinRecord) {
         try {
+            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
+            groupJoinRecord.setuId(operatorUId);
             groupJoinRecord.validate();
             groupJoinRecordService.saveGroupJoinRecord(groupJoinRecord);
             return success();
         } catch (PropertiesException_Runtime e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
-            return fail(HttpStatus.CONFLICT, ErrorCode.GROUPJOINRECORD_EXISTS.getErrorCod(), "GroupJoinRecord(" + groupJoinRecord.getGId() + "-" + groupJoinRecord.getUId() + ") dose exist,or it is still under review.");
+            return fail(HttpStatus.CONFLICT, ErrorCode.GROUPJOINRECORD_EXISTS.getErrorCod(), "GroupJoinRecord(" + groupJoinRecord.getgId() + "-" + groupJoinRecord.getuId() + ") dose exist,or it is still under review.");
         }
     }
 
@@ -48,21 +50,22 @@ public class GroupJoinRecordController extends HyggeWriterController {
     @DeleteMapping(value = "/main/group/record")
     public ResponseEntity<?> removeGroupJoinRecord(@RequestHeader HttpHeaders headers, @RequestBody GroupJoinRecord groupJoinRecord) {
         try {
-            Long currentTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
+            Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
+            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
             groupJoinRecord.validate();
-            groupJoinRecordService.removeGroupJoinRecord(headers.getFirst("uId"), groupJoinRecord.getGId(), groupJoinRecord.getUId(), currentTs);
+            groupJoinRecordService.removeGroupJoinRecord(operatorUId, groupJoinRecord.getgId(), groupJoinRecord.getuId(), upTs);
             return success();
         } catch (PropertiesException_Runtime e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
-            return fail(HttpStatus.CONFLICT, ErrorCode.GROUPJOINRECORD_EXISTS.getErrorCod(), "GroupJoinRecord(" + groupJoinRecord.getGId() + "-" + groupJoinRecord.getUId() + ") dose exist,or it is still under review.");
+            return fail(HttpStatus.CONFLICT, ErrorCode.GROUPJOINRECORD_EXISTS.getErrorCod(), "GroupJoinRecord(" + groupJoinRecord.getgId() + "-" + groupJoinRecord.getuId() + ") dose exist,or it is still under review.");
         } catch (Universal_403_X_Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
 
     @EnableControllerLog
-    @PostMapping(value = "/main/group/validate")
+    @PostMapping(value = "/extra/group/validate")
     public ResponseEntity<?> groupValidate(@RequestBody GroupValidateBO groupValidateBO) {
         try {
             groupValidateBO.validate();

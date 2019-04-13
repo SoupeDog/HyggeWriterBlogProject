@@ -1,5 +1,8 @@
 package org.xavier.blog.user.domain.po.group;
 
+import org.xavier.common.utils.PropertiesHelper;
+import org.xavier.common.utils.UtilsCreator;
+
 /**
  * 描述信息：<br/>
  * 群组
@@ -30,6 +33,12 @@ public class Group {
      * 创建时间 utc 毫秒级时间戳
      */
     private Long ts;
+
+    public void validate(){
+       PropertiesHelper propertiesHelper= UtilsCreator.getInstance_DefaultPropertiesHelper();
+       propertiesHelper.stringNotNull(groupOwner,9,10,"[groupOwner] can't be null,and its length should within 9~10.");
+       propertiesHelper.stringNotNull(groupName, 1, 32, "[uName] can't be null,and its length should within 32.");
+    }
 
     public String getgId() {
         return gId;

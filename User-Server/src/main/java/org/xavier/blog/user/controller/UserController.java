@@ -80,7 +80,7 @@ public class UserController extends HyggeWriterController {
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.USER_EXISTS.getErrorCod(), "Name of User should be unique.");
         } catch (Universal_404_X_Exception e) {
-            return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         } catch (Universal_403_X_Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         } catch (Universal_409_X_Exception e) {

@@ -26,7 +26,7 @@ public interface GroupMapper {
      * @param group 目标组
      * @return 受影响行
      */
-    Integer saveGroup_Single(@Param("group") Group group);
+    Integer saveGroup_Single(@Param("Group") Group group);
 
     /**
      * 根据 gId List 批量删除组

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.user.dao.GroupMapper">
+
+    <sql id="Base_Column_List">
+        gId,groupOwner,groupName,lastUpdateTs,ts
+    </sql>
+
+    <!--<sql id="All_Column_List">-->
+    <!--</sql>-->
+
+    <insert id="saveGroup_Single" parameterType="Group">
+        INSERT INTO `group`(<include refid="Base_Column_List"/>)VALUES (
+        #{Group.gId},
+        #{Group.groupOwner},
+        #{Group.groupName},
+        #{Group.lastUpdateTs},
+        #{Group.ts}
+        )
+    </insert>
+
+    <delete id="removeGroupByGId_Multiple">
+        DELETE FROM `group`
+        WHERE lastUpdateTs &lt; #{lastUpdateTs}
+        AND gId IN
+        <foreach collection="gIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="updateByGId_CASByLastUpdateTs">
+        UPDATE `group`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE lastUpdateTs &lt; #{lastUpdateTs_CAS} AND gId=#{gId}
+    </update>
+
+    <select id="queryGroupByGId" resultType="Group">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `group` WHERE  gId=#{gId} LIMIT 1
+    </select>
+
+    <select id="queryGroupListByGId" resultType="Group">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `group` WHERE gId IN
+        <foreach collection="gIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryGroupMapByGId" resultType="Group">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `group` WHERE gId IN
+        <foreach collection="gIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

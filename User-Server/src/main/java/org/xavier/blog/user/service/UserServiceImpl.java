@@ -84,13 +84,13 @@ public class UserServiceImpl extends DefaultService {
     /**
      * 根据 uId 批量逻辑删除用户
      */
-    public Boolean removeUserByUId_Logically_Multiple(String operatorUId, List<String> uIdList, Long serviceTs) throws Universal_403_X_Exception {
+    public Boolean removeUserByUId_Logically_Multiple(String operatorUId, List<String> uIdList, Long upTs) throws Universal_403_X_Exception {
         User currentOperator = queryUserByUId(operatorUId);
         if (currentOperator == null || !currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
             throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
         }
         ArrayList<String> uIdListForQuery = listHelper.filterStringListNotEmpty(uIdList, "uIdList", 32, 32);
-        Integer remove_AffectedLine = userMapper.removeUserByUId_Logically_Multiple(uIdListForQuery, serviceTs);
+        Integer remove_AffectedLine = userMapper.removeUserByUId_Logically_Multiple(uIdListForQuery, upTs);
         Boolean removeResult = remove_AffectedLine == uIdList.size();
         if (!removeResult) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("remove_AffectedLine", propertiesHelper.string(uIdList.size()), remove_AffectedLine, uIdList));
@@ -103,7 +103,7 @@ public class UserServiceImpl extends DefaultService {
      *
      * @throws Universal_400_X_Exception 有效更改参数为空
      */
-    public Boolean updateUser(String operatorUId, String uId, Map rowData, Long serviceTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
+    public Boolean updateUser(String operatorUId, String uId, Map rowData, Long upTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
         propertiesHelper.stringNotNull(uId, 1, 10, "User(" + uId + ") was not found.");
         // 当前操作、目标用户是否都存在
         User currentOperator = queryUserByUId_WithExistValidate(operatorUId);
@@ -114,7 +114,7 @@ public class UserServiceImpl extends DefaultService {
         }
         HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
         mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
-        Integer update_AffectedLine = userMapper.updateByUId_CASByLastUpdateTs(uId, data, serviceTs);
+        Integer update_AffectedLine = userMapper.updateByUId_CASByLastUpdateTs(uId, data, upTs);
         Boolean updateResult = update_AffectedLine == 1;
         if (!updateResult) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("update_AffectedLine", "1", update_AffectedLine, rowData));
