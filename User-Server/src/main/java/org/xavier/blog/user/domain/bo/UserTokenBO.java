@@ -40,7 +40,7 @@ public class UserTokenBO {
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
-        propertiesHelper.stringNotNull(token, 32, 32, "[token] can't be null,and its length should be 32.");
+        propertiesHelper.stringNotNull(token, "[token] can't be null or empty.");
     }
 
     public UserTokenScopeEnum calculateScope() throws Universal_400_X_Exception {

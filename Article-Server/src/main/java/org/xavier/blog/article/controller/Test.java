@@ -2,6 +2,7 @@ package org.xavier.blog.article.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.xavier.common.utils.HttpHelpper;
 
 import java.util.HashMap;
 
@@ -15,8 +16,7 @@ import java.util.HashMap;
  */
 @RestController
 public class Test {
-
-    @GetMapping("/test")
+    @GetMapping("/main")
     public Object test() {
         return new HashMap() {{
             put("name", "张三");
