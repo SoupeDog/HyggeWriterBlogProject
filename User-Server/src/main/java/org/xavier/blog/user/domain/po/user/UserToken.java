@@ -60,12 +60,12 @@ public class UserToken {
         this.uId = uId;
         this.token = UtilsCreator.getInstance_DefaultRandomHelper().getUUID();
         this.deadLine = currentTs + 7200000L;
-        this.lastToken="";
-        this.lastDeadLine=0L;
+        this.lastToken = "";
+        this.lastDeadLine = 0L;
         this.scope = scope;
         this.ts = currentTs;
         this.lastUpdateTs = currentTs;
-        this.refreshKey=UtilsCreator.getInstance_DefaultRandomHelper().getUUID();
+        this.refreshKey = UtilsCreator.getInstance_DefaultRandomHelper().getUUID();
     }
 
     public void refresh(Long currentTs) {

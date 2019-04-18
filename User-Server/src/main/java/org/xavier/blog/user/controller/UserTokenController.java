@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.user.domain.bo.UserLoginBO;
+import org.xavier.blog.user.domain.bo.UserTokenBO;
 import org.xavier.blog.user.domain.dto.user.UserTokenDTO;
 import org.xavier.blog.user.service.UserTokenServiceImpl;
 import org.xavier.common.exception.*;
@@ -46,6 +47,26 @@ public class UserTokenController extends HyggeWriterController {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         } catch (Universal_409_X_Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
+        }
+    }
+
+    @EnableControllerLog
+    @PostMapping("/extra/token/validate")
+    public ResponseEntity<?> validateToken(@RequestBody UserTokenBO userTokenBO) {
+        try {
+            userTokenBO.validate();
+            userTokenService.validateUserToken(userTokenBO.getuId(), userTokenBO.getToken(), userTokenBO.calculateScope());
+            return success(true);
+        } catch (Universal_403_X_Exception e) {
+            // token 错误或过期
+            return success(false);
+        } catch (Universal_404_X_Exception e) {
+            // 目标用户 token 不存在
+            return success(false);
+        } catch (PropertiesException_Runtime e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        } catch (Universal_400_X_Exception e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         }
     }
 
