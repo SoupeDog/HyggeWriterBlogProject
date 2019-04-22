@@ -5,6 +5,7 @@ import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
 import org.xavier.blog.user.service.UserTokenServiceImpl;
 import org.xavier.common.exception.base.RequestException;
 import org.xavier.common.exception.base.RequestException_Runtime;
+import org.xavier.common.exception.base.ServiceException_Runtime;
 import org.xavier.common.utils.PropertiesHelper;
 import org.xavier.common.utils.UtilsCreator;
 
@@ -54,6 +55,8 @@ public class LoginFilter extends OncePerRequestFilter {
             }
         } catch (RequestException_Runtime e) {
             onError(response, e);
+        } catch (ServiceException_Runtime e) {
+            onError(response, e);
         } catch (ServletException e) {
             onError(response, e);
         } catch (IOException e) {
@@ -64,6 +67,10 @@ public class LoginFilter extends OncePerRequestFilter {
     }
 
     private void onError(HttpServletResponse response, RequestException_Runtime e) {
+        initResponse(response, e.getStateCode(), e.getMessage());
+    }
+
+    private void onError(HttpServletResponse response, ServiceException_Runtime e) {
         initResponse(response, e.getStateCode(), e.getMessage());
     }
 

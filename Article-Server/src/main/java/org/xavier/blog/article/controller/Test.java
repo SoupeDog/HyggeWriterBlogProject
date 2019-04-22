@@ -2,7 +2,7 @@ package org.xavier.blog.article.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.xavier.common.utils.HttpHelpper;
+import org.xavier.blog.common.HyggeWriterController;
 
 import java.util.HashMap;
 
@@ -15,7 +15,7 @@ import java.util.HashMap;
  * @since Jdk 1.8
  */
 @RestController
-public class Test {
+public class Test extends HyggeWriterController {
     @GetMapping("/main")
     public Object test() {
         return new HashMap() {{

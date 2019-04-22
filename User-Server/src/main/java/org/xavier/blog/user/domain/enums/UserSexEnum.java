@@ -10,7 +10,7 @@ package org.xavier.blog.user.domain.enums;
  * @since Jdk 1.8
  */
 public enum UserSexEnum {
-    SECRET((byte) 0, "秘"),
+    SECRET((byte) 3, "秘"),
     MALE((byte) 1, "男"),
     FEMALE((byte) 2, "女");
     private Byte index;
