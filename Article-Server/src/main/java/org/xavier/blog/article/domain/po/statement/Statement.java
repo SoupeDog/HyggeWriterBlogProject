@@ -46,7 +46,7 @@ public class Statement {
      */
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
-        propertiesHelper.stringNotNull(uId, 1, 10, "[uId] can't be null,and its length should within 10.");
+        propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
         propertiesHelper.stringNotNull(content, "[content] can't be null,and its length should within 1000.");
     }
 

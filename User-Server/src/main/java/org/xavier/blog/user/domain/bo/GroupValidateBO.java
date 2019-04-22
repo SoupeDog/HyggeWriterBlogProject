@@ -41,7 +41,7 @@ public class GroupValidateBO {
 
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
-        propertiesHelper.stringNotNull(uId, 9, 32, "Length of [uId] should within 9~32");
+        propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
         propertiesHelper.stringNotNull(gId, 32, 32, "Length of [gId] should be 32");
     }
 }
