@@ -2,7 +2,7 @@ package org.xavier.blog.article.filter;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.xavier.blog.article.service.UserTokenServiceImpl;
-import org.xavier.blog.article.domain.UserTokenScopeEnum;
+import org.xavier.blog.article.domain.enums.UserTokenScopeEnum;
 import org.xavier.common.exception.base.RequestException;
 import org.xavier.common.exception.base.RequestException_Runtime;
 import org.xavier.common.utils.PropertiesHelper;
@@ -86,13 +86,7 @@ public class LoginFilter extends OncePerRequestFilter {
         PrintWriter out = null;
         try {
             out = response.getWriter();
-            out.append("{\n" +
-                    "    \"type\": 2,\n" +
-                    "    \"code\": " + stateCode + ",\n" +
-                    "    \"msg\": \"" + message + "\",\n" +
-                    "    \"data\": null,\n" +
-                    "    \"ts\": " + System.currentTimeMillis() + "\n" +
-                    "}");
+            out.append(String.format("{\n    \"type\": 2,\n    \"code\": %s,\n    \"msg\": \"%s\",\n    \"data\": null,\n    \"ts\": %d\n}", stateCode, message, System.currentTimeMillis()));
         } catch (IOException e2) {
             e2.printStackTrace();
         } finally {

@@ -3,7 +3,7 @@ package org.xavier.blog.article.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.xavier.blog.article.domain.UserTokenScopeEnum;
+import org.xavier.blog.article.domain.enums.UserTokenScopeEnum;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.common.exception.Universal_403_X_Exception;
 import org.xavier.common.exception.Universal_500_X_Exception_Runtime;

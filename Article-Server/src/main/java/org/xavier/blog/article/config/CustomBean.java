@@ -12,7 +12,6 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.xavier.common.utils.BaseHttpHelper;
 import org.xavier.common.utils.HttpHelpper;
-import org.xavier.common.utils.UtilsCreator;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
