@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.xavier.blog.article.filter.LoginFilter;
-import org.xavier.blog.article.service.UserTokenServiceImpl;
+import org.xavier.blog.article.service.remote.UserTokenServiceImpl;
 
 /**
  * 描述信息：<br/>

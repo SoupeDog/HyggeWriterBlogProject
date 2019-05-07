@@ -28,8 +28,6 @@ import org.xavier.web.annotation.EnableControllerLog;
 public class UserTokenController extends HyggeWriterController {
     @Autowired
     UserTokenServiceImpl userTokenService;
-    @Autowired
-    LoadBalancerClient loadBalancerClient;
 
     @EnableControllerLog
     @PostMapping("/extra/token/login")

@@ -18,7 +18,6 @@ public enum ArticleAccessPermitEnum {
     CRON((byte) 5, "周期性可见"),
     PUBLIC((byte) 6, "公开可见");
 
-
     private Byte index;
     private String description;
 

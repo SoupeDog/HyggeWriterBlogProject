@@ -33,6 +33,10 @@ public class Statement {
      */
     private Boolean legal_Flag;
     /**
+     * 额外配置参数
+     */
+    private String properties;
+    /**
      * 最后修改时间 utc 毫秒级时间戳
      */
     private Long lastUpdateTs;
@@ -80,6 +84,14 @@ public class Statement {
 
     public void setLegal_Flag(Boolean legal_Flag) {
         this.legal_Flag = legal_Flag;
+    }
+
+    public String getProperties() {
+        return properties;
+    }
+
+    public void setProperties(String properties) {
+        this.properties = properties;
     }
 
     public Long getLastUpdateTs() {
