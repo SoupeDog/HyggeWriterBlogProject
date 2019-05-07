@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.xavier.common.exception.Universal_404_X_Exception;
 import org.xavier.common.utils.UtilsCreator;
 
 import static org.junit.Assert.*;
@@ -25,7 +26,7 @@ public class UserServiceImplTest {
 
 
     @Test
-    public void queryUserByUId() {
-        System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(userService.queryUserByUId("U00000001")));
+    public void queryUserByUId() throws Universal_404_X_Exception {
+        System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(userService.queryUserByUId_WithExistValidate("U00000004")));
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.article.domain.dto.UserDTO;
 import org.xavier.blog.common.ErrorCode;
+import org.xavier.common.exception.Universal_404_X_Exception;
 import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
 import org.xavier.common.logging.HyggeLogger;
 import org.xavier.common.utils.HttpHelperResponse;
@@ -29,19 +30,26 @@ public class UserServiceImpl extends DefaultRemoteService {
     @Autowired
     HyggeLogger logger;
 
-
-    private static final TypeReference RESPONSE_TYPEREFERENCE_USER = new TypeReference<GatewayResponse<ArrayList<UserDTO>>>() {
+    private static final TypeReference RESPONSE_TYPEREFERENCE_USER_LIST = new TypeReference<GatewayResponse<ArrayList<UserDTO>>>() {
     };
 
     public UserDTO queryUserByUId(String uId) {
-        HttpHelperResponse<GatewayResponse<ArrayList<UserDTO>>> response = httpHelpper.get(getUserServicePrefix() + "/main/user/" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_USER);
+        HttpHelperResponse<GatewayResponse<ArrayList<UserDTO>>> response = httpHelpper.get(getUserServicePrefix() + "/main/user/" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_USER_LIST);
         if (response.isFail()) {
             throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[queryUserByUId].", response.getData().getMsg());
         }
-        if (response.getData().getData().size() < 0) {
+        if (response.getData().getData().size() < 1) {
             return null;
         } else {
             return response.getData().getData().get(0);
         }
+    }
+
+    public UserDTO queryUserByUId_WithExistValidate(String uId) throws Universal_404_X_Exception {
+        UserDTO result = queryUserByUId(uId);
+        if (result == null) {
+            throw new Universal_404_X_Exception(ErrorCode.USER_NOTFOUND.getErrorCod(), "User(" + uId + ") was not found.");
+        }
+        return result;
     }
 }
