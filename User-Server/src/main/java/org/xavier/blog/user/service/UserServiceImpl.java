@@ -16,10 +16,7 @@ import org.xavier.common.logging.HyggeLoggerMsgBuilder;
 import org.xavier.common.utils.bo.ColumnInfo;
 import org.xavier.web.extend.DefaultService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -36,21 +33,17 @@ public class UserServiceImpl extends DefaultService {
     @Autowired
     UserMapper userMapper;
 
-    private static final List<ColumnInfo> checkInfo;
-
-    static {
-        checkInfo = new ArrayList<ColumnInfo>() {{
-            add(new ColumnInfo(ColumnType.STRING, "uName", "uName", false, 0, 20));
-            add(new ColumnInfo(ColumnType.STRING, "pw", "pw", false, 6, 20));
-            add(new ColumnInfo(ColumnType.STRING, "headIcon", "headIcon", false, 0, 30));
-            add(new ColumnInfo(ColumnType.LONG, "birthday", "birthday", true, 0, Long.MAX_VALUE));
-            add(new ColumnInfo(ColumnType.STRING, "phone", "phone", true, 0, 15));
-            add(new ColumnInfo(ColumnType.STRING, "email", "email", false, 0, 50));
-            add(new ColumnInfo(ColumnType.STRING, "biography", "biography", true, 0, 200));
-            add(new ColumnInfo(ColumnType.INTEGER, "exp", "exp", false, 0, Integer.MAX_VALUE));
-            add(new ColumnInfo(ColumnType.STRING, "properties", "properties", true, 0, 1000));
-        }};
-    }
+    private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
+        add(new ColumnInfo(ColumnType.STRING, "uName", "uName", false, 0, 20));
+        add(new ColumnInfo(ColumnType.STRING, "pw", "pw", false, 6, 20));
+        add(new ColumnInfo(ColumnType.STRING, "headIcon", "headIcon", false, 0, 30));
+        add(new ColumnInfo(ColumnType.LONG, "birthday", "birthday", true, 0, Long.MAX_VALUE));
+        add(new ColumnInfo(ColumnType.STRING, "phone", "phone", true, 0, 15));
+        add(new ColumnInfo(ColumnType.STRING, "email", "email", false, 0, 50));
+        add(new ColumnInfo(ColumnType.STRING, "biography", "biography", true, 0, 200));
+        add(new ColumnInfo(ColumnType.INTEGER, "exp", "exp", false, 0, Integer.MAX_VALUE));
+        add(new ColumnInfo(ColumnType.STRING, "properties", "properties", true, 0, 1000));
+    }};
 
     /**
      * 添加用户
@@ -106,7 +99,7 @@ public class UserServiceImpl extends DefaultService {
     public Boolean updateUser(String operatorUId, String uId, Map rowData, Long upTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
         // 如果是修改自己的数据直接执行
-        if(!operatorUId.equals(uId)){
+        if (!operatorUId.equals(uId)) {
             User currentOperator = queryUserByUId_WithExistValidate(operatorUId);
             // 如果是超级管理员，则也执行
             if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
@@ -122,7 +115,12 @@ public class UserServiceImpl extends DefaultService {
         Integer update_AffectedLine = userMapper.updateByUId_CASByLastUpdateTs(uId, data, upTs);
         Boolean updateResult = update_AffectedLine == 1;
         if (!updateResult) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("update_AffectedLine", "1", update_AffectedLine, rowData));
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("update_AffectedLine", "1", update_AffectedLine, new LinkedHashMap<String, Object>() {{
+                put("operatorUId", operatorUId);
+                put("uId", uId);
+                put("data", data);
+                put("currentTs", upTs);
+            }}));
         }
         return updateResult;
     }

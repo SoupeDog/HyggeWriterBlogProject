@@ -32,19 +32,15 @@ public class GroupServiceImpl extends DefaultService {
     @Autowired
     UserServiceImpl userService;
 
-    private static final List<ColumnInfo> checkInfo;
+    private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
+        add(new ColumnInfo(ColumnType.STRING, "groupOwner", "groupOwner", false, 9, 10));
+        add(new ColumnInfo(ColumnType.STRING, "groupName", "groupName", false, 1, 32));
+    }};
 
-    static {
-        checkInfo = new ArrayList<ColumnInfo>() {{
-            add(new ColumnInfo(ColumnType.STRING, "gId", "gId", false, 32, 32));
-            add(new ColumnInfo(ColumnType.STRING, "groupOwner", "groupOwner", false, 9, 10));
-            add(new ColumnInfo(ColumnType.STRING, "groupName", "groupName", false, 1, 32));
-        }};
-    }
-
-    public Boolean saveGroup(Group group) {
-        group.setgId(UtilsCreator.getInstance_DefaultRandomHelper().getUUID());
+    public Boolean saveGroup(String operatorUId, Group group) {
         Long currentTs = System.currentTimeMillis();
+        group.setgId(UtilsCreator.getInstance_DefaultRandomHelper().getUUID());
+        group.setGroupOwner(operatorUId);
         group.setLastUpdateTs(currentTs);
         group.setTs(currentTs);
         Integer saveGroup_affectedLine = groupMapper.saveGroup_Single(group);
@@ -57,7 +53,6 @@ public class GroupServiceImpl extends DefaultService {
 
     public Boolean removeGroup(String operatorUId, String gId, Long upTs) throws Universal_403_X_Exception, Universal_404_X_Exception {
         propertiesHelper.stringNotNull(gId, 32, 32, "[gId] can't be null,and its length should be 32.");
-        propertiesHelper.stringNotNull(operatorUId, 9, 10, "[uId] can't be null,and its length should within 9~10.");
         checkRight(operatorUId, gId);
         Integer removeGroup_affectedLine = groupMapper.removeGroupByGId_Multiple(listHelper.createSingleList(gId), upTs);
         Boolean removeGroup_Flag = removeGroup_affectedLine == 1;
@@ -73,7 +68,6 @@ public class GroupServiceImpl extends DefaultService {
 
     public Boolean updateGroup(String operatorUId, String gId, Map rowData, Long upTs) throws Universal_403_X_Exception, Universal_404_X_Exception {
         propertiesHelper.stringNotNull(gId, 32, 32, "[gId] can't be null,and its length should be 32.");
-        propertiesHelper.stringNotNull(operatorUId, 9, 10, "[uId] can't be null,and its length should within 9~10.");
         checkRight(operatorUId, gId);
         HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
         if (data.containsKey("groupOwner")) {
@@ -86,6 +80,7 @@ public class GroupServiceImpl extends DefaultService {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("updateGroup_affectedLine", "1", updateGroup_affectedLine, new LinkedHashMap() {{
                 put("operatorUId", operatorUId);
                 put("gId", gId);
+                put("data", data);
                 put("upTs", upTs);
             }}));
         }
@@ -108,7 +103,9 @@ public class GroupServiceImpl extends DefaultService {
             throw new Universal_404_X_Exception(ErrorCode.GROUP_NOTFOUND.getErrorCod(), "Group(" + gId + ") was not found.");
         }
         User currentOperator = userService.queryUserByUId(operatorUId);
-        if (currentOperator != null) {
+        if (currentOperator == null) {
+            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+        } else {
             if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT) && !group.getGroupOwner().equals(operatorUId)) {
                 throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
             }

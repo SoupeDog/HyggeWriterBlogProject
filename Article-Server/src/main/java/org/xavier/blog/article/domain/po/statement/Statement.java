@@ -29,10 +29,6 @@ public class Statement {
      */
     private String content;
     /**
-     * 版权声明合法性标识 null:待审核 true:合法 false:非法
-     */
-    private Boolean legal_Flag;
-    /**
      * 额外配置参数
      */
     private String properties;
@@ -51,7 +47,7 @@ public class Statement {
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
-        propertiesHelper.stringNotNull(content, "[content] can't be null,and its length should within 1000.");
+        propertiesHelper.stringNotNull(content, 1, 1000, "[content] can't be null,and its length should within 1000.");
     }
 
     public String getStatementId() {
@@ -76,14 +72,6 @@ public class Statement {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Boolean getLegal_Flag() {
-        return legal_Flag;
-    }
-
-    public void setLegal_Flag(Boolean legal_Flag) {
-        this.legal_Flag = legal_Flag;
     }
 
     public String getProperties() {

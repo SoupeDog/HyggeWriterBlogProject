@@ -36,11 +36,10 @@ public class GroupController extends HyggeWriterController {
 
     @EnableControllerLog
     @PostMapping(value = "/main/group")
-    public ResponseEntity<?> saveUser(@RequestHeader HttpHeaders headers,@RequestBody Group group) {
+    public ResponseEntity<?> saveUser(@RequestHeader HttpHeaders headers, @RequestBody Group group) {
         try {
             String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
-            group.setGroupOwner(operatorUId);
-            groupService.saveGroup(group);
+            groupService.saveGroup(operatorUId, group);
             return success(group);
         } catch (PropertiesException_Runtime e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

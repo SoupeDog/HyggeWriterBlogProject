@@ -1,5 +1,7 @@
 package org.xavier.blog.article.domain.dto;
 
+import org.xavier.blog.article.domain.enums.UserTypeEnum;
+
 /**
  * 描述信息：<br/>
  * 用户数据传输层对象
@@ -19,6 +21,10 @@ public class UserDTO {
      * 头像 url
      */
     private String headIcon;
+    /**
+     * 用户类型
+     */
+    private UserTypeEnum userType;
     /**
      * 用户昵称
      */
@@ -52,6 +58,9 @@ public class UserDTO {
      */
     private Long lastUpdateTs;
 
+    public UserDTO() {
+    }
+
     public String getuId() {
         return uId;
     }
@@ -66,6 +75,14 @@ public class UserDTO {
 
     public void setHeadIcon(String headIcon) {
         this.headIcon = headIcon;
+    }
+
+    public UserTypeEnum getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserTypeEnum userType) {
+        this.userType = userType;
     }
 
     public String getuName() {

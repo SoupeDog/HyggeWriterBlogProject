@@ -1,6 +1,7 @@
 package org.xavier.blog.user.domain.dto.user;
 
 
+import org.xavier.blog.user.domain.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.user.User;
 
 /**
@@ -22,6 +23,10 @@ public class UserDTO {
      * 头像 url
      */
     private String headIcon;
+    /**
+     * 用户类型
+     */
+    private UserTypeEnum userType;
     /**
      * 用户昵称
      */
@@ -61,6 +66,7 @@ public class UserDTO {
     public UserDTO(User user) {
         uId = user.getuId();
         headIcon = user.getHeadIcon();
+        userType = user.getUserType();
         uName = user.getuName();
         sex = user.getSex().getDescription();
         birthday = user.getBirthday();
@@ -85,6 +91,14 @@ public class UserDTO {
 
     public void setHeadIcon(String headIcon) {
         this.headIcon = headIcon;
+    }
+
+    public UserTypeEnum getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserTypeEnum userType) {
+        this.userType = userType;
     }
 
     public String getuName() {

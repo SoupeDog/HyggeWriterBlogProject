@@ -26,9 +26,10 @@ public class DefaultRemoteService extends DefaultService {
     protected HttpHelpper httpHelpper;
 
     protected static HttpHeaders httpHeaders = new HttpHeaders() {{
-
+        add("uId", "U00000000");
+        add("token", "0000");
+        add("scope", "web");
     }};
-
 
     protected String getUserServicePrefix() {
         return "http://127.0.0.1:8080";

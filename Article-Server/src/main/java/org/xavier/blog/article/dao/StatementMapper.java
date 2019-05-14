@@ -44,7 +44,7 @@ public interface StatementMapper {
      * @param data        修改数据
      * @return 受影响行
      */
-    Integer updateStatement(@Param("statementId") String statementId, @Param("data") Map data);
+    Integer updateStatement(@Param("statementId") String statementId, @Param("data") Map data,@Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据版权声明唯一标识批量查询
