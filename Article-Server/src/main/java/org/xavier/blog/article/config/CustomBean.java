@@ -28,7 +28,7 @@ import java.util.List;
 @Configuration
 public class CustomBean {
     @Bean
-    public HttpHelpper httpHelpper(){
+    public HttpHelpper httpHelpper() {
         HttpHelpper baseHttpHelper = new BaseHttpHelper() {
             @Override
             public void initObjectMapper() {
@@ -40,7 +40,7 @@ public class CustomBean {
             }
 
             @Override
-           public void initRestTemplate() {
+            public void initRestTemplate() {
                 restTemplate = new RestTemplate();
                 ResponseErrorHandler responseErrorHandler = new ResponseErrorHandler() {
                     @Override
@@ -65,12 +65,12 @@ public class CustomBean {
                 }
                 if (needRemove) {
                     converters.remove(needReplaceIndex);
+                    // 在最后一位找到目标
                     if (needReplaceIndex < converters.size()) {
                         converters.add(needReplaceIndex, new StringHttpMessageConverter(Charset.forName("utf-8")));
-                    } else if (needReplaceIndex > -1) {
-                        converters.add(needReplaceIndex - 1, new StringHttpMessageConverter(Charset.forName("utf-8")));
+                        // 非第一位找到目标
                     } else {
-                        converters.add(new StringHttpMessageConverter(Charset.forName("utf-8")));
+                        converters.add(needReplaceIndex - 1, new StringHttpMessageConverter(Charset.forName("utf-8")));
                     }
                     restTemplate.setMessageConverters(converters);
                 }
