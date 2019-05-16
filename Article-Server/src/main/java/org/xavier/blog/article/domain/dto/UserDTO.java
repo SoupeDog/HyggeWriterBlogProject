@@ -4,7 +4,7 @@ import org.xavier.blog.article.domain.enums.UserTypeEnum;
 
 /**
  * 描述信息：<br/>
- * 用户数据传输层对象
+ * 用户 数据传输层对象
  *
  * @author Xavier
  * @version 1.0

@@ -1,18 +1,24 @@
-package org.xavier.blog.article.domain.po.statement;
+package org.xavier.blog.article.domain.dto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.xavier.blog.article.domain.po.statement.Statement;
+import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
 import org.xavier.common.utils.PropertiesHelper;
 import org.xavier.common.utils.UtilsCreator;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
+
 /**
  * 描述信息：<br/>
- * 版权声明
+ * 版权声明 数据传输层对象
  *
  * @author Xavier
  * @version 1.0
  * @date 2017/12/7
  * @since Jdk 1.8
  */
-public class Statement {
+public class StatementDTO {
 
     /**
      * 版权声明唯一标识
@@ -31,7 +37,7 @@ public class Statement {
     /**
      * 额外配置参数
      */
-    private String properties;
+    private LinkedHashMap properties;
     /**
      * 最后修改时间 utc 毫秒级时间戳
      */
@@ -40,6 +46,19 @@ public class Statement {
      * 创建时间 utc 毫秒级时间戳
      */
     private Long ts;
+
+    public StatementDTO(Statement statement) {
+        try {
+            this.statementId = statement.getStatementId();
+            this.uId = statement.getuId();
+            this.content = statement.getContent();
+            this.properties = new ObjectMapper().readValue(statement.getProperties(), LinkedHashMap.class);
+            this.lastUpdateTs = statement.getLastUpdateTs();
+            this.ts = statement.getTs();
+        } catch (IOException e) {
+            throw new Universal_500_X_Exception_Runtime("Fail to deserialize [" + statement.getProperties() + "] to Map.");
+        }
+    }
 
     /**
      * 参数校验
@@ -73,11 +92,11 @@ public class Statement {
         this.content = content;
     }
 
-    public String getProperties() {
+    public LinkedHashMap getProperties() {
         return properties;
     }
 
-    public void setProperties(String properties) {
+    public void setProperties(LinkedHashMap properties) {
         this.properties = properties;
     }
 

@@ -35,7 +35,7 @@ public interface StatementMapper {
      * @param statementIdList 版权声明唯一标识 List
      * @return 受影响行
      */
-    Integer removeStatementMultipleByIds_Logically(@Param("statementIdList") ArrayList<String> statementIdList, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer removeStatementMultipleByStatementIdList(@Param("statementIdList") ArrayList<String> statementIdList, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 修改版权声明
@@ -44,7 +44,7 @@ public interface StatementMapper {
      * @param data        修改数据
      * @return 受影响行
      */
-    Integer updateStatement(@Param("statementId") String statementId, @Param("data") Map data,@Param("lastUpdateTs") Long lastUpdateTs);
+    Integer updateStatement(@Param("statementId") String statementId, @Param("data") Map data, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据版权声明唯一标识批量查询
@@ -65,8 +65,18 @@ public interface StatementMapper {
 
     /**
      * 在限制范围内查询目标用户名下版权声明的 statementId 列表（与批量删除连用）
-     * @param uId 目标用户唯一表示
+     *
+     * @param uId                  目标用户唯一表示
      * @param rangeStatementIdList statementId 限制范围
      */
-    ArrayList<String> queryStatementListOfUser(@Param("uId") String uId, @Param("rangeStatementIdList") ArrayList<String> rangeStatementIdList);
+    ArrayList<String> queryStatementListOfUserRange(@Param("uId") String uId, @Param("rangeStatementIdList") ArrayList<String> rangeStatementIdList);
+
+    /**
+     *  批量查询目标用户名下的版权声明
+     * @param uId 目标用户唯一标识
+     * @param startPoint 起始游标
+     * @param size 也容量
+     * @return 查询结果集
+     */
+    ArrayList<Statement> queryStatementListOfUser(@Param("uId") String uId, @Param("startPoint") Integer startPoint, @Param("size") Integer size);
 }

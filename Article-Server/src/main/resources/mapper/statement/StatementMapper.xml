@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.article.dao.StatementMapper">
+
+    <sql id="Base_Column_List">
+        statementId,uId,content,properties,ts,lastUpdateTs
+    </sql>
+
+    <sql id="All_Column_List">
+        statementId,uId,content,properties,ts,lastUpdateTs
+    </sql>
+
+
+    <insert id="saveStatement" parameterType="Statement">
+        INSERT INTO `statement`(<include refid="All_Column_List"/>)VALUES (
+        #{statement.statementId},
+        #{statement.uId},
+        #{statement.content},
+        #{statement.properties},
+        #{statement.ts},
+        #{statement.lastUpdateTs}
+        )
+    </insert>
+
+    <delete id="removeStatementMultipleByStatementIdList">
+        DELETE FROM `statement`
+        WHERE lastUpdateTs &lt;= #{lastUpdateTs} AND statementId IN
+        <foreach collection="statementIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="updateStatement">
+        UPDATE `statement`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE statementId=#{statementId} AND lastUpdateTs &lt;= #{lastUpdateTs}
+    </update>
+
+    <select id="queryStatementListByIds" resultType="Statement">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `statement` WHERE statementId IN
+        <foreach collection="statementIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryStatementMapByUId" resultType="Statement">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `statement` WHERE uId= #{uId}
+    </select>
+
+    <select id="queryStatementListOfUserRange" resultType="string">
+        SELECT statementId
+        FROM `statement`
+        WHERE uId = #{uId} AND statementId IN
+        <foreach collection="rangeStatementIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryStatementListOfUser" resultType="Statement">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `statement`
+        WHERE uId = #{uId}
+    </select>
+</mapper>
