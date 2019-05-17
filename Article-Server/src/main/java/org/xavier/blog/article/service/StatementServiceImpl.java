@@ -1,6 +1,5 @@
 package org.xavier.blog.article.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.article.dao.StatementMapper;
