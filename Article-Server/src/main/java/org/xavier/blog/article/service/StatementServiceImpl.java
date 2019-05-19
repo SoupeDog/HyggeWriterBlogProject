@@ -91,7 +91,11 @@ public class StatementServiceImpl extends DefaultService {
      */
     public Boolean updateStatement(String operatorUId, String statementId, Map rowData, Long upTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
         propertiesHelper.stringNotNull(statementId, 32, 32, "[statementId] can't be null,and its length should be 32.");
-        checkRight(operatorUId, statementId);
+        Statement statement = quarryStatementByStatementId(statementId);
+        if (statement == null) {
+            throw new Universal_404_X_Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Statement(" + statementId + ") was not found.");
+        }
+        userService.checkRight(operatorUId, statement.getuId());
         if (rowData.containsKey("properties")) {
             try {
                 Object propertiesObj = rowData.get("properties");
@@ -134,6 +138,8 @@ public class StatementServiceImpl extends DefaultService {
      */
     public ArrayList<Statement> quarryStatementListByUid(String uId, Integer currentPage, Integer pageSize) {
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
+        propertiesHelper.intRangeNotNull(currentPage, 1, Integer.MAX_VALUE, "[currentPage] should be a int number more than 0.");
+        propertiesHelper.intRangeNotNull(pageSize, 1, Integer.MAX_VALUE, "[pageSize] should be a int number more than 0.");
         ArrayList<Statement> result = statementMapper.queryStatementListOfUser(uId, (currentPage - 1) * pageSize, pageSize);
         return result;
     }
@@ -144,20 +150,5 @@ public class StatementServiceImpl extends DefaultService {
             result.add(new StatementDTO(temp));
         }
         return result;
-    }
-
-    private void checkRight(String operatorUId, String statementId) throws Universal_403_X_Exception, Universal_404_X_Exception {
-        Statement statement = quarryStatementByStatementId(statementId);
-        if (statement == null) {
-            throw new Universal_404_X_Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Statement(" + statementId + ") was not found.");
-        }
-        UserDTO currentOperator = userService.queryUserByUId(operatorUId);
-        if (currentOperator == null) {
-            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
-        } else {
-            if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT) && !statement.getuId().equals(operatorUId)) {
-                throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
-            }
-        }
     }
 }

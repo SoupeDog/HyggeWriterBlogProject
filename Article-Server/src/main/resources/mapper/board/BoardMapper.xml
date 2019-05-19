@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.article.dao.BoardMapper">
+
+    <sql id="Base_Column_List">
+        uId, boardName, legal_Flag, lastUpdateTs, ts
+    </sql>
+
+    <sql id="All_Column_List">
+        boardId, uId, boardName, legal_Flag, lastUpdateTs, ts
+    </sql>
+
+
+    <insert id="saveBoard" parameterType="Board">
+        INSERT INTO `board`(<include refid="All_Column_List"/>)VALUES (
+        #{board.boardId},
+        #{board.uId},
+        #{board.boardName},
+        #{board.legal_Flag},
+        #{board.lastUpdateTs},
+        #{board.ts}
+        )
+    </insert>
+
+    <update id="removeBoardMultipleByBoardIds_Logically">
+        UPDATE `board`
+        SET legal_Flag = FALSE,
+        lastUpdateTs = #{lastUpdateTs}
+        WHERE boardId IN
+        <foreach collection="boardIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND legal_Flag = TRUE
+    </update>
+
+    <update id="updateBoard">
+        UPDATE `board`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE boardId=#{boardId} AND lastUpdateTs &lt; #{lastUpdateTs_CAS}
+    </update>
+
+    <select id="queryBoardListByBoardIds" resultType="Board">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `board` WHERE legal_Flag=TRUE AND boardId IN
+        <foreach collection="boardIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryAllBoardList" resultType="Board">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `board` WHERE legal_Flag=TRUE ORDER BY #{orderKey} ${order}
+        Limit #{startPoint},#{size}
+    </select>
+</mapper>
