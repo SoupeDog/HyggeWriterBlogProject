@@ -3,9 +3,9 @@ package org.xavier.blog.article.service.remote;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.xavier.blog.article.domain.bo.UserValidateBO;
 import org.xavier.blog.article.domain.dto.UserDTO;
 import org.xavier.blog.article.domain.enums.UserTypeEnum;
-import org.xavier.blog.article.domain.po.statement.Statement;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.common.exception.Universal_403_X_Exception;
 import org.xavier.common.exception.Universal_404_X_Exception;
@@ -32,9 +32,21 @@ public class UserServiceImpl extends DefaultRemoteService {
     HttpHelpper httpHelpper;
     @Autowired
     HyggeLogger logger;
+    @Autowired
+    GroupServiceImpl groupService;
 
     private static final TypeReference RESPONSE_TYPEREFERENCE_USER_LIST = new TypeReference<GatewayResponse<ArrayList<UserDTO>>>() {
     };
+
+    public UserValidateBO queryUserValidateBOByUId(String uId, String secretKey) {
+        UserValidateBO result = new UserValidateBO();
+        UserDTO user = queryUserByUId(uId);
+        result.setUser(user);
+        ArrayList<String> groupIdList = groupService.quarryGroupInfoOfUser(uId);
+        result.setGroupIdList(groupIdList);
+        result.setSecretKey(secretKey);
+        return result;
+    }
 
     public UserDTO queryUserByUId(String uId) {
         HttpHelperResponse<GatewayResponse<ArrayList<UserDTO>>> response = httpHelpper.get(getUserServicePrefix() + "/main/user/" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_USER_LIST);

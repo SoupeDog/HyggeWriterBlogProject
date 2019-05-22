@@ -130,6 +130,17 @@ public class BoardServiceImpl extends DefaultService {
     }
 
     /**
+     * 根据版权唯一标识查询板块
+     */
+    public Board quarryBoardByBoardId__WithExistValidate(String boardId) throws Universal_404_X_Exception {
+        Board result = quarryBoardByBoardId(boardId);
+        if (result == null) {
+            throw new Universal_404_X_Exception(ErrorCode.BOARD_NOTFOUND.getErrorCod(), "Board(" + boardId + ") was not found.");
+        }
+        return result;
+    }
+
+    /**
      * 查询所有板块信息
      */
     public ArrayList<Board> queryAllBoardList(Integer currentPage, Integer pageSize, String orderKey, Boolean isDESC) {

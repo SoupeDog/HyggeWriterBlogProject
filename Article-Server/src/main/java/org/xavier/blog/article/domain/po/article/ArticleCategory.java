@@ -47,14 +47,6 @@ public class ArticleCategory {
      */
     private String extendProperties;
     /**
-     * parentNode , 为 "" 时该类别为根节点
-     */
-    private String parentNode;
-    /**
-     * 文章类别根节点对应的深度，根节点下的第一代节点深度为 1
-     */
-    private Integer depth;
-    /**
      * 文章类别合法性标识 null:待审核 true:合法 false:非法
      */
     private Boolean legal_Flag;
@@ -138,22 +130,6 @@ public class ArticleCategory {
 
     public void setExtendProperties(String extendProperties) {
         this.extendProperties = extendProperties;
-    }
-
-    public String getParentNode() {
-        return parentNode;
-    }
-
-    public void setParentNode(String parentNode) {
-        this.parentNode = parentNode;
-    }
-
-    public Integer getDepth() {
-        return depth;
-    }
-
-    public void setDepth(Integer depth) {
-        this.depth = depth;
     }
 
     public Boolean getLegal_Flag() {

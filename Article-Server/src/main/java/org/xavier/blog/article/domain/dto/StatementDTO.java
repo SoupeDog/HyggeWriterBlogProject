@@ -5,6 +5,7 @@ import org.xavier.blog.article.domain.po.statement.Statement;
 import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
 import org.xavier.common.utils.PropertiesHelper;
 import org.xavier.common.utils.UtilsCreator;
+import org.xavier.common.utils.base.BaseJsonHelper;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -52,7 +53,7 @@ public class StatementDTO {
             this.statementId = statement.getStatementId();
             this.uId = statement.getuId();
             this.content = statement.getContent();
-            this.properties = new ObjectMapper().readValue(statement.getProperties(), LinkedHashMap.class);
+            this.properties = UtilsCreator.getInstance_DefaultJsonHelper(false).getMapper().readValue(statement.getProperties(), LinkedHashMap.class);
             this.lastUpdateTs = statement.getLastUpdateTs();
             this.ts = statement.getTs();
         } catch (IOException e) {
