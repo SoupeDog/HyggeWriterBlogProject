@@ -16,6 +16,8 @@ import org.xavier.common.exception.Universal_403_X_Exception;
 import org.xavier.common.utils.UtilsCreator;
 import org.xavier.web.annotation.EnableControllerLog;
 
+import java.util.ArrayList;
+
 /**
  * 描述信息：<br/>
  *
@@ -32,9 +34,9 @@ public class GroupJoinRecordController extends HyggeWriterController {
 
     @EnableControllerLog
     @PostMapping(value = "/main/group/record")
-    public ResponseEntity<?> addGroupJoinRecord(@RequestHeader HttpHeaders headers,@RequestBody GroupJoinRecord groupJoinRecord) {
+    public ResponseEntity<?> addGroupJoinRecord(@RequestHeader HttpHeaders headers, @RequestBody GroupJoinRecord groupJoinRecord) {
         try {
-            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
+            String operatorUId = headers.getFirst("uId");
             groupJoinRecord.setuId(operatorUId);
             groupJoinRecord.validate();
             groupJoinRecordService.saveGroupJoinRecord(groupJoinRecord);
@@ -73,6 +75,25 @@ public class GroupJoinRecordController extends HyggeWriterController {
             return success(result);
         } catch (PropertiesException_Runtime e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        }
+    }
+
+    @EnableControllerLog(ignoreProperties = {"headers"})
+    @GetMapping(value = "/main/group/list")
+    public ResponseEntity<?> quarryGroupInfoOfUser(@RequestHeader HttpHeaders headers,
+                                           @RequestParam(value = "uId") String uId,
+                                           @RequestParam(value = "type", required = false, defaultValue = "id") String type) {
+        try {
+            String operatorUId = headers.getFirst("uId");
+            switch (type) {
+                default:
+                    ArrayList<String> result = groupJoinRecordService.queryGroupIdListOfUser(operatorUId, uId);
+                    return success(result);
+            }
+        } catch (PropertiesException_Runtime e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        } catch (Universal_403_X_Exception e) {
+            return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
 }

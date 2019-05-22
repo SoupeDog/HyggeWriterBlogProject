@@ -48,6 +48,14 @@ public interface GroupJoinRecordMapper {
     ArrayList<GroupJoinRecord> queryGroupJoinRecordListByGIdAndUIdList(@Param("gId") String gId, @Param("uIdList") ArrayList<String> uIdList);
 
     /**
+     * 查询目标用户名下的全部群组唯一标识
+     *
+     * @param uId 目标用户
+     * @return 查询结果
+     */
+    ArrayList<String> queryGroupIdListOfUser(@Param("uId") String uId);
+
+    /**
      * 查询目标群组下符合条件的用户加入记录
      *
      * @param gId     群组唯一标识

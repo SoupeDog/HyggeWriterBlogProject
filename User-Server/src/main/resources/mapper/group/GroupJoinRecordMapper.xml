@@ -26,6 +26,12 @@
         AND gId =#{gId} AND uId=#{uId}
     </delete>
 
+    <select id="queryGroupIdListOfUser" resultType="string">
+        SELECT
+        gId
+        FROM `groupJoinRecord` WHERE isActive=TRUE AND uId=#{uId}
+    </select>
+
     <select id="queryGroupJoinRecordListByGIdAndUIdList" resultType="GroupJoinRecord">
         SELECT
         <include refid="All_Column_List"/>

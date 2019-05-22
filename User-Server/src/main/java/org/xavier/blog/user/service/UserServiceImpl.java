@@ -98,14 +98,7 @@ public class UserServiceImpl extends DefaultService {
      */
     public Boolean updateUser(String operatorUId, String uId, Map rowData, Long upTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
-        // 如果是修改自己的数据直接执行
-        if (!operatorUId.equals(uId)) {
-            User currentOperator = queryUserByUId_WithExistValidate(operatorUId);
-            // 如果是超级管理员，则也执行
-            if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
-                throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions");
-            }
-        }
+        checkRight(operatorUId, uId);
         // 目标用户是否存在
         User targetUser = queryUserByUId_WithExistValidate(operatorUId);
         HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
@@ -153,6 +146,18 @@ public class UserServiceImpl extends DefaultService {
             throw new Universal_404_X_Exception(ErrorCode.USER_NOTFOUND.getErrorCod(), "User(" + uId + ") was not found.");
         }
         return targetUser;
+    }
+
+    public void checkRight(String operatorUId, String expectedUId) throws Universal_403_X_Exception {
+        User currentOperator = queryUserByUId(operatorUId);
+        if (currentOperator == null) {
+            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+        } else {
+            if (UserTypeEnum.ROOT.equals(currentOperator.getUserType()) || operatorUId.equals(expectedUId)) {
+                return;
+            }
+            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+        }
     }
 
     public String getUId(Integer id) {

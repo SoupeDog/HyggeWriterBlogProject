@@ -62,6 +62,18 @@ public class GroupJoinRecordServiceImpl extends DefaultService {
         return removeResult;
     }
 
+    /**
+     * 查询目标用户名下的所有组 id
+     *
+     * @param operatorUId 当前用户
+     * @param uId         目标用户
+     */
+    public ArrayList<String> queryGroupIdListOfUser(String operatorUId, String uId) throws Universal_403_X_Exception {
+        userService.checkRight(operatorUId, uId);
+        ArrayList<String> result = groupJoinRecordMapper.queryGroupIdListOfUser(uId);
+        return result;
+    }
+
     public Boolean isUserInTargetGroup(String uId, String gId) {
         ArrayList<GroupJoinRecord> groupJoinRecordList = groupJoinRecordMapper.queryGroupJoinRecordListByGIdAndUIdList(gId, listHelper.createSingleList(uId));
         return groupJoinRecordList.size() > 0;
