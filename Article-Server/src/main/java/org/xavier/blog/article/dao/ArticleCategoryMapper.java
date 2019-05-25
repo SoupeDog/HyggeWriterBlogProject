@@ -33,7 +33,7 @@ public interface ArticleCategoryMapper {
      * @param articleCategoryIdList 文章类别唯一标识 List 字符串形式
      * @return 受影响行
      */
-    Integer removeArticleCategoryMultipleByIds_Logically(@Param("uId") String uId, @Param("articleCategoryIdList") ArrayList<String> articleCategoryIdList, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer removeArticleCategoryMultipleByArticleCategoryId_Logically(@Param("uId") String uId, @Param("articleCategoryIdList") ArrayList<String> articleCategoryIdList, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 更新文章类别
@@ -53,14 +53,6 @@ public interface ArticleCategoryMapper {
     ArrayList<ArticleCategory> queryArticleCategoryByUId(@Param("uId") String uId, @Param("accessPermitRangeList") ArrayList<Byte> accessPermitRangeList);
 
     /**
-     * 根据 板块唯一标识 查询其名下的文章类别
-     *
-     * @param boardIdRangeList      boardId 限制范围
-     * @param accessPermitRangeList 许可类型(可空)
-     */
-    ArrayList<ArticleCategory> queryArticleCategoryByBoardId(@Param("boardIdRangeList") ArrayList<String> boardIdRangeList, @Param("accessPermitRangeList") ArrayList<Byte> accessPermitRangeList);
-
-    /**
      * 根据 用户唯一标识 查询其名下的文章类别
      *
      * @param articleIdList articleId 限制范围
@@ -70,7 +62,7 @@ public interface ArticleCategoryMapper {
     /**
      * 根据 类别唯一标识 查询类别
      *
-     * @param articleCategoryIdList 用户唯一标识
+     * @param articleCategoryIdList 文章类别唯一标识数组
      */
     ArrayList<ArticleCategory> queryArticleCategoryById(@Param("articleCategoryIdList") ArrayList<String> articleCategoryIdList);
 

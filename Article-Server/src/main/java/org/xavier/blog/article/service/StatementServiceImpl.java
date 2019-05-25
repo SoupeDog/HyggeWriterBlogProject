@@ -134,6 +134,17 @@ public class StatementServiceImpl extends DefaultService {
     }
 
     /**
+     * 根据版权唯一标识查询版权声明
+     */
+    public Statement queryStatementByStatementId_WithExistValidate(String statementId) throws Universal_404_X_Exception {
+        Statement result = quarryStatementByStatementId(statementId);
+        if (result == null) {
+            throw new Universal_404_X_Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Statement(" + statementId + ") was not found.");
+        }
+        return result;
+    }
+
+    /**
      * 批量查询目标用户名下的版权声明
      */
     public ArrayList<Statement> quarryStatementListByUid(String uId, Integer currentPage, Integer pageSize) {

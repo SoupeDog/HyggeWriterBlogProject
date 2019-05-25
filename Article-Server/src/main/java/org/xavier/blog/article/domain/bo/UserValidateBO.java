@@ -65,7 +65,7 @@ public class UserValidateBO {
                 }
                 break;
             case GROUP:
-                if (groupIdList.contains(articleCategory.getExtendProperties())) {
+                if (groupIdList != null && groupIdList.contains(articleCategory.getExtendProperties())) {
                     result = true;
                 }
                 break;

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.article.dao.ArticleCategoryMapper">
+
+    <sql id="Base_Column_List">
+        articleCategoryId, uId, boardName, boardId, articleCategoryName, description, accessPermit, extendProperties, legal_Flag, lastUpdateTs, ts
+    </sql>
+
+    <sql id="All_Column_List">
+        articleCategoryId, uId, boardName, boardId, articleCategoryName, description, accessPermit, extendProperties, legal_Flag, lastUpdateTs, ts
+    </sql>
+
+    <sql id="All_Column_List_QueryArticleCategoryByArticleId">
+        category.articleCategoryId, category.uId, category.boardName, category.boardId, category.articleCategoryName, category.description, category.accessPermit, category.extendProperties, category.legal_Flag, category.lastUpdateTs, category.ts
+    </sql>
+
+    <insert id="saveArticleCategory" parameterType="ArticleCategory" useGeneratedKeys="true"
+            keyProperty="ArticleCategory.articleCategoryId">
+        INSERT INTO `articleCategory`(<include refid="Base_Column_List"/>)VALUES (
+        #{articleCategory.articleCategoryId},
+        #{articleCategory.uId},
+        #{articleCategory.boardName},
+        #{articleCategory.boardId},
+        #{articleCategory.articleCategoryName},
+        #{articleCategory.description},
+        #{articleCategory.accessPermit},
+        #{articleCategory.extendProperties},
+        #{articleCategory.legal_Flag},
+        #{articleCategory.lastUpdateTs},
+        #{articleCategory.ts}
+        )
+    </insert>
+
+    <update id="removeArticleCategoryMultipleByArticleCategoryId_Logically">
+        UPDATE `articleCategory`
+        SET legal_Flag = FALSE,
+        lastUpdateTs = #{lastUpdateTs}
+        WHERE articleCategoryId IN
+        <foreach collection="articleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND uId = #{uId}
+    </update>
+
+    <update id="updateArticleCategory">
+        UPDATE `articleCategory`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE lastUpdateTs &lt; #{lastUpdateTs_CAS} AND articleCategoryId=#{articleCategoryId}
+    </update>
+
+    <select id="queryArticleCategoryByUId" resultType="ArticleCategory">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `articleCategory` WHERE legal_Flag=TRUE AND uId=#{uId}
+        <if test="accessPermitRangeList != null">
+            AND accessPermit IN
+            <foreach collection="accessPermitRangeList" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryArticleCategoryById" resultType="ArticleCategory">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `articleCategory` WHERE legal_Flag=TRUE AND articleCategoryId IN
+        <foreach collection="articleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryArticleCategoryByArticleId" resultType="ArticleCategory">
+        SELECT
+        <include refid="All_Column_List_QueryArticleCategoryByArticleId"/>
+        FROM `articleCategory` as category INNER JOIN `article` AS article
+        ON category.articleCategoryId=article.articleCategoryId
+        WHERE article.legal_Flag=TRUE
+        AND category.legal_Flag=TRUE
+        AND article.articleId IN
+        <foreach collection="articleIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryArticleCategoryIdOfUser" resultType="string">
+        SELECT articleCategoryId
+        FROM `articleCategory`
+        WHERE legal_Flag = TRUE
+        AND uId = #{uId}
+        AND articleCategoryId IN
+        <foreach collection="rangeArticleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

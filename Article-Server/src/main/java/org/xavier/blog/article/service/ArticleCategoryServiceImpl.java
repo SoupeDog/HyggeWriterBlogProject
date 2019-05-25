@@ -59,15 +59,14 @@ public class ArticleCategoryServiceImpl extends DefaultService {
      * @param articleCategory 文章类别实体
      * @param currentTs       瞬时时间戳
      */
-    public Boolean saveArticleCategory(String operatorUId, ArticleCategory articleCategory, Long currentTs) throws Universal_403_X_Exception, Universal_404_X_Exception {
-        userService.checkRight(operatorUId, articleCategory.getuId());
+    public Boolean saveArticleCategory(ArticleCategory articleCategory, Long currentTs) throws Universal_403_X_Exception, Universal_404_X_Exception {
         articleCategory.setLegal_Flag(true);
         articleCategory.setTs(currentTs);
         articleCategory.setLastUpdateTs(currentTs);
         articleCategory.setArticleCategoryId(UtilsCreator.getInstance_DefaultRandomHelper().getUUID());
         switch (articleCategory.getAccessPermit()) {
             case PERSONAL:
-                articleCategory.setExtendProperties(operatorUId);
+                articleCategory.setExtendProperties(articleCategory.getuId());
                 break;
             case SECRET_KEY:
                 articleCategory.setExtendProperties(UtilsCreator.getInstance_DefaultRandomHelper().getUUID());
@@ -99,7 +98,7 @@ public class ArticleCategoryServiceImpl extends DefaultService {
         ArrayList<String> articleCategoryIdListForQuery = listHelper.filterStringListNotEmpty(articleCategoryIdList, "articleCategoryId", 32, 32);
         articleCategoryIdList = articleCategoryMapper.queryArticleCategoryIdOfUser(operatorUId, articleCategoryIdListForQuery);
         articleCategoryIdListForQuery = listHelper.filterStringListNotEmpty(articleCategoryIdList, "articleCategoryId", 32, 32);
-        Integer removeArticleCategoryMultiple_EffectedLine = articleCategoryMapper.removeArticleCategoryMultipleByIds_Logically(operatorUId, articleCategoryIdListForQuery, upTs);
+        Integer removeArticleCategoryMultiple_EffectedLine = articleCategoryMapper.removeArticleCategoryMultipleByArticleCategoryId_Logically(operatorUId, articleCategoryIdListForQuery, upTs);
         Boolean removeArticleCategoryMultiple_Flag = removeArticleCategoryMultiple_EffectedLine == articleCategoryIdListForQuery.size();
         if (!removeArticleCategoryMultiple_Flag) {
             ArrayList<String> finalArticleCategoryIdListForQuery = articleCategoryIdListForQuery;
@@ -197,7 +196,7 @@ public class ArticleCategoryServiceImpl extends DefaultService {
     /**
      * 根据 articleCategoryId 查询对象
      */
-    public ArticleCategory queryArticleCategoryByArticleCategoryId(String articleCategoryId) throws Universal_404_X_Exception {
+    public ArticleCategory queryArticleCategoryByArticleCategoryId(String articleCategoryId) {
         ArrayList<ArticleCategory> targetArticleCategoryList = articleCategoryMapper.queryArticleCategoryById(listHelper.createSingleList(articleCategoryId));
         if (targetArticleCategoryList.size() < 1) {
             return null;
