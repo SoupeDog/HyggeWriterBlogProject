@@ -6,6 +6,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.xavier.blog.article.domain.bo.ArticleQuarryBO;
+import org.xavier.blog.article.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.article.domain.dto.ArticleDTO;
 import org.xavier.blog.article.domain.po.article.Article;
 import org.xavier.blog.article.service.ArticleServiceImpl;
@@ -17,6 +19,7 @@ import org.xavier.common.exception.Universal_404_X_Exception;
 import org.xavier.common.exception.Universal_409_X_Exception;
 import org.xavier.common.utils.UtilsCreator;
 import org.xavier.web.annotation.EnableControllerLog;
+import org.xavier.web.extend.PageResult;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -101,7 +104,25 @@ public class ArticleController extends HyggeWriterController {
         String secretKey = headers.getFirst("secretKey");
         try {
             System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(headers));
-            ArticleDTO result = articleService.articleToArticleDTO(articleService.queryArticleByArticleId_WithBusinessCheck(operatorUId, secretKey, articleId));
+            ArticleQuarryBO result = articleService.queryArticleByArticleId_WithBusinessCheck(operatorUId, secretKey, articleId);
+            return success(result);
+        } catch (PropertiesException_Runtime e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        }
+    }
+
+    @EnableControllerLog(ignoreProperties = "headers")
+    @GetMapping(value = "/main/article/summary/{boardId}")
+    public ResponseEntity<?> queryArticleSummary(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId,
+                                                 @RequestParam(value = "uId", required = false, defaultValue = "U00000001") String uId,
+                                                 @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
+                                                 @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                 @RequestParam(value = "orderKey", required = false, defaultValue = "ts") String orderKey,
+                                                 @RequestParam(value = "isDESC", required = false, defaultValue = "true") Boolean isDESC) {
+        String operatorUId = headers.getFirst("uId");
+        String secretKey = headers.getFirst("secretKey");
+        try {
+            PageResult<ArticleSummaryQueryBO> result = articleService.queryArticleSummaryOfUser_WithBusinessCheck(operatorUId, uId, boardId, secretKey, currentPage, pageSize, orderKey, isDESC);
             return success(result);
         } catch (PropertiesException_Runtime e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

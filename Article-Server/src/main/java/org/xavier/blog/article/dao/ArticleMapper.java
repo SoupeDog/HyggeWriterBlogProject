@@ -2,7 +2,11 @@ package org.xavier.blog.article.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.xavier.blog.article.domain.bo.ArticleQuarryBO;
+import org.xavier.blog.article.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.article.domain.po.article.Article;
+import org.xavier.blog.article.domain.po.article.ArticleQuarryPO;
+import org.xavier.blog.article.domain.po.article.ArticleSummaryQueryPO;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -74,4 +78,18 @@ public interface ArticleMapper {
      */
     ArrayList<String> queryArticleIdLisOfUser(@Param("uId") String uId, @Param("rangeArticleIdListList") ArrayList<String> rangeArticleIdListList);
 
+    /**
+     * 请求方最终查询的文章实体
+     */
+    ArticleQuarryPO queryArticleQuarryBOByArticleId(@Param("articleId") String articleId);
+
+    /**
+     * 批量查询 文章摘要
+     */
+    ArrayList<ArticleSummaryQueryPO> queryArticleQuarryBOByArticleIdList(@Param("articleCategoryIdList") ArrayList<String> articleCategoryIdList, @Param("startPoint") Integer startPoint, @Param("size") Integer size, @Param("orderKey") String orderKey, @Param("order") String order);
+
+    /**
+     * 批量查询 文章摘要总记录数
+     */
+    Integer queryArticleQuarryBOByArticleIdList_TotalCount(@Param("articleCategoryIdList") ArrayList<String> articleCategoryIdList);
 }

@@ -3,10 +3,14 @@ package org.xavier.blog.article.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.article.dao.ArticleMapper;
+import org.xavier.blog.article.domain.bo.ArticleQuarryBO;
+import org.xavier.blog.article.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.article.domain.bo.UserValidateBO;
 import org.xavier.blog.article.domain.dto.ArticleDTO;
 import org.xavier.blog.article.domain.po.article.Article;
 import org.xavier.blog.article.domain.po.article.ArticleCategory;
+import org.xavier.blog.article.domain.po.article.ArticleQuarryPO;
+import org.xavier.blog.article.domain.po.article.ArticleSummaryQueryPO;
 import org.xavier.blog.article.service.remote.UserServiceImpl;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.common.enums.ColumnType;
@@ -16,6 +20,7 @@ import org.xavier.common.logging.HyggeLoggerMsgBuilder;
 import org.xavier.common.utils.UtilsCreator;
 import org.xavier.common.utils.bo.ColumnInfo;
 import org.xavier.web.extend.DefaultService;
+import org.xavier.web.extend.PageResult;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -151,13 +156,14 @@ public class ArticleServiceImpl extends DefaultService {
         return updateArticle_Flag;
     }
 
-    public Article queryArticleByArticleId_WithBusinessCheck(String operatorUId, String secretKey, String articleId) {
+    public ArticleQuarryBO queryArticleByArticleId_WithBusinessCheck(String operatorUId, String secretKey, String articleId) {
         propertiesHelper.stringNotNull(operatorUId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
         propertiesHelper.stringNotNull(articleId, 32, 32, "[articleId] can't be null,and its length should be 32.");
-        Article result = querySingleArticleByArticleId(articleId);
-        if (result == null) {
+        ArticleQuarryPO articleQuarryPO = articleMapper.queryArticleQuarryBOByArticleId(articleId);
+        if (articleQuarryPO == null) {
             return null;
         }
+        ArticleQuarryBO result = new ArticleQuarryBO(articleQuarryPO);
         ArticleCategory articleCategoryTemp = articleCategoryService.queryArticleCategoryByArticleCategoryId(result.getArticleCategoryId());
         UserValidateBO currentUser = userService.queryUserValidateBOByUId(operatorUId, secretKey);
         if (currentUser.chekPromission(articleCategoryTemp)) {
@@ -165,6 +171,41 @@ public class ArticleServiceImpl extends DefaultService {
             return result;
         }
         return null;
+    }
+
+    public PageResult<ArticleSummaryQueryBO> queryArticleSummaryOfUser_WithBusinessCheck(String operatorUId, String uId, String boardId, String secretKey, Integer currentPage, Integer size, String orderKeyTemp, Boolean isDESC) {
+        propertiesHelper.stringNotNull(operatorUId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
+        propertiesHelper.stringNotNull(boardId, 32, 32, "[boardId] can't be null,and its length should be 32.");
+        ArrayList<ArticleCategory> articleCategoryList = articleCategoryService.queryArticleCategoryByUId(operatorUId, boardId, uId, secretKey);
+        ArrayList<String> articleCategoryIdList = new ArrayList();
+        for (ArticleCategory temp : articleCategoryList) {
+            articleCategoryIdList.add(temp.getArticleCategoryId());
+        }
+        PageResult<ArticleSummaryQueryBO> result = new PageResult();
+        String orderKey;
+        switch (orderKeyTemp) {
+            case "lastUpdateTs":
+                orderKey = "lastUpdateTs";
+                break;
+            case "pageViews":
+                orderKey = "pageViews";
+                break;
+            default:
+                orderKey = "ts";
+        }
+        ArrayList<ArticleSummaryQueryPO> resultSetTemp;
+        if (isDESC) {
+            resultSetTemp = articleMapper.queryArticleQuarryBOByArticleIdList(articleCategoryIdList, (currentPage - 1) * size, size, orderKey, DESC);
+        } else {
+            resultSetTemp = articleMapper.queryArticleQuarryBOByArticleIdList(articleCategoryIdList, (currentPage - 1) * size, size, orderKey, ASC);
+        }
+        ArrayList<ArticleSummaryQueryBO> resultSet = new ArrayList();
+        for (ArticleSummaryQueryPO temp : resultSetTemp) {
+            resultSet.add(new ArticleSummaryQueryBO(temp));
+        }
+        result.setTotalCount(articleMapper.queryArticleQuarryBOByArticleIdList_TotalCount(articleCategoryIdList));
+        result.setResultSet(resultSet);
+        return result;
     }
 
     /**

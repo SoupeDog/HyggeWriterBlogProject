@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.xavier.blog.article.service.ArticleCategoryServiceImpl;
 import org.xavier.common.exception.Universal_404_X_Exception;
 import org.xavier.common.utils.UtilsCreator;
 
@@ -24,9 +25,17 @@ public class UserServiceImplTest {
     @Autowired
     UserServiceImpl userService;
 
+    @Autowired
+    ArticleCategoryServiceImpl articleCategoryService;
+
 
     @Test
     public void queryUserByUId() throws Universal_404_X_Exception {
         System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(userService.queryUserByUId_WithExistValidate("U00000004")));
+    }
+    @Test
+    public void queryUserByUId2() throws Universal_404_X_Exception {
+        System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(articleCategoryService.queryArticleCategoryByUId("U00000001","123", "U00000001", "")));
+
     }
 }

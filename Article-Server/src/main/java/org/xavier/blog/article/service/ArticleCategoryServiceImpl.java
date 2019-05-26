@@ -146,7 +146,8 @@ public class ArticleCategoryServiceImpl extends DefaultService {
      * @param operatorUId 当前用户唯一标识
      * @param uId         目标用户唯一标识
      */
-    public ArrayList<ArticleCategory> queryArticleCategoryByUId(String operatorUId, String uId, String secretKey) {
+    public ArrayList<ArticleCategory> queryArticleCategoryByUId(String operatorUId, String boardId, String uId, String secretKey) {
+        propertiesHelper.stringNotNull(boardId, 32, 32, "[boardId] can't be null,and its length should be 32.");
         UserValidateBO currentUserInfo = userService.queryUserValidateBOByUId(operatorUId, secretKey);
         ArrayList<ArticleCategory> result = new ArrayList();
         ArrayList<Byte> accessPermitRange = new ArrayList();
@@ -173,7 +174,7 @@ public class ArticleCategoryServiceImpl extends DefaultService {
                     accessPermitRange.add(ArticleAccessPermitEnum.MALE.getIndex());
             }
         }
-        ArrayList<ArticleCategory> resultTemp = articleCategoryMapper.queryArticleCategoryByUId(uId, accessPermitRange);
+        ArrayList<ArticleCategory> resultTemp = articleCategoryMapper.queryArticleCategoryByUId(boardId, uId, accessPermitRange);
         for (ArticleCategory category : resultTemp) {
             if (currentUserInfo.chekPromission(category)) {
                 result.add(category);

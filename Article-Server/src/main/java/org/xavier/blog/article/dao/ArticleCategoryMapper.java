@@ -48,9 +48,10 @@ public interface ArticleCategoryMapper {
      * 根据 用户唯一标识 查询其名下的文章类别
      *
      * @param uId                   用户唯一标识
+     * @param boardId               板块唯一标识
      * @param accessPermitRangeList 许可类型(可空)
      */
-    ArrayList<ArticleCategory> queryArticleCategoryByUId(@Param("uId") String uId, @Param("accessPermitRangeList") ArrayList<Byte> accessPermitRangeList);
+    ArrayList<ArticleCategory> queryArticleCategoryByUId(@Param("boardId") String boardId, @Param("uId") String uId, @Param("accessPermitRangeList") ArrayList<Byte> accessPermitRangeList);
 
     /**
      * 根据 用户唯一标识 查询其名下的文章类别

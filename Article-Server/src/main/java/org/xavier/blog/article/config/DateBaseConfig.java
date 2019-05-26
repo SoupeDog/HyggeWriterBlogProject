@@ -52,7 +52,8 @@ public class DateBaseConfig {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(mySQLDataSource);
         VFS.addImplClass(SpringBootVFS.class);
-        String typeAliasesPackage = "org.xavier.blog.article.domain.po";
+        String typeAliasesPackage = "org.xavier.blog.article.domain.po;" +
+                "org.xavier.blog.article.domain.bo";
         // 扫描Mybatis所用到的返回entity类型
         bean.setTypeAliasesPackage(typeAliasesPackage);
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();

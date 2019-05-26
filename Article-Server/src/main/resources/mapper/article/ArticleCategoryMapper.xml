@@ -3,15 +3,29 @@
 <mapper namespace="org.xavier.blog.article.dao.ArticleCategoryMapper">
 
     <sql id="Base_Column_List">
-        articleCategoryId, uId, boardName, boardId, articleCategoryName, description, accessPermit, extendProperties, legal_Flag, lastUpdateTs, ts
+        articleCategoryId,
+        uId,
+        boardId,
+        articleCategoryName,
+        description,
+        accessPermit,
+        extendProperties,
+        legal_Flag,
+        lastUpdateTs,
+        ts
     </sql>
 
     <sql id="All_Column_List">
-        articleCategoryId, uId, boardName, boardId, articleCategoryName, description, accessPermit, extendProperties, legal_Flag, lastUpdateTs, ts
-    </sql>
-
-    <sql id="All_Column_List_QueryArticleCategoryByArticleId">
-        category.articleCategoryId, category.uId, category.boardName, category.boardId, category.articleCategoryName, category.description, category.accessPermit, category.extendProperties, category.legal_Flag, category.lastUpdateTs, category.ts
+        articleCategoryId,
+        uId,
+        boardId,
+        articleCategoryName,
+        description,
+        accessPermit,
+        extendProperties,
+        legal_Flag,
+        lastUpdateTs,
+        ts
     </sql>
 
     <insert id="saveArticleCategory" parameterType="ArticleCategory" useGeneratedKeys="true"
@@ -53,7 +67,7 @@
     <select id="queryArticleCategoryByUId" resultType="ArticleCategory">
         SELECT
         <include refid="All_Column_List"/>
-        FROM `articleCategory` WHERE legal_Flag=TRUE AND uId=#{uId}
+        FROM `articleCategory` WHERE boardId=#{boardId} AND legal_Flag=TRUE AND uId=#{uId}
         <if test="accessPermitRangeList != null">
             AND accessPermit IN
             <foreach collection="accessPermitRangeList" index="index" item="item" open="(" separator="," close=")">
@@ -73,7 +87,16 @@
 
     <select id="queryArticleCategoryByArticleId" resultType="ArticleCategory">
         SELECT
-        <include refid="All_Column_List_QueryArticleCategoryByArticleId"/>
+        category.articleCategoryId,
+        category.uId,
+        category.boardId,
+        category.articleCategoryName,
+        category.description,
+        category.accessPermit,
+        category.extendProperties,
+        category.legal_Flag,
+        category.lastUpdateTs,
+        category.ts
         FROM `articleCategory` as category INNER JOIN `article` AS article
         ON category.articleCategoryId=article.articleCategoryId
         WHERE article.legal_Flag=TRUE

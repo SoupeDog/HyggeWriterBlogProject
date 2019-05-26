@@ -33,6 +33,21 @@
         ts,
         lastUpdateTs
     </sql>
+    <sql id="ArticleSummaryQueryPO_Column_List">
+        articleId,
+        uId,
+        articleCategoryId,
+        statementId,
+        title,
+        summary,
+        content,
+        wordCount,
+        pageViews,
+        properties,
+        legal_Flag,
+        ts,
+        lastUpdateTs
+    </sql>
 
 
     <insert id="saveArticle" parameterType="Article">
@@ -149,6 +164,97 @@
         articleId
         FROM `article` WHERE legal_Flag=TRUE AND uId = #{uId} AND articleId IN
         <foreach collection="rangeArticleIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="queryArticleQuarryBOByArticleId" resultType="ArticleQuarryPO">
+        SELECT t3.articleId,
+               t3.uId,
+               statement.statementId,
+               statement.content                                     AS "statementContent",
+               statement.properties                                  AS "statementProperties",
+               t3.boardName,
+               t3.articleCategoryId,
+               quarryArticleCategoryPathToRoot(t3.articleCategoryId) AS "articleCategoryPathStringVal",
+               t3.title,
+               t3.content,
+               t3.pageViews,
+               t3.wordCount,
+               t3.properties,
+               t3.lastUpdateTs,
+               t3.ts
+        FROM (SELECT articleId,
+                     uId,
+                     statementId,
+                     boardName,
+                     article.articleCategoryId,
+                     title,
+                     content,
+                     pageViews,
+                     wordCount,
+                     properties,
+                     article.lastUpdateTs,
+                     article.ts
+              FROM article
+                       LEFT JOIN (SELECT articleCategoryId, boardName, articleCategoryName
+                                  FROM articleCategory
+                                           INNER JOIN board ON articleCategory.boardId = board.boardId) AS t2
+                                 ON article.articleCategoryId = t2.articleCategoryId
+              WHERE articleId = #{articleId}) AS t3
+                 LEFT JOIN statement ON t3.statementId = statement.statementId
+        LIMIT 1;
+    </select>
+
+    <select id="queryArticleQuarryBOByArticleIdList" resultType="ArticleSummaryQueryPO">
+        SELECT
+        articleId,
+        uId,
+        boardName,
+        quarryArticleCategoryPathToRoot(article.articleCategoryId) AS "articleCategoryPathStringVal",
+        title,
+        summary,
+        pageViews,
+        wordCount,
+        properties,
+        article.lastUpdateTs,
+        article.ts
+        FROM article
+        LEFT JOIN (SELECT articleCategoryId, boardName, articleCategoryName
+        FROM articleCategory
+        INNER JOIN board ON articleCategory.boardId = board.boardId
+        WHERE articleCategory.legal_Flag=TRUE AND board.legal_Flag=TRUE AND articleCategoryId IN
+        <foreach collection="articleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )
+        AS t2
+        ON article.articleCategoryId = t2.articleCategoryId
+        WHERE article.legal_Flag=TRUE AND article.articleCategoryId IN
+        <foreach collection="articleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY ${orderKey} ${order}
+        Limit #{startPoint},#{size}
+    </select>
+
+    <select id="queryArticleQuarryBOByArticleIdList_TotalCount" resultType="integer">
+        SELECT
+        COUNT(*)
+        FROM article
+        LEFT JOIN (SELECT articleCategoryId, boardName, articleCategoryName
+        FROM articleCategory
+        INNER JOIN board ON articleCategory.boardId = board.boardId
+        WHERE articleCategory.legal_Flag=TRUE AND board.legal_Flag=TRUE AND articleCategoryId IN
+        <foreach collection="articleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )
+        AS t2
+        ON article.articleCategoryId = t2.articleCategoryId
+        WHERE article.legal_Flag=TRUE AND article.articleCategoryId IN
+        <foreach collection="articleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
