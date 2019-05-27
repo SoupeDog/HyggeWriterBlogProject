@@ -31,11 +31,14 @@ public class UserServiceImplTest {
 
     @Test
     public void queryUserByUId() throws Universal_404_X_Exception {
-        System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(userService.queryUserByUId_WithExistValidate("U00000004")));
+        Long ts = System.currentTimeMillis();
+        Object object = userService.queryUserValidateBOByUId("U00000001",null);
+        System.out.println((System.currentTimeMillis() - ts) + " 毫秒");
+        System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(object));
     }
+
     @Test
     public void queryUserByUId2() throws Universal_404_X_Exception {
-        System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(articleCategoryService.queryArticleCategoryByUId("U00000001","123", "U00000001", "")));
-
+        System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(articleCategoryService.queryArticleCategoryByUId("U00000001", "123", "U00000001", "")));
     }
 }

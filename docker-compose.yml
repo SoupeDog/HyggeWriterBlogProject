@@ -1,0 +1,22 @@
+version: '3'
+services:
+  eureka:
+    image: eureka
+    ports:
+      - "8761:8761"
+  article-server:
+    image: article-server
+    ports:
+      - "8081:8081"
+    links:
+      - "eureka:eureka"
+    expose:
+      - "8081"
+  user-server:
+    image: user-server
+    ports:
+      - "8080:8080"
+    links:
+      - "eureka:eureka"
+    expose:
+      - "8080"

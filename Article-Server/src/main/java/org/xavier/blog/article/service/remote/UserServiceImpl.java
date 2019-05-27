@@ -49,7 +49,9 @@ public class UserServiceImpl extends DefaultRemoteService {
     }
 
     public UserDTO queryUserByUId(String uId) {
+        Long ts=System.currentTimeMillis();
         HttpHelperResponse<GatewayResponse<ArrayList<UserDTO>>> response = httpHelpper.get(getUserServicePrefix() + "/main/user/" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_USER_LIST);
+        System.out.println((System.currentTimeMillis()-ts)+" 毫秒=查询用户信息");
         if (response.isFail()) {
             throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[queryUserByUId].", response.getData().getMsg());
         }
