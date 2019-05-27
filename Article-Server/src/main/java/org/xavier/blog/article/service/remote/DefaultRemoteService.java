@@ -2,9 +2,11 @@ package org.xavier.blog.article.service.remote;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
 import org.xavier.common.utils.HttpHelpper;
 import org.xavier.web.extend.DefaultService;
 
@@ -32,6 +34,10 @@ public class DefaultRemoteService extends DefaultService {
     }};
 
     protected String getUserServicePrefix() {
-        return "http://127.0.0.1:8080";
+        ServiceInstance userService = client.choose(USER_SERVICE_NAME);
+        if (userService == null) {
+            throw new Universal_500_X_Exception_Runtime("Fail to query host of " + USER_SERVICE_NAME);
+        }
+        return userService.getUri().toString();
     }
 }
