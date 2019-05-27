@@ -36,7 +36,7 @@ public class DefaultRemoteService extends DefaultService {
     protected String getUserServicePrefix() {
         ServiceInstance userService = client.choose(USER_SERVICE_NAME);
         if (userService == null) {
-            throw new Universal_500_X_Exception_Runtime("Fail to query host of " + USER_SERVICE_NAME);
+            throw new Universal_500_X_Exception_Runtime("Fail to query URI of " + USER_SERVICE_NAME);
         }
         return userService.getUri().toString();
     }
