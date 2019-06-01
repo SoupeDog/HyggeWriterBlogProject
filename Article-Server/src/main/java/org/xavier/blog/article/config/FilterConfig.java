@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.xavier.blog.article.filter.LoginFilter;
 import org.xavier.blog.article.service.remote.UserTokenServiceImpl;
+import org.xavier.blog.common.filter.CrossOriginFilter;
 
 /**
  * 描述信息：<br/>
@@ -20,6 +21,16 @@ import org.xavier.blog.article.service.remote.UserTokenServiceImpl;
 public class FilterConfig {
     @Autowired
     UserTokenServiceImpl userTokenService;
+
+//     跨域 plan A
+    @Bean
+    public FilterRegistrationBean crossOriginFilterRegistrationBean() {
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        filterRegistrationBean.setFilter(new CrossOriginFilter());
+        filterRegistrationBean.setOrder(Ordered.LOWEST_PRECEDENCE - 1);
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
+    }
 
     @Bean
     public FilterRegistrationBean loginFilterRegistration() {

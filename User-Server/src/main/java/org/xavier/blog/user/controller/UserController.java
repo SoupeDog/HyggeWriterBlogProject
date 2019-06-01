@@ -30,7 +30,6 @@ import java.util.Map;
  * @date 2018/2/9
  * @since Jdk 1.8
  */
-@CrossOrigin
 @RestController
 public class UserController extends HyggeWriterController {
     @Autowired

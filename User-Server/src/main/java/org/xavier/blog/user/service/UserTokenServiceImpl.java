@@ -40,7 +40,7 @@ public class UserTokenServiceImpl extends DefaultService {
         }
         UserToken userToken = new UserToken();
         userToken.firstInit(loginBO.getuId(), loginBO.calculateScope(), System.currentTimeMillis());
-        userTokenMapper.removeUserToken(loginBO.getuId(), loginBO.getScopeByte());
+        userTokenMapper.removeUserToken(loginBO.getuId(), userToken.getScope().getScope());
         try {
             userTokenMapper.saveUserToken_Single(userToken);
         } catch (DuplicateKeyException e) {

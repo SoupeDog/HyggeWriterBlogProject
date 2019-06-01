@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.user.domain.bo.UserLoginBO;
@@ -25,12 +26,13 @@ import org.xavier.web.annotation.EnableControllerLog;
  * @since Jdk 1.8
  */
 @RestController
+@RequestMapping("/user-service/extra")
 public class UserTokenController extends HyggeWriterController {
     @Autowired
     UserTokenServiceImpl userTokenService;
 
     @EnableControllerLog
-    @PostMapping("/extra/token/login")
+    @PostMapping("/token/login")
     public ResponseEntity<?> createToken(@RequestBody UserLoginBO userLoginBO) {
         try {
             UserTokenDTO result = new UserTokenDTO(userTokenService.login(userLoginBO));
@@ -49,7 +51,7 @@ public class UserTokenController extends HyggeWriterController {
     }
 
     @EnableControllerLog
-    @PostMapping("/extra/token/validate")
+    @PostMapping("/token/validate")
     public ResponseEntity<?> validateToken(@RequestBody UserTokenBO userTokenBO) {
         try {
             userTokenBO.validate();
@@ -69,7 +71,7 @@ public class UserTokenController extends HyggeWriterController {
     }
 
     @EnableControllerLog
-    @PostMapping("/extra/token/refresh")
+    @PostMapping("/token/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody UserLoginBO userLoginBO) {
         try {
             UserTokenDTO result = new UserTokenDTO(userTokenService.refreshToken(userLoginBO.getuId(), userLoginBO.calculateScope(), userLoginBO.getRefreshKey(), System.currentTimeMillis()));

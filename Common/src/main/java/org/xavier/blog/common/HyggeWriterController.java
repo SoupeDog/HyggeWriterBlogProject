@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
  * @date 2018.07.27
  * @since Jdk 1.8
  */
-@CrossOrigin
 public class HyggeWriterController extends DefaultController {
     //请求类型不对
     @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
