@@ -54,7 +54,7 @@ public class ArticleServiceImpl extends DefaultService {
             add(new ColumnInfo(ColumnType.STRING, "title", "title", false, 1, 50));
             add(new ColumnInfo(ColumnType.STRING, "articleCategoryId", "articleCategoryId", false, 1, 32));
             add(new ColumnInfo(ColumnType.STRING, "uId", "uId", false, 1, 10));
-            add(new ColumnInfo(ColumnType.STRING, "statementId", "statementId", false, 1, 32));
+            add(new ColumnInfo(ColumnType.STRING, "statementId", "statementId", true, 1, 32));
             add(new ColumnInfo(ColumnType.STRING, "summary", "summary", true, 1, 1000));
             add(new ColumnInfo(ColumnType.STRING, "content", "content", false, 1, 100000));
         }};
@@ -132,12 +132,20 @@ public class ArticleServiceImpl extends DefaultService {
         HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
         mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
         if (data.containsKey("statementId")) {
-            String statementId = propertiesHelper.stringNotNull(data.get("statementId"), 32, 32, "[statementId] can't be null and its length should be 32.");
-            statementService.queryStatementByStatementId_WithExistValidate(statementId);
+            String statementId = propertiesHelper.string(data.get("statementId"), 32, 32, "[statementId] can't be null and its length should be 32.");
+            if (statementId != null) {
+                statementService.queryStatementByStatementId_WithExistValidate(statementId);
+            } else {
+                data.remove("statementId");
+            }
         }
         if (data.containsKey("articleCategoryId")) {
-            String articleCategoryId = propertiesHelper.stringNotNull(data.get("articleCategoryId"), 32, 32, "[articleCategoryId] can't be null and its length should be 32.");
-            articleCategoryService.queryArticleCategoryById_WithExistValidate(articleCategoryId);
+            String articleCategoryId = propertiesHelper.string(data.get("articleCategoryId"), 32, 32, "[articleCategoryId] can't be null and its length should be 32.");
+            if (articleCategoryId != null) {
+                articleCategoryService.queryArticleCategoryById_WithExistValidate(articleCategoryId);
+            } else {
+                data.remove("articleCategoryId");
+            }
         }
         if (data.containsKey("content")) {
             Integer wordCount = data.get("content").toString().trim().length();

@@ -1,8 +1,11 @@
 package org.xavier.blog.article.filter;
 
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.xavier.blog.article.service.remote.UserTokenServiceImpl;
 import org.xavier.blog.article.domain.enums.UserTokenScopeEnum;
+import org.xavier.blog.common.filter.FilterHelper;
+import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
 import org.xavier.common.exception.base.RequestException;
 import org.xavier.common.exception.base.RequestException_Runtime;
 import org.xavier.common.exception.base.ServiceException_Runtime;
@@ -15,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 
 /**
  * 描述信息：<br/>
@@ -45,10 +49,14 @@ public class LoginFilter extends OncePerRequestFilter {
                 case "POST":
                 case "DELETE":
                 case "PUT":
-                    uId = propertiesHelper.stringNotNull(request.getHeader("uId"), "[uId] can't be null.");
-                    token = propertiesHelper.stringNotNull(request.getHeader("token"), "[token] can't be null.");
-                    scope = UserTokenScopeEnum.getUserTypeEnum(propertiesHelper.stringNotNull(request.getHeader("scope"), "[scope] can't be null."));
-                    tokenService.validateUserToken(uId, token, scope);
+                    uId = propertiesHelper.string(request.getHeader("uId"));
+                    token = propertiesHelper.string(request.getHeader("token"));
+                    if (token == null && uId == null) {
+                        FilterHelper.addValueToHeaders(request, "uId", "U00000000");
+                    } else {
+                        scope = UserTokenScopeEnum.getUserTypeEnum(propertiesHelper.stringNotNull(request.getHeader("scope"), "[scope] can't be null. "));
+                        tokenService.validateUserToken(uId, token, scope);
+                    }
                     filterChain.doFilter(request, response);
                     break;
                 default:

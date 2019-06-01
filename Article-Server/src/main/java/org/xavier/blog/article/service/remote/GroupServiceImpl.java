@@ -38,7 +38,7 @@ public class GroupServiceImpl extends DefaultRemoteService {
 
     public ArrayList<String> quarryGroupInfoOfUser(String uId) {
         Long ts=System.currentTimeMillis();
-        HttpHelperResponse<GatewayResponse<ArrayList<String>>> response = httpHelpper.get(getUserServicePrefix() + "/main/group/list?uId=" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_STRING_LIST);
+        HttpHelperResponse<GatewayResponse<ArrayList<String>>> response = httpHelpper.get(getUserServicePrefix() + "/user-service/main/group/list?uId=" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_STRING_LIST);
         System.out.println((System.currentTimeMillis()-ts)+" 毫秒=查询用户群组信息");
         if (response.isFail()) {
             throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[quarryGroupInfoOfUser].", response.getData().getMsg());

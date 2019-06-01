@@ -24,7 +24,7 @@ public class UserTokenServiceImpl extends DefaultRemoteService {
 
     public void validateUserToken(String uId, String token, UserTokenScopeEnum scope) throws Universal_403_X_Exception {
         try {
-            HttpHelperResponse<GatewayResponse<Boolean>> response = httpHelpper.post(getUserServicePrefix() + "/extra/token/validate", String.format("{\"uId\":\"%s\",\"token\":\"%s\",\"scopeByte\":%s}", uId, token, scope.getScope()), RESPONSE_TYPEREFERENCE);
+            HttpHelperResponse<GatewayResponse<Boolean>> response = httpHelpper.post(getUserServicePrefix() + "/user-service/extra/token/validate", String.format("{\"uId\":\"%s\",\"token\":\"%s\",\"scopeByte\":%s}", uId, token, scope.getScope()), RESPONSE_TYPEREFERENCE);
             if (response.isFail()) {
                 throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[validateUserToken].", response.getData().getMsg());
             }

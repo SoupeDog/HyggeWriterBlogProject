@@ -163,7 +163,7 @@
         SELECT
         articleId
         FROM `article` WHERE legal_Flag=TRUE AND uId = #{uId} AND articleId IN
-        <foreach collection="rangeArticleIdList" index="index" item="item" open="(" separator="," close=")">
+        <foreach collection="rangeArticleIdListList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>

@@ -32,14 +32,14 @@ import java.util.Map;
  * @date 2018/6/18
  * @since Jdk 1.8
  */
-@CrossOrigin
 @RestController
+@RequestMapping("/article-service/main")
 public class ArticleController extends HyggeWriterController {
     @Autowired
     ArticleServiceImpl articleService;
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @PostMapping(value = "/main/article")
+    @PostMapping(value = "/article")
     public ResponseEntity<?> saveArticle(@RequestHeader HttpHeaders headers, @RequestBody Article article) {
         try {
             String operatorUId = headers.getFirst("uId");
@@ -60,7 +60,7 @@ public class ArticleController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @DeleteMapping(value = "/main/article/{articleIds}")
+    @DeleteMapping(value = "/article/{articleIds}")
     public ResponseEntity<?> removeArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleIds") ArrayList<String> articleIds) {
         try {
             String operatorUId = headers.getFirst("uId");
@@ -77,13 +77,13 @@ public class ArticleController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @PutMapping(value = "/main/article/{articleId}")
+    @PutMapping(value = "/article/{articleId}")
     public ResponseEntity<?> updateArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleId") String articleId, @RequestBody Map data) {
         try {
             String operatorUId = headers.getFirst("uId");
             Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a long number.");
             if (!articleService.updateArticle(operatorUId, articleId, data, upTs)) {
-                throw new Universal_409_X_Exception(ErrorCode.BOARD_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
+                throw new Universal_409_X_Exception(ErrorCode.ARTICLE_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();
         } catch (PropertiesException_Runtime e) {
@@ -98,7 +98,7 @@ public class ArticleController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @GetMapping(value = "/main/article/{article}")
+    @GetMapping(value = "/article/{article}")
     public ResponseEntity<?> queryArticle(@RequestHeader HttpHeaders headers, @PathVariable("article") String articleId) {
         String operatorUId = headers.getFirst("uId");
         String secretKey = headers.getFirst("secretKey");
@@ -112,7 +112,7 @@ public class ArticleController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @GetMapping(value = "/main/article/summary/{boardId}")
+    @GetMapping(value = "/article/summary/{boardId}")
     public ResponseEntity<?> queryArticleSummary(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId,
                                                  @RequestParam(value = "uId", required = false, defaultValue = "U00000001") String uId,
                                                  @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,

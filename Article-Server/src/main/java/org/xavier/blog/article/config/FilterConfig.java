@@ -37,7 +37,7 @@ public class FilterConfig {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         filterRegistrationBean.setFilter(new LoginFilter(userTokenService));
         filterRegistrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
-        filterRegistrationBean.addUrlPatterns("/main/*");
+        filterRegistrationBean.addUrlPatterns("/article-service/main/*");
         return filterRegistrationBean;
     }
 }
