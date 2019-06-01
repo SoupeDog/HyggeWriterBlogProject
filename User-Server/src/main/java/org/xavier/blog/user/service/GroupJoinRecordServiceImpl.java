@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.user.dao.GroupJoinRecordMapper;
 import org.xavier.blog.user.domain.enums.UserTypeEnum;
+import org.xavier.blog.user.domain.po.group.Group;
 import org.xavier.blog.user.domain.po.group.GroupJoinRecord;
 import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.common.exception.Universal_403_X_Exception;
+import org.xavier.common.exception.Universal_404_X_Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
 import org.xavier.web.extend.DefaultService;
 
@@ -28,12 +30,18 @@ public class GroupJoinRecordServiceImpl extends DefaultService {
     GroupJoinRecordMapper groupJoinRecordMapper;
     @Autowired
     UserServiceImpl userService;
+    @Autowired
+    GroupServiceImpl groupService;
 
-    public Boolean saveGroupJoinRecord(GroupJoinRecord groupJoinRecord) {
+    public Boolean saveGroupJoinRecord(GroupJoinRecord groupJoinRecord) throws Universal_404_X_Exception {
         groupJoinRecord.setisActive(false);
         Long currentTs = System.currentTimeMillis();
         groupJoinRecord.setLastUpdateTs(currentTs);
         groupJoinRecord.setTs(currentTs);
+        Group group = groupService.queryGroupByGId(groupJoinRecord.getgId());
+        if (group == null) {
+            throw new Universal_404_X_Exception(ErrorCode.GROUP_NOTFOUND.getErrorCod(), "Group(" + groupJoinRecord.getgId() + ") was not found.");
+        }
         Integer saveGroupJoinRecord_affectedLine = groupJoinRecordMapper.saveGroupJoinRecord_Single(groupJoinRecord);
         Boolean saveGroupJoinRecord_Flag = saveGroupJoinRecord_affectedLine == 1;
         if (!saveGroupJoinRecord_Flag) {
@@ -74,7 +82,8 @@ public class GroupJoinRecordServiceImpl extends DefaultService {
         return result;
     }
 
-    public Boolean isUserInTargetGroup(String uId, String gId) {
+    public Boolean isUserInTargetGroup(String operatorUId, String uId, String gId) throws Universal_403_X_Exception {
+        userService.checkRight(operatorUId, uId);
         ArrayList<GroupJoinRecord> groupJoinRecordList = groupJoinRecordMapper.queryGroupJoinRecordListByGIdAndUIdList(gId, listHelper.createSingleList(uId));
         return groupJoinRecordList.size() > 0;
     }
