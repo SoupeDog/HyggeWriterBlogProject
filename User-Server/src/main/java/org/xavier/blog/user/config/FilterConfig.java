@@ -36,7 +36,7 @@ public class FilterConfig {
     public FilterRegistrationBean loginFilterRegistration() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         filterRegistrationBean.setFilter(new LoginFilter(userTokenService));
-        filterRegistrationBean.addUrlPatterns("/main/*");
+        filterRegistrationBean.addUrlPatterns("/user-service/main/*");
         filterRegistrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
         return filterRegistrationBean;
     }

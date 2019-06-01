@@ -31,12 +31,13 @@ import java.util.Map;
  * @since Jdk 1.8
  */
 @RestController
+@RequestMapping("/user-service/main")
 public class UserController extends HyggeWriterController {
     @Autowired
     UserServiceImpl userService;
 
     @EnableControllerLog
-    @PostMapping(value = "/main/user")
+    @PostMapping(value = "/user")
     public ResponseEntity<?> saveUser(@RequestBody User user) {
         try {
             userService.saveUser(user, System.currentTimeMillis());
@@ -49,7 +50,7 @@ public class UserController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @DeleteMapping(value = "/main/user/{uIds}")
+    @DeleteMapping(value = "/user/{uIds}")
     public ResponseEntity<?> removeUserMultiple(@RequestHeader HttpHeaders headers, @PathVariable("uIds") ArrayList<String> uIdList) {
         try {
             Long currentTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
@@ -67,7 +68,7 @@ public class UserController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = {"headers"})
-    @PutMapping(value = "/main/user/{uId}")
+    @PutMapping(value = "/user/{uId}")
     public ResponseEntity<?> updateUser(@RequestHeader HttpHeaders headers, @PathVariable("uId") String uId, @RequestBody Map rowData) {
         try {
             if (!userService.updateUser(headers.getFirst("uId"), uId, rowData, System.currentTimeMillis())) {
@@ -88,9 +89,10 @@ public class UserController extends HyggeWriterController {
     }
 
     @EnableControllerLog
-    @GetMapping(value = "/main/user/{uIds}")
-    public ResponseEntity<?> queryUserMultiple(@PathVariable("uIds") ArrayList<String> uIdList) {
+    @GetMapping(value = "/user/{uIds}")
+    public ResponseEntity<?> queryUserMultiple(@RequestHeader HttpHeaders headers, @PathVariable("uIds") ArrayList<String> uIdList) {
         try {
+            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
             ArrayList<UserDTO> result = userService.userToUserDTO(userService.queryUserListByUId(uIdList));
             return success(result);
         } catch (PropertiesException_Runtime e) {
