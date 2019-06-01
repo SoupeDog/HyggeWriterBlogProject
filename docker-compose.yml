@@ -4,6 +4,8 @@ services:
     build: Eureka/.
     ports:
       - "8761:8761"
+    volumes:
+      - /home/log/:/logFile
     networks:
       - Hygge
   article-server:
@@ -22,6 +24,8 @@ services:
     build: User-Server/.
     ports:
       - "8081:8080"
+    volumes:
+      - /home/log/:/logFile
     depends_on:
       - eureka
     links:
