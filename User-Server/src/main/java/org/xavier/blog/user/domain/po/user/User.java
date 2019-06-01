@@ -90,6 +90,9 @@ public class User {
         propertiesHelper.stringNotNull(uName, 1, 20, "[uName] can't be null,and its length should within 20.");
         propertiesHelper.stringNotNull(pw, 6, 20, "[pw] can't be null,and its length should be between 6~20.");
         propertiesHelper.string(properties, 0, 1000, "Length of [properties] should within 1000.");
+        if (properties != null) {
+            properties = UtilsCreator.getInstance_DefaultJsonHelper(false).format(properties);
+        }
     }
 
     /**
@@ -134,11 +137,11 @@ public class User {
     public User() {
     }
 
-    public Integer getId() {
+    public Integer getid() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setid(Integer id) {
         this.id = id;
     }
 

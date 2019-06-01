@@ -90,9 +90,8 @@ public class UserController extends HyggeWriterController {
 
     @EnableControllerLog
     @GetMapping(value = "/user/{uIds}")
-    public ResponseEntity<?> queryUserMultiple(@RequestHeader HttpHeaders headers, @PathVariable("uIds") ArrayList<String> uIdList) {
+    public ResponseEntity<?> queryUserMultiple(@PathVariable("uIds") ArrayList<String> uIdList) {
         try {
-            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
             ArrayList<UserDTO> result = userService.userToUserDTO(userService.queryUserListByUId(uIdList));
             return success(result);
         } catch (PropertiesException_Runtime e) {

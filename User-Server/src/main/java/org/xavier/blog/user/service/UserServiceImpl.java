@@ -36,7 +36,7 @@ public class UserServiceImpl extends DefaultService {
     private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
         add(new ColumnInfo(ColumnType.STRING, "uName", "uName", false, 0, 20));
         add(new ColumnInfo(ColumnType.STRING, "pw", "pw", false, 6, 20));
-        add(new ColumnInfo(ColumnType.STRING, "headIcon", "headIcon", false, 0, 30));
+        add(new ColumnInfo(ColumnType.STRING, "headIcon", "headIcon", true, 0, 30));
         add(new ColumnInfo(ColumnType.LONG, "birthday", "birthday", true, 0, Long.MAX_VALUE));
         add(new ColumnInfo(ColumnType.STRING, "phone", "phone", true, 0, 15));
         add(new ColumnInfo(ColumnType.STRING, "email", "email", false, 0, 50));
@@ -58,12 +58,12 @@ public class UserServiceImpl extends DefaultService {
         if (!saveUser_Flag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("saveUser_EffectedLine", "1", saveUser_affectedLine, user));
         } else {
-            user.setuId(getUId(user.getId()));
+            user.setuId(getUId(user.getid()));
             HashMap map = new HashMap() {{
                 put("uId", user.getuId());
                 put("lastUpdateTs", user.getRegisterTs() + 1L);
             }};
-            Integer updateUId_AffectedLineT = userMapper.updateById_CASByLastUpdateTs(user.getId(), map, user.getRegisterTs() + 1L);
+            Integer updateUId_AffectedLineT = userMapper.updateById_CASByLastUpdateTs(user.getid(), map, user.getRegisterTs() + 1L);
             Boolean updateUId_Flag = updateUId_AffectedLineT == 1;
             if (!updateUId_Flag) {
                 logger.warn(HyggeLoggerMsgBuilder.assertFail("updateUId_EffectedLine", "1", updateUId_AffectedLineT, user));
@@ -82,7 +82,7 @@ public class UserServiceImpl extends DefaultService {
         if (currentOperator == null || !currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
             throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
         }
-        ArrayList<String> uIdListForQuery = listHelper.filterStringListNotEmpty(uIdList, "uIdList", 32, 32);
+        ArrayList<String> uIdListForQuery = listHelper.filterStringListNotEmpty(uIdList, "uIdList", 9, 10);
         Integer remove_AffectedLine = userMapper.removeUserByUId_Logically_Multiple(uIdListForQuery, upTs);
         Boolean removeResult = remove_AffectedLine == uIdList.size();
         if (!removeResult) {

@@ -10,7 +10,7 @@
         id, uId, pw, headIcon, userType, uName, sex, birthday, phone, email, biography, exp, properties, legal_Flag, registerTs, lastUpdateTs
     </sql>
 
-    <insert id="saveUser_Single" parameterType="User" useGeneratedKeys="true" keyProperty="user.id">
+    <insert id="saveUser_Single" parameterType="User" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `user`(<include refid="Base_Column_List"/>)VALUES (
         #{user.uId},
         #{user.pw},
