@@ -102,7 +102,8 @@ public class ArticleController extends HyggeWriterController {
         String operatorUId = headers.getFirst("uId");
         String secretKey = headers.getFirst("secretKey");
         try {
-            System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(headers));
+            String str = UtilsCreator.getInstance_DefaultJsonHelper(true).format(headers);
+            logger.warn(str);
             ArticleQuarryBO result = articleService.queryArticleByArticleId_WithBusinessCheck(operatorUId, secretKey, articleId);
             return success(result);
         } catch (PropertiesException_Runtime e) {

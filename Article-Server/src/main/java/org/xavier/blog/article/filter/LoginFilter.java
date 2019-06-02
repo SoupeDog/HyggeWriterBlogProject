@@ -40,12 +40,6 @@ public class LoginFilter extends OncePerRequestFilter {
         PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
         String uId, token;
         UserTokenScopeEnum scope;
-        String possibleIpStr = request.getHeader("x-forwarded-for");
-        String possibleIpStr2 = request.getHeader("X-FORWARDED-FOR");
-        String remoteIp = request.getRemoteAddr();
-        FilterHelper.addValueToHeaders(request, "remoteIp", remoteIp);
-        FilterHelper.addValueToHeaders(request, "possibleIpStr", possibleIpStr);
-        FilterHelper.addValueToHeaders(request, "possibleIpStr2", possibleIpStr2);
         try {
             switch (request.getMethod().toUpperCase()) {
                 case "GET":
