@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.user.dao.UserOperationLogMapper">
+
+    <sql id="Base_Column_List">
+        uId,behavior,mainPoints,realIp,userAgent,ts
+    </sql>
+
+    <sql id="All_Column_List">
+        id,uId,behavior,mainPoints,realIp,userAgent,ts
+    </sql>
+
+    <insert id="saveUserOperationLog" parameterType="UserOperationLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `userOperationLog`(<include refid="Base_Column_List"/>)VALUES (
+        #{userOperationLog.uId},
+        #{userOperationLog.behavior},
+        #{userOperationLog.mainPoints},
+        #{userOperationLog.realIp},
+        #{userOperationLog.userAgent},
+        #{userOperationLog.ts}
+        )
+    </insert>
+
+    <select id="queryUserOperationLogByUIdList" resultType="UserOperationLog">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `userOperationLog`
+        <if test="uIdList != null">
+            WHERE uId IN
+            <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY ${orderKey} ${order}
+        Limit #{startPoint},#{size}
+    </select>
+
+    <select id="queryUserOperationLogByUIdList_TotalCount" resultType="integer">
+        SELECT
+        COUNT(*)
+        FROM `userOperationLog`
+        <if test="uIdList != null">
+            WHERE uId IN
+            <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>

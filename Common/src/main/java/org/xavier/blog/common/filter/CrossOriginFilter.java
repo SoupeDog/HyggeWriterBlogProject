@@ -1,6 +1,7 @@
 package org.xavier.blog.common.filter;
 
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.xavier.blog.common.PropertiesReminder;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -26,8 +27,8 @@ public class CrossOriginFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With,uid,token,scope,secretKey");
         // x-forwarded-for 为 HTTP 头字段标准化草案中正式提出。详见 https://baike.baidu.com/item/X-Forwarded-For
         //        String remoteIp = request.getRemoteAddr();
-        String x_Forwarded_For = request.getHeader("x-forwarded-for");
-        FilterHelper.addValueToHeaders(request, "x-forwarded-for", x_Forwarded_For);
+        String x_Forwarded_For = request.getHeader(PropertiesReminder.DESC_REAL_IP_NAME);
+        FilterHelper.addValueToHeaders(request, PropertiesReminder.DESC_REAL_IP_NAME, x_Forwarded_For);
         filterChain.doFilter(request, response);
     }
 }

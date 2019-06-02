@@ -3,52 +3,16 @@
 <mapper namespace="org.xavier.blog.article.dao.ArticleMapper">
 
     <sql id="Summary_Column_List">
-        articleId,
-        uId,
-        articleCategoryId,
-        statementId,
-        title,
-        summary,
-        content,
-        wordCount,
-        pageViews,
-        properties,
-        legal_Flag,
-        ts,
-        lastUpdateTs
+       articleId,uId,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,ts,lastUpdateTs
     </sql>
 
     <sql id="All_Column_List">
-        articleId,
-        uId,
-        articleCategoryId,
-        statementId,
-        title,
-        summary,
-        content,
-        wordCount,
-        pageViews,
-        properties,
-        legal_Flag,
-        ts,
-        lastUpdateTs
-    </sql>
-    <sql id="ArticleSummaryQueryPO_Column_List">
-        articleId,
-        uId,
-        articleCategoryId,
-        statementId,
-        title,
-        summary,
-        content,
-        wordCount,
-        pageViews,
-        properties,
-        legal_Flag,
-        ts,
-        lastUpdateTs
+        articleId,uId,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,ts,lastUpdateTs
     </sql>
 
+    <sql id="ArticleSummaryQueryPO_Column_List">
+        articleId,uId,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,ts,lastUpdateTs
+    </sql>
 
     <insert id="saveArticle" parameterType="Article">
         INSERT INTO `article`(<include refid="All_Column_List"/>)VALUES (

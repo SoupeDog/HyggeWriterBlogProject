@@ -10,7 +10,7 @@
     </sql>
 
     <insert id="saveUserToken_Single" parameterType="UserToken">
-        INSERT INTO `userToken`(<include refid="Base_Column_List"/>)VALUES (
+        INSERT INTO `userToken`(<include refid="All_Column_List"/>)VALUES (
         #{userToken.uId},
         #{userToken.token},
         #{userToken.deadLine},

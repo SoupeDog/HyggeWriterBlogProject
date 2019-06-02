@@ -3,29 +3,11 @@
 <mapper namespace="org.xavier.blog.article.dao.ArticleCategoryMapper">
 
     <sql id="Base_Column_List">
-        articleCategoryId,
-        uId,
-        boardId,
-        articleCategoryName,
-        description,
-        accessPermit,
-        extendProperties,
-        legal_Flag,
-        lastUpdateTs,
-        ts
+        articleCategoryId,uId,boardId,articleCategoryName,description,accessPermit,extendProperties,legal_Flag,lastUpdateTs,ts
     </sql>
 
     <sql id="All_Column_List">
-        articleCategoryId,
-        uId,
-        boardId,
-        articleCategoryName,
-        description,
-        accessPermit,
-        extendProperties,
-        legal_Flag,
-        lastUpdateTs,
-        ts
+        articleCategoryId,uId,boardId,articleCategoryName,description,accessPermit,extendProperties,legal_Flag,lastUpdateTs,ts
     </sql>
 
     <insert id="saveArticleCategory" parameterType="ArticleCategory" useGeneratedKeys="true"
