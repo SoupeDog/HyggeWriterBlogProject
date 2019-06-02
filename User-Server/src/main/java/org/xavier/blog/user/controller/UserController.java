@@ -71,7 +71,7 @@ public class UserController extends HyggeWriterController {
     @PutMapping(value = "/user/{uId}")
     public ResponseEntity<?> updateUser(@RequestHeader HttpHeaders headers, @PathVariable("uId") String uId, @RequestBody Map rowData) {
         try {
-            if (!userService.updateUser(headers.getFirst("uId"), uId, rowData, System.currentTimeMillis())) {
+            if (!userService.updateUser(headers.getFirst("uId"), uId, rowData)) {
                 throw new Universal_409_X_Exception(ErrorCode.USER_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();

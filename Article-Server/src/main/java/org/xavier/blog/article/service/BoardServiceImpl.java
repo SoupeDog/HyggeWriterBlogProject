@@ -94,7 +94,7 @@ public class BoardServiceImpl extends DefaultService {
     /**
      * 修改版权声明
      */
-    public Boolean updateBoard(String operatorUId, String boardId, Map rowData, Long upTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
+    public Boolean updateBoard(String operatorUId, String boardId, Map rowData) throws Universal_404_X_Exception, Universal_403_X_Exception {
         propertiesHelper.stringNotNull(boardId, 32, 32, "[boardId] can't be null,and its length should be 32.");
         Board board = quarryBoardByBoardId(boardId);
         if (board == null) {
@@ -103,6 +103,7 @@ public class BoardServiceImpl extends DefaultService {
         userService.checkRight(operatorUId, board.getuId());
         HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
         mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
+        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
         Integer updateBoard_affectedLine = boardMapper.updateBoard(boardId, data, upTs);
         Boolean updateBoard_Flag = updateBoard_affectedLine == 1;
         if (!updateBoard_Flag) {

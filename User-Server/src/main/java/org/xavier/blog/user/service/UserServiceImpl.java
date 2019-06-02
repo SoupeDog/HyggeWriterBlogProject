@@ -96,7 +96,7 @@ public class UserServiceImpl extends DefaultService {
      *
      * @throws Universal_400_X_Exception 有效更改参数为空
      */
-    public Boolean updateUser(String operatorUId, String uId, Map rowData, Long upTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
+    public Boolean updateUser(String operatorUId, String uId, Map rowData) throws Universal_404_X_Exception, Universal_403_X_Exception {
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
         checkRight(operatorUId, uId);
         // 目标用户是否存在
@@ -104,6 +104,7 @@ public class UserServiceImpl extends DefaultService {
         HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
         // 不能通过此接口修改经验
         data.remove("exp");
+        Long upTs =propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
         mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
         Integer update_AffectedLine = userMapper.updateByUId_CASByLastUpdateTs(uId, data, upTs);
         Boolean updateResult = update_AffectedLine == 1;

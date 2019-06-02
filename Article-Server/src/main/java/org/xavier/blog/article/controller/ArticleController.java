@@ -81,8 +81,7 @@ public class ArticleController extends HyggeWriterController {
     public ResponseEntity<?> updateArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleId") String articleId, @RequestBody Map data) {
         try {
             String operatorUId = headers.getFirst("uId");
-            Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a long number.");
-            if (!articleService.updateArticle(operatorUId, articleId, data, upTs)) {
+            if (!articleService.updateArticle(operatorUId, articleId, data)) {
                 throw new Universal_409_X_Exception(ErrorCode.ARTICLE_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();

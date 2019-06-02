@@ -126,7 +126,7 @@ public class ArticleServiceImpl extends DefaultService {
      * @param articleId 文章唯一标识
      * @param rowData   修改原数据
      */
-    public Boolean updateArticle(String operatorUId, String articleId, Map rowData, Long upTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
+    public Boolean updateArticle(String operatorUId, String articleId, Map rowData) throws Universal_404_X_Exception, Universal_403_X_Exception {
         Article targetArticle = querySingleArticleByArticleId_WithExistValidate(articleId);
         userService.checkRight(operatorUId, targetArticle.getuId());
         HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
@@ -151,6 +151,7 @@ public class ArticleServiceImpl extends DefaultService {
             Integer wordCount = data.get("content").toString().trim().length();
             data.put("wordCount", wordCount);
         }
+        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
         Integer updateArticle_affectedLine = articleMapper.updateArticle(articleId, data, upTs);
         Boolean updateArticle_Flag = updateArticle_affectedLine == 1;
         if (!updateArticle_Flag) {

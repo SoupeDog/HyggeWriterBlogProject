@@ -66,7 +66,7 @@ public class GroupServiceImpl extends DefaultService {
         return removeGroup_Flag;
     }
 
-    public Boolean updateGroup(String operatorUId, String gId, Map rowData, Long upTs) throws Universal_403_X_Exception, Universal_404_X_Exception {
+    public Boolean updateGroup(String operatorUId, String gId, Map rowData) throws Universal_403_X_Exception, Universal_404_X_Exception {
         propertiesHelper.stringNotNull(gId, 32, 32, "[gId] can't be null,and its length should be 32.");
         checkRight(operatorUId, gId);
         HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
@@ -74,6 +74,7 @@ public class GroupServiceImpl extends DefaultService {
             userService.queryUserByUId_WithExistValidate(propertiesHelper.string(data.get("groupOwner")));
         }
         mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
+        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
         Integer updateGroup_affectedLine = groupMapper.updateByGId_CASByLastUpdateTs(gId, data, upTs);
         Boolean updateGroup_Flag = updateGroup_affectedLine == 1;
         if (!updateGroup_Flag) {

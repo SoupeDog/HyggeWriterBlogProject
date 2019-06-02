@@ -29,14 +29,14 @@ import java.util.Map;
  * @date 2018/4/22
  * @since Jdk 1.8
  */
-@CrossOrigin
 @RestController
+@RequestMapping("/article-service/main")
 public class BoardController extends HyggeWriterController {
     @Autowired
     BoardServiceImpl boardService;
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @PostMapping(value = "/main/board")
+    @PostMapping(value = "/board")
     public ResponseEntity<?> saveBoard(@RequestHeader HttpHeaders headers, @RequestBody Board board) {
         try {
             board.validate();
@@ -50,7 +50,7 @@ public class BoardController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @DeleteMapping(value = "/main/board/{boardIds}")
+    @DeleteMapping(value = "/board/{boardIds}")
     public ResponseEntity<?> removeUserMultiple(@RequestHeader HttpHeaders headers, @PathVariable("boardIds") ArrayList<String> boardIdList) {
         try {
             if (!boardService.removeBoard_Multiple(headers.getFirst("uId"), boardIdList, System.currentTimeMillis())) {
@@ -67,11 +67,10 @@ public class BoardController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @PutMapping(value = "/main/board/{boardId}")
+    @PutMapping(value = "/board/{boardId}")
     public ResponseEntity<?> updateBoard(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId, @RequestBody Map rowData) {
         try {
-            Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] should be a Long,and it can't be null.");
-            boardService.updateBoard(headers.getFirst("uId"), boardId, rowData, upTs);
+            boardService.updateBoard(headers.getFirst("uId"), boardId, rowData);
             return success();
         } catch (PropertiesException_Runtime e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
@@ -83,7 +82,7 @@ public class BoardController extends HyggeWriterController {
     }
 
     @EnableControllerLog(ignoreProperties = "headers")
-    @GetMapping(value = "/main/board/all")
+    @GetMapping(value = "/board/all")
     public ResponseEntity<?> queryBoardAll(@RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") Integer pageSize,
                                            @RequestParam(value = "orderKey", required = false, defaultValue = "ts") String orderKey,
