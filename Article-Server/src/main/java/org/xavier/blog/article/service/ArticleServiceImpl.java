@@ -1,7 +1,9 @@
 package org.xavier.blog.article.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.xavier.blog.article.dao.ArticleMapper;
 import org.xavier.blog.article.domain.bo.ArticleQuarryBO;
 import org.xavier.blog.article.domain.bo.ArticleSummaryQueryBO;
@@ -13,6 +15,7 @@ import org.xavier.blog.article.domain.po.article.ArticleQuarryPO;
 import org.xavier.blog.article.domain.po.article.ArticleSummaryQueryPO;
 import org.xavier.blog.article.service.remote.UserServiceImpl;
 import org.xavier.blog.common.ErrorCode;
+import org.xavier.blog.common.PropertiesReminder;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.exception.Universal_403_X_Exception;
 import org.xavier.common.exception.Universal_404_X_Exception;
@@ -117,6 +120,11 @@ public class ArticleServiceImpl extends DefaultService {
             if (autoIncreaseArticlePageViews_affectedLine != 1) {
                 logger.warn(HyggeLoggerMsgBuilder.assertFail("autoIncreaseArticlePageViews_affectedLine", String.valueOf(1), autoIncreaseArticlePageViews_affectedLine, articleId));
             }
+        }).exceptionally(throwable -> {
+            if (throwable != null) {
+                logger.error(throwable.getMessage(), throwable);
+            }
+            return null;
         });
     }
 
@@ -165,7 +173,7 @@ public class ArticleServiceImpl extends DefaultService {
         return updateArticle_Flag;
     }
 
-    public ArticleQuarryBO queryArticleByArticleId_WithBusinessCheck(String operatorUId, String secretKey, String articleId) {
+    public ArticleQuarryBO queryArticleByArticleId_WithBusinessCheck(HttpHeaders headers, String operatorUId, String secretKey, String articleId) {
         propertiesHelper.stringNotNull(operatorUId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
         propertiesHelper.stringNotNull(articleId, 32, 32, "[articleId] can't be null,and its length should be 32.");
         ArticleQuarryPO articleQuarryPO = articleMapper.queryArticleQuarryBOByArticleId(articleId);
@@ -177,6 +185,13 @@ public class ArticleServiceImpl extends DefaultService {
         UserValidateBO currentUser = userService.queryUserValidateBOByUId(operatorUId, secretKey);
         if (currentUser.chekPromission(articleCategoryTemp)) {
             increasePageViews_Asynchronous(result.getArticleId());
+            userService.addUserLog_Async(operatorUId,
+                    PropertiesReminder.浏览文章,
+                    result.getTitle(),
+                    headers.getFirst(PropertiesReminder.DESC_REAL_IP_NAME),
+                    headers.getFirst(PropertiesReminder.请求方代理设备信息),
+                    System.currentTimeMillis()
+            );
             return result;
         }
         return null;

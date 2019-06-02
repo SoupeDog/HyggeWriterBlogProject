@@ -5,4 +5,6 @@ package org.xavier.blog.common;
  */
 public class PropertiesReminder {
     public static final String DESC_REAL_IP_NAME = "x-forwarded-for";
+    public static final String 请求方代理设备信息 = "user-agent";
+    public static final String 浏览文章 = "浏览文章";
 }

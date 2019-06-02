@@ -39,5 +39,6 @@ public class DefaultRemoteService extends DefaultService {
             throw new Universal_500_X_Exception_Runtime("Fail to query URI of " + USER_SERVICE_NAME);
         }
         return userService.getUri().toString();
+//        return "http://127.0.0.1:8080/user-service";
     }
 }

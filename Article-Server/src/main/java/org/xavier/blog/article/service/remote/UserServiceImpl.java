@@ -16,6 +16,7 @@ import org.xavier.common.utils.HttpHelpper;
 import org.xavier.web.extend.GatewayResponse;
 
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 描述信息：<br/>
@@ -37,6 +38,8 @@ public class UserServiceImpl extends DefaultRemoteService {
 
     private static final TypeReference RESPONSE_TYPEREFERENCE_USER_LIST = new TypeReference<GatewayResponse<ArrayList<UserDTO>>>() {
     };
+    private static final TypeReference RESPONSE_TYPEREFERENCE_VOID = new TypeReference<GatewayResponse<String>>() {
+    };
 
     public UserValidateBO queryUserValidateBOByUId(String uId, String secretKey) {
         UserValidateBO result = new UserValidateBO();
@@ -49,9 +52,9 @@ public class UserServiceImpl extends DefaultRemoteService {
     }
 
     public UserDTO queryUserByUId(String uId) {
-        Long ts=System.currentTimeMillis();
+        Long ts = System.currentTimeMillis();
         HttpHelperResponse<GatewayResponse<ArrayList<UserDTO>>> response = httpHelpper.get(getUserServicePrefix() + "/user-service/main/user/" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_USER_LIST);
-        System.out.println((System.currentTimeMillis()-ts)+" 毫秒=查询用户信息");
+        System.out.println((System.currentTimeMillis() - ts) + " 毫秒=查询用户信息");
         if (response.isFail()) {
             throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[queryUserByUId].", response.getData().getMsg());
         }
@@ -60,6 +63,28 @@ public class UserServiceImpl extends DefaultRemoteService {
         } else {
             return response.getData().getData().get(0);
         }
+    }
+
+    public void addUserLog_Async(String uId, String behavior, String mainPoints, String realIp, String userAgent, Long ts) {
+        String requestJson = String.format("{\"uId\":\"%s\",\"behavior\":\"%s\",\"mainPoints\":\"%s\",\"realIp\":\"%s\",\"userAgent\":\"%s\",\"ts\":%s}",
+                uId,
+                behavior,
+                mainPoints,
+                realIp,
+                userAgent,
+                ts.toString());
+        CompletableFuture.runAsync(() -> {
+            System.out.println(getUserServicePrefix() + "/main/user/log/operation");
+            HttpHelperResponse<GatewayResponse<String>> response = httpHelpper.post(getUserServicePrefix() + "/main/user/log/operation", requestJson, httpHeaders, RESPONSE_TYPEREFERENCE_VOID);
+            if (response.isFail()) {
+                throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[saveUserOperationLog]. " + response.getHttpStatus() + " " + requestJson);
+            }
+        }).exceptionally(throwable -> {
+            if (throwable != null) {
+                logger.error(throwable.getMessage(), throwable);
+            }
+            return null;
+        });
     }
 
     public UserDTO queryUserByUId_WithExistValidate(String uId) throws Universal_404_X_Exception {

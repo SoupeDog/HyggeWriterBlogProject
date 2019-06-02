@@ -9,6 +9,8 @@ import org.xavier.blog.article.service.ArticleCategoryServiceImpl;
 import org.xavier.common.exception.Universal_404_X_Exception;
 import org.xavier.common.utils.UtilsCreator;
 
+import java.io.IOException;
+
 import static org.junit.Assert.*;
 
 /**
@@ -32,7 +34,7 @@ public class UserServiceImplTest {
     @Test
     public void queryUserByUId() throws Universal_404_X_Exception {
         Long ts = System.currentTimeMillis();
-        Object object = userService.queryUserValidateBOByUId("U00000001",null);
+        Object object = userService.queryUserValidateBOByUId("U00000001", null);
         System.out.println((System.currentTimeMillis() - ts) + " 毫秒");
         System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(object));
     }
@@ -40,5 +42,11 @@ public class UserServiceImplTest {
     @Test
     public void queryUserByUId2() throws Universal_404_X_Exception {
         System.out.println(UtilsCreator.getInstance_DefaultJsonHelper(true).format(articleCategoryService.queryArticleCategoryByUId("U00000001", "123", "U00000001", "")));
+    }
+
+    @Test
+    public void addUserLog() throws InterruptedException, IOException {
+        userService.addUserLog_Async("U00000001", "搞事情", "没搞成", "127.0.0.1", "爪机", 1L);
+       System.in.read();
     }
 }
