@@ -89,7 +89,7 @@ public class StatementServiceImpl extends DefaultService {
     /**
      * 修改版权声明
      */
-    public Boolean updateStatement(String operatorUId, String statementId, Map rowData, Long upTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
+    public Boolean updateStatement(String operatorUId, String statementId, Map rowData) throws Universal_404_X_Exception, Universal_403_X_Exception {
         propertiesHelper.stringNotNull(statementId, 32, 32, "[statementId] can't be null,and its length should be 32.");
         Statement statement = quarryStatementByStatementId(statementId);
         if (statement == null) {
@@ -107,6 +107,7 @@ public class StatementServiceImpl extends DefaultService {
         }
         HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
         mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
+        Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a long number.");
         Integer updateStatement_affectedLine = statementMapper.updateStatement(statementId, data, upTs);
         Boolean updateGroup_Flag = updateStatement_affectedLine == 1;
         if (!updateGroup_Flag) {

@@ -1,11 +1,9 @@
 package org.xavier.blog.article.filter;
 
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.xavier.blog.article.service.remote.UserTokenServiceImpl;
 import org.xavier.blog.article.domain.enums.UserTokenScopeEnum;
+import org.xavier.blog.article.service.remote.UserTokenServiceImpl;
 import org.xavier.blog.common.filter.FilterHelper;
-import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
 import org.xavier.common.exception.base.RequestException;
 import org.xavier.common.exception.base.RequestException_Runtime;
 import org.xavier.common.exception.base.ServiceException_Runtime;
@@ -18,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 
 /**
  * 描述信息：<br/>
@@ -43,6 +40,12 @@ public class LoginFilter extends OncePerRequestFilter {
         PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
         String uId, token;
         UserTokenScopeEnum scope;
+        String possibleIpStr = request.getHeader("x-forwarded-for");
+        String possibleIpStr2 = request.getHeader("X-FORWARDED-FOR");
+        String remoteIp = request.getRemoteAddr();
+        FilterHelper.addValueToHeaders(request, "remoteIp", remoteIp);
+        FilterHelper.addValueToHeaders(request, "possibleIpStr", possibleIpStr);
+        FilterHelper.addValueToHeaders(request, "possibleIpStr2", possibleIpStr2);
         try {
             switch (request.getMethod().toUpperCase()) {
                 case "GET":
