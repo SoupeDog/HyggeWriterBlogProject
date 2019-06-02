@@ -104,7 +104,7 @@ public class ArticleController extends HyggeWriterController {
         try {
             String str = UtilsCreator.getInstance_DefaultJsonHelper(true).format(headers);
             logger.warn(str);
-            ArticleQuarryBO result = articleService.queryArticleByArticleId_WithBusinessCheck(operatorUId, secretKey, articleId);
+            ArticleQuarryBO result = articleService.queryArticleByArticleId_WithBusinessCheck(headers, operatorUId, secretKey, articleId);
             return success(result);
         } catch (PropertiesException_Runtime e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

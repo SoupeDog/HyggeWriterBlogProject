@@ -75,7 +75,7 @@ public class UserServiceImpl extends DefaultRemoteService {
                 ts.toString());
         CompletableFuture.runAsync(() -> {
             System.out.println(getUserServicePrefix() + "/main/user/log/operation");
-            HttpHelperResponse<GatewayResponse<String>> response = httpHelpper.post(getUserServicePrefix() + "/main/user/log/operation", requestJson, httpHeaders, RESPONSE_TYPEREFERENCE_VOID);
+            HttpHelperResponse<GatewayResponse<String>> response = httpHelpper.post(getUserServicePrefix() + "/user-service/main/user/log/operation", requestJson, httpHeaders, RESPONSE_TYPEREFERENCE_VOID);
             if (response.isFail()) {
                 throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[saveUserOperationLog]. " + response.getHttpStatus() + " " + requestJson);
             }
