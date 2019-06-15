@@ -49,6 +49,9 @@ public class UserValidateBO {
     }
 
     public Boolean chekPromission(ArticleCategory articleCategory) {
+        if (articleCategory.getuId().equals(user.getuId())) {
+            return true;
+        }
         Boolean result = false;
         switch (articleCategory.getAccessPermit()) {
             case PUBLIC:
