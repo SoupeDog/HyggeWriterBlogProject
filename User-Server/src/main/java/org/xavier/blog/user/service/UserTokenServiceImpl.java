@@ -72,7 +72,7 @@ public class UserTokenServiceImpl extends DefaultService {
         if (userToken == null) {
             throw new Universal_404_X_Exception(ErrorCode.TOKEN_NOTFOUND.getErrorCod(), "Token of User(" + uId + ") was not found.");
         } else {
-            if (userToken.getScope().getScope() != scope.getScope()) {
+            if (!userToken.getScope().getScope().equals(scope.getScope())) {
                 throw new Universal_403_X_Exception(ErrorCode.UNEXPECTED_TOKEN_SCOPE.getErrorCod(), "Unexpected scope of token.");
             }
             if (!userToken.getRefreshKey().equals(refreshKey)) {

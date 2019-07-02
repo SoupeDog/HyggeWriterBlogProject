@@ -263,14 +263,14 @@ public class ArticleServiceImpl extends DefaultService {
         }
     }
 
-    public static ArticleDTO articleToArticleDTO(Article article) {
+    public ArticleDTO articleToArticleDTO(Article article) {
         if (article == null) {
             return null;
         }
         return new ArticleDTO(article);
     }
 
-    public static ArrayList<ArticleDTO> articleToArticleDTO(List<Article> articleList) {
+    public ArrayList<ArticleDTO> articleToArticleDTO(List<Article> articleList) {
         ArrayList<ArticleDTO> result = new ArrayList();
         for (Article temp : articleList) {
             result.add(new ArticleDTO(temp));

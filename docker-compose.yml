@@ -4,14 +4,14 @@ services:
     build: Eureka/.
     ports:
       - "8761:8761"
-    volumes:
-      - /home/log/:/logFile
     networks:
       - Hygge
   article-server:
     build: Article-Server/.
     ports:
       - "8082:8081"
+    volumes:
+      - /home/log/:/logFile
     depends_on:
       - eureka
     links:
@@ -19,7 +19,8 @@ services:
     expose:
       - "8081"
     networks:
-      - Hygge
+      Hygge:
+        ipv4_address: 172.19.0.8
   user-server:
     build: User-Server/.
     ports:
@@ -33,7 +34,8 @@ services:
     expose:
       - "8080"
     networks:
-      - Hygge
+      Hygge:
+        ipv4_address: 172.19.0.9
 networks:
   Hygge:
     external: true
