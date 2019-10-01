@@ -1,8 +1,10 @@
 import React from 'react';
-import LogHelper from "../utils/LogHelper.jsx";
-import clsx from "clsx";
+import LogHelper from '../utils/LogHelper.jsx';
+import clsx from 'clsx';
 import 'antd/dist/antd.less';
 import '../../css/index.less';
+
+import csdnLogo from '../../img/csdnLogo.png';
 
 import {Layout, Menu, Icon, Avatar, message, notification} from 'antd';
 import URLHelper from "../utils/URLHelper.jsx";
@@ -64,7 +66,12 @@ class IndexContainer extends React.Component {
                                 inNewTab: true
                             });
                         }}>
-                            <Icon type="edit"/>
+
+                            <i className="anticon anticon-link">
+                                <Avatar size={14}
+                                        src={csdnLogo}/>
+                            </i>
+                            {/*<Icon type="edit"/>*/}
                             <span>CSDN(已停更)</span>
                         </Menu.Item>
                         <Menu.Item key="3" onClick={() => {
