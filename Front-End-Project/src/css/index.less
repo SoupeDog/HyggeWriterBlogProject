@@ -1,0 +1,70 @@
+body {
+  .leftMenu {
+    overflow: auto;
+    height: 100%;
+    position: fixed;
+    left: 0
+  }
+  .header {
+    background-color: #000;
+    padding: 0;
+    position: fixed;
+    margin-left: 200px;
+    zIndex: 1;
+    width: 100%;
+    transition: 0.2s;
+  }
+  .headerCollapsed {
+    background-color: #000;
+    padding: 0;
+    position: fixed;
+    margin-left: 80px;
+    zIndex: 1;
+    width: 100%;
+    transition: 0.2s;
+  }
+
+  #myPage {
+    .trigger {
+      color: #FFF;
+      font-size: 18px;
+      line-height: 64px;
+      padding: 0 24px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .trigger:hover {
+      color: #1890ff;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+      font-weight: 500;
+      line-height: 1.6;
+      letter-spacing: 0.0075em;
+      color: #FFFFFF;
+      text-align: center;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      margin: 16px;
+    }
+
+    .myContent {
+      margin: 64px 16px 24px 216px;
+      padding: 24px;
+      background: #FFF;
+      height: 2800px;
+      transition: 0.2s;
+    }
+
+    .myContentCollapsed {
+      margin: 64px 16px 24px 96px;
+      padding: 24px;
+      background: #FFF;
+      height: 2800px;
+      transition: 0.2s;
+    }
+  }
+}

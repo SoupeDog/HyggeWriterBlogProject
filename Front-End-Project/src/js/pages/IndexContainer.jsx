@@ -1,8 +1,11 @@
 import React from 'react';
 import LogHelper from "../utils/LogHelper.jsx";
+import clsx from "clsx";
 import 'antd/dist/antd.less';
+import '../../css/index.less';
 
-import {Layout, Menu, Icon} from 'antd';
+import {Layout, Menu, Icon, Avatar,message,notification} from 'antd';
+import URLHelper from "../utils/URLHelper.jsx";
 
 const {Header, Sider, Content} = Layout;
 
@@ -41,40 +44,69 @@ class IndexContainer extends React.Component {
 
     render() {
         return (
-            <Layout id={"components-layout-demo-custom-trigger"}>
-                <Sider trigger={null} collapsible collapsed={this.state.mainMenuCollapsed}>
-                    <div className="logo"/>
-                    <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+            <Layout id={"myPage"}>
+                <Sider theme="dark" className="leftMenu" trigger={null} collapsible
+                       collapsed={this.state.mainMenuCollapsed}>
+                    <div className="logo autoOmit_2">{this.state.mainMenuCollapsed ? "宅" : "我的小宅子"}</div>
+                    <Menu theme="dark" mode="inline" selectable={false}>
                         <Menu.Item key="1">
-                            <Icon type="user"/>
-                            <span>nav 1</span>
+                            <i className="anticon anticon-link">
+                                <Avatar size={14}
+                                        src="https://www.xavierwang.cn/images/47454e58e7f249c3968524d25a6c9c7a_M.png"/>
+                            </i>
+                            <span>Xavier</span>
                         </Menu.Item>
-                        <Menu.Item key="2">
-                            <Icon type="video-camera"/>
-                            <span>nav 2</span>
+                        <Menu.Item key="2" onClick={() => {
+                            URLHelper.openNewPage({
+                                finalUrl: "https://blog.csdn.net/u014430366",
+                                inNewTab: true
+                            });
+                        }}>
+                            <Icon type="edit"/>
+                            <span>CSDN(已停更)</span>
                         </Menu.Item>
-                        <Menu.Item key="3">
-                            <Icon type="upload"/>
-                            <span>nav 3</span>
+                        <Menu.Item key="3" onClick={()=>{
+                            URLHelper.openNewPage({
+                                finalUrl: "https://github.com/SoupeDog",
+                                inNewTab: true
+                            });
+                        }}>
+                            <Icon type="github" theme="filled"/>
+                            <span>GitHub</span>
+                        </Menu.Item>
+                        <Menu.Item key="4" onClick={()=>{
+                            message.warn('暂时还没有，有人在期待着一场 PY 交易嘛~', 2);
+                        }}>
+                            <Icon type="link"/>
+                            <span>友链</span>
+                        </Menu.Item>
+                        <Menu.Item key="5" onClick={()=>{
+                            notification.info({
+                                message: '关于',
+                                description:
+                                    '本站前端基于 React 、Antd、Vditor 开发，后端基于 Spring Boot 全家桶开发，已在我的 Github 个人仓库开源。目标使用场景为 PC ，对手机端提供少数功能，平板将被视为手机端。本站全部音频、图片素材来源于网络，若侵犯了您的权益，请联系 xavierpe@qq.com 以便及时删除侵权素材。',
+                            });
+                        }}>
+                            <Icon type="question"/>
+                            <span>关于</span>
                         </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout>
-                    <Header style={{background: '#fff', padding: 0}}>
+                    <Header className={clsx({
+                        "headerCollapsed": this.state.mainMenuCollapsed,
+                        "header": !this.state.mainMenuCollapsed
+                    })}>
                         <Icon
                             className="trigger"
                             type={this.state.mainMenuCollapsed ? 'menu-unfold' : 'menu-fold'}
                             onClick={this.mainMenuToggle}
                         />
                     </Header>
-                    <Content
-                        style={{
-                            margin: '24px 16px',
-                            padding: 24,
-                            background: '#fff',
-                            minHeight: 280,
-                        }}
-                    >
+                    <Content className={clsx({
+                        "myContentCollapsed": this.state.mainMenuCollapsed,
+                        "myContent": !this.state.mainMenuCollapsed
+                    })}>
                         Content
                     </Content>
                 </Layout>
