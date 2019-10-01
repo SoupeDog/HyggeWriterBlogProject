@@ -4,8 +4,9 @@ import clsx from "clsx";
 import 'antd/dist/antd.less';
 import '../../css/index.less';
 
-import {Layout, Menu, Icon, Avatar,message,notification} from 'antd';
+import {Layout, Menu, Icon, Avatar, message, notification} from 'antd';
 import URLHelper from "../utils/URLHelper.jsx";
+import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
 
 const {Header, Sider, Content} = Layout;
 
@@ -14,6 +15,7 @@ class IndexContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            headerTransparent: true,
             mainMenuCollapsed: false
         };
         LogHelper.info({className: "IndexContainer", msg: "constructor----------"});
@@ -65,7 +67,7 @@ class IndexContainer extends React.Component {
                             <Icon type="edit"/>
                             <span>CSDN(已停更)</span>
                         </Menu.Item>
-                        <Menu.Item key="3" onClick={()=>{
+                        <Menu.Item key="3" onClick={() => {
                             URLHelper.openNewPage({
                                 finalUrl: "https://github.com/SoupeDog",
                                 inNewTab: true
@@ -74,13 +76,13 @@ class IndexContainer extends React.Component {
                             <Icon type="github" theme="filled"/>
                             <span>GitHub</span>
                         </Menu.Item>
-                        <Menu.Item key="4" onClick={()=>{
+                        <Menu.Item key="4" onClick={() => {
                             message.warn('暂时还没有，有人在期待着一场 PY 交易嘛~', 2);
                         }}>
                             <Icon type="link"/>
                             <span>友链</span>
                         </Menu.Item>
-                        <Menu.Item key="5" onClick={()=>{
+                        <Menu.Item key="5" onClick={() => {
                             notification.info({
                                 message: '关于',
                                 description:
@@ -95,7 +97,8 @@ class IndexContainer extends React.Component {
                 <Layout>
                     <Header className={clsx({
                         "headerCollapsed": this.state.mainMenuCollapsed,
-                        "header": !this.state.mainMenuCollapsed
+                        "header": !this.state.mainMenuCollapsed,
+                        "backgroundTransparent": this.state.headerTransparent
                     })}>
                         <Icon
                             className="trigger"
@@ -115,7 +118,18 @@ class IndexContainer extends React.Component {
     }
 
     componentDidMount() {
+        let _react = this;
         LogHelper.info({className: "IndexContainer", msg: "componentDidMount----------"});
+        WindowsEventHelper.addCallback_Scroll({
+            name: "APPBar 透明判定", delta: 50, callbackFunction: function ({currentScrollY}) {
+                if (currentScrollY > 270) {
+                    _react.setState({headerTransparent: false});
+                } else {
+                    _react.setState({headerTransparent: true});
+                }
+            }
+        });
+        WindowsEventHelper.start_OnScroll();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
