@@ -6,7 +6,7 @@ import '../../css/index.less';
 
 import csdnLogo from '../../img/csdnLogo.png';
 
-import {Layout, Menu, Icon, Avatar, message, notification} from 'antd';
+import {Layout, Menu, Icon, Avatar, BackTop,message, notification} from 'antd';
 import URLHelper from "../utils/URLHelper.jsx";
 import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
 
@@ -18,7 +18,7 @@ class IndexContainer extends React.Component {
         super(props);
         this.state = {
             headerTransparent: true,
-            mainMenuCollapsed: false
+            mainMenuCollapsed: true
         };
         LogHelper.info({className: "IndexContainer", msg: "constructor----------"});
 
@@ -120,6 +120,9 @@ class IndexContainer extends React.Component {
                         Content
                     </Content>
                 </Layout>
+                <BackTop>
+                    <div id="ant-back-top-inner">Top</div>
+                </BackTop>
             </Layout>
         );
     }
