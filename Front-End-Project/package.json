@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "antd": "^3.23.5",
+    "jquery": "^3.4.1",
     "react": "^16.10.0",
     "react-dom": "^16.10.0",
     "vditor": "^1.8.13"
