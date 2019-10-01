@@ -1,0 +1,104 @@
+@charset "utf-8";
+/*a, body, div, dl, dt, h1, h2, h3, h4, h5, h6, input, li, ol, p, span, textarea {*/
+    /*margin: 0;*/
+    /*padding: 0*/
+/*}*/
+
+/*body {*/
+    /*font-family: "Microsoft YaHei", Arial, Helvetica, sans-serifsans-serif*/
+/*}*/
+
+/*a, em {*/
+    /*text-decoration: none*/
+/*}*/
+
+/** {*/
+    /*outline: 0;*/
+/*}*/
+
+/*a img {*/
+    /*border: 0*/
+/*}*/
+
+/*address, caption, cite, code, dfn, p, em, i, th, var {*/
+    /*font-style: normal;*/
+    /*font-weight: normal*/
+/*}*/
+
+/*.pointer {*/
+    /*cursor: pointer;*/
+/*}*/
+
+/*.floatLeft {*/
+    /*display: inline-block;*/
+    /*float: left;*/
+/*}*/
+
+/*.floatRight {*/
+    /*display: inline-block;*/
+    /*float: right;*/
+/*}*/
+
+/*.clearFix:after {*/
+    /*content: "";*/
+    /*display: block;*/
+    /*height: 0;*/
+    /*overflow: hidden;*/
+    /*clear: both*/
+/*}*/
+
+/*.clearFix {*/
+    /**zoom: 1*/
+/*}*/
+
+/*.backgroundTransparent {*/
+    /*background-color: transparent;*/
+/*}*/
+
+/*.autoWrap {*/
+    /*word-wrap: break-word*/
+/*}*/
+
+/*.autoOmit {*/
+    /*text-overflow: ellipsis;*/
+    /*white-space: nowrap;*/
+    /*overflow: hidden;*/
+/*}*/
+
+/*.autoOmit_2 {*/
+    /*display:-webkit-box;overflow:hidden;text-overflow:ellipsis;-webkit-line-clamp:2;-webkit-box-orient:vertical;*/
+/*}*/
+
+/*.clearBoth {*/
+    /*clear: both;*/
+/*}*/
+
+/*.textCenter {*/
+    /*text-align: center;*/
+/*}*/
+
+/*.b_r {*/
+    /*color: #00A1D6;*/
+    /*cursor:pointer*/
+/*}*/
+/*.b_r:hover {*/
+    /*color: #F35C8F*/
+/*}*/
+
+#components-layout-demo-custom-trigger .trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+#components-layout-demo-custom-trigger .trigger:hover {
+    color: #1890ff;
+}
+
+#components-layout-demo-custom-trigger .logo {
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 16px;
+}
