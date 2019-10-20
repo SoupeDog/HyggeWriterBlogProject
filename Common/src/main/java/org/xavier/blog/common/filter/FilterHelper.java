@@ -1,7 +1,7 @@
 package org.xavier.blog.common.filter;
 
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
+import org.xavier.common.exception.Universal500RuntimeException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
@@ -33,7 +33,7 @@ public class FilterHelper {
             mimeHeadersOfCoyoteRequest = org.apache.coyote.Request.class.getDeclaredField("headers");
             mimeHeadersOfCoyoteRequest.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw new Universal_500_X_Exception_Runtime("Fail to init addValueToHeaders().");
+            throw new Universal500RuntimeException("Fail to init addValueToHeaders().");
         }
     }
 
@@ -51,7 +51,7 @@ public class FilterHelper {
             // 设置 headers 属性
             mimeHeaders.addValue(key).setString(value);
         } catch (Exception e) {
-            throw new Universal_500_X_Exception_Runtime("Fail to addValueToHeaders.[key]:" + key + " [value]:" + value);
+            throw new Universal500RuntimeException("Fail to addValueToHeaders.[key]:" + key + " [value]:" + value);
         }
     }
 }
