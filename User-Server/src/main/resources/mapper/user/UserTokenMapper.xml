@@ -9,7 +9,7 @@
         uId, token, deadLine, scope, lastToken, lastDeadLine, refreshKey, ts, lastUpdateTs
     </sql>
 
-    <insert id="saveUserToken_Single" parameterType="UserToken">
+    <insert id="saveUserToken" parameterType="UserToken">
         INSERT INTO `userToken`(<include refid="All_Column_List"/>)VALUES (
         #{userToken.uId},
         #{userToken.token},
@@ -27,14 +27,14 @@
         DELETE FROM `userToken` where uId=#{uId} AND scope=#{scope}
     </delete>
 
-    <update id="refreshToken_CAS">
+    <update id="refreshToken">
         UPDATE `userToken`
         SET token        = #{token},
             deadLine     = #{deadLine},
             lastToken    = #{lastToken},
             lastDeadLine = #{lastDeadLine},
             refreshKey   = #{refreshKey}
-        WHERE scope = #{scope} AND uId = #{uId} AND #{ts_CAS} &gt; lastUpdateTs
+        WHERE scope = #{scope} AND uId = #{uId} AND #{lastUpdateTs} &gt; lastUpdateTs
     </update>
 
     <select id="queryUserByUIdAndScope" resultType="UserToken">
