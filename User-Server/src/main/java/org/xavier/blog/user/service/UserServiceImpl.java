@@ -86,7 +86,7 @@ public class UserServiceImpl extends DefaultUtils {
         if (uIdListForQuery.size() < 1) {
             throw new PropertiesRuntimeException("[uIdList] can't be empty.");
         }
-        Integer removeAffectedRow = userMapper.removeUserByUId_Logically_Multiple(uIdListForQuery, upTs);
+        Integer removeAffectedRow = userMapper.removeUserLogicallyByUIdMultiple(uIdListForQuery, upTs);
         Boolean removeResult = removeAffectedRow == uIdList.size();
         if (!removeResult) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("removeAffectedRow", propertiesHelper.string(uIdList.size()), removeAffectedRow, uIdList));

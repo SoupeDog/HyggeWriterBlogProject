@@ -1,7 +1,7 @@
 package org.xavier.blog.user.domain.po.user;
 
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 /**
  * 用户操作日志实体
@@ -43,7 +43,7 @@ public class UserOperationLog {
     private Long ts;
 
     public void validate() {
-        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
         propertiesHelper.stringNotNull(behavior, 0, 100, "[behavior] can't be null,and its length should be between 0~100.");
         propertiesHelper.stringNotNull(mainPoints, 0, 200, "[mainPoints] can't be null,and its length should be between 0~200.");

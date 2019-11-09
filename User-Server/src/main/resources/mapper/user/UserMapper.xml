@@ -30,7 +30,7 @@
         )
     </insert>
 
-    <update id="removeUserByUId_Logically_Multiple">
+    <update id="removeUserLogicallyByUIdMultiple">
         UPDATE `user`
         SET legal_Flag = FALSE, lastUpdateTs = #{lastUpdateTs}
         WHERE uId IN

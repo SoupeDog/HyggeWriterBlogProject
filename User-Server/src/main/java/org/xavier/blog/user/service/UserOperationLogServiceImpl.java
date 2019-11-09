@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.user.dao.UserOperationLogMapper;
 import org.xavier.blog.user.domain.po.user.UserOperationLog;
-import org.xavier.common.exception.Universal_403_X_Exception;
+import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
-import org.xavier.web.extend.DefaultService;
-import org.xavier.web.extend.PageResult;
+import org.xavier.webtoolkit.base.DefaultUtils;
+import org.xavier.webtoolkit.domain.PageResult;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * 用户操作日志 service
  */
 @Service
-public class UserOperationLogServiceImpl extends DefaultService {
+public class UserOperationLogServiceImpl extends DefaultUtils {
     @Autowired
     UserOperationLogMapper userOperationLogMapper;
     @Autowired
@@ -25,7 +25,7 @@ public class UserOperationLogServiceImpl extends DefaultService {
     /**
      * 添加用户操作日志
      */
-    public Boolean saveUserOperationLog(String operatorUId, UserOperationLog userOperationLog) throws Universal_403_X_Exception {
+    public Boolean saveUserOperationLog(String operatorUId, UserOperationLog userOperationLog) throws Universal403Exception {
         userOperationLog.validate();
         userService.checkRight(operatorUId, "U00000003");
         Integer saveUserOperationLog_affectedLine = userOperationLogMapper.saveUserOperationLog(userOperationLog);
@@ -39,9 +39,9 @@ public class UserOperationLogServiceImpl extends DefaultService {
     /**
      * 添加用户操作日志
      */
-    public PageResult<UserOperationLog> quarryUserOperationLogByUIdList(String operatorUId, ArrayList<String> uIdList, Integer currentPage, Integer size, String orderKey, Boolean isDESC) throws Universal_403_X_Exception {
+    public PageResult<UserOperationLog> quarryUserOperationLogByUIdList(String operatorUId, ArrayList<String> uIdList, Integer currentPage, Integer size, String orderKey, Boolean isDESC) throws Universal403Exception {
         userService.checkRight(operatorUId, "U00000003");
-        String order = isDESC ? DESC : ASC;
+        String order = isDESC ? "DESC" : "ASC";
         switch (orderKey) {
             case "uId":
                 orderKey = "uId";

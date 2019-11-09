@@ -35,7 +35,7 @@ public interface UserMapper {
      * @param uIdList uId List
      * @return 受影响行
      */
-    Integer removeUserByUId_Logically_Multiple(@Param("uIdList") ArrayList<String> uIdList, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer removeUserLogicallyByUIdMultiple(@Param("uIdList") ArrayList<String> uIdList, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据 UId 更新用户信息

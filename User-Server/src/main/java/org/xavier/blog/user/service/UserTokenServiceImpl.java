@@ -58,7 +58,7 @@ public class UserTokenServiceImpl extends DefaultUtils {
                 if (userToken.getRefreshKey().equals(refreshKey)) {
                     userToken = refreshToken(uId, scope, refreshKey, currentTs);
                 } else {
-                    userToken = null;
+                    throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN.getErrorCod(), "Unexpected Token(" + token + ") of User(" + uId + ").");
                 }
             }
         }

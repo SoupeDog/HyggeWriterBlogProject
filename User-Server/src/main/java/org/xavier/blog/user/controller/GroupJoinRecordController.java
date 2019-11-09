@@ -12,11 +12,9 @@ import org.xavier.blog.user.domain.bo.GroupValidateBO;
 import org.xavier.blog.user.domain.po.group.GroupJoinRecord;
 import org.xavier.blog.user.service.GroupJoinRecordServiceImpl;
 import org.xavier.blog.user.service.UserServiceImpl;
-import org.xavier.common.exception.PropertiesException_Runtime;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
-import org.xavier.common.utils.UtilsCreator;
-import org.xavier.web.annotation.EnableControllerLog;
+import org.xavier.common.exception.PropertiesRuntimeException;
+import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
 
 import java.util.ArrayList;
 
@@ -36,7 +34,6 @@ public class GroupJoinRecordController extends HyggeWriterController {
     @Autowired
     UserServiceImpl userService;
 
-    @EnableControllerLog
     @PostMapping(value = "/group/record")
     public ResponseEntity<?> addGroupJoinRecord(@RequestHeader HttpHeaders headers, @RequestBody GroupJoinRecord groupJoinRecord) {
         try {
@@ -45,36 +42,34 @@ public class GroupJoinRecordController extends HyggeWriterController {
             userService.checkRight(operatorUId, groupJoinRecord.getuId());
             groupJoinRecordService.saveGroupJoinRecord(groupJoinRecord);
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.GROUPJOINRECORD_EXISTS.getErrorCod(), "GroupJoinRecord(" + groupJoinRecord.getgId() + "-" + groupJoinRecord.getuId() + ") dose exist,or it is still under review.");
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog
     @DeleteMapping(value = "/group/record")
     public ResponseEntity<?> removeGroupJoinRecord(@RequestHeader HttpHeaders headers, @RequestBody GroupJoinRecord groupJoinRecord) {
         try {
-            Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
-            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
+            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
+            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
             groupJoinRecord.validate();
             groupJoinRecordService.removeGroupJoinRecord(operatorUId, groupJoinRecord.getgId(), groupJoinRecord.getuId(), upTs);
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.GROUPJOINRECORD_EXISTS.getErrorCod(), "GroupJoinRecord(" + groupJoinRecord.getgId() + "-" + groupJoinRecord.getuId() + ") dose exist,or it is still under review.");
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog
     @PostMapping(value = "/group/validate")
     public ResponseEntity<?> groupValidate(@RequestHeader HttpHeaders headers, @RequestBody GroupValidateBO groupValidateBO) {
         try {
@@ -82,14 +77,13 @@ public class GroupJoinRecordController extends HyggeWriterController {
             String operatorUId = headers.getFirst("uId");
             Boolean result = groupJoinRecordService.isUserInTargetGroup(operatorUId, groupValidateBO.getuId(), groupValidateBO.getgId());
             return success(result);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = {"headers"})
     @GetMapping(value = "/group/list")
     public ResponseEntity<?> quarryGroupInfoOfUser(@RequestHeader HttpHeaders headers,
                                                    @RequestParam(value = "uId") String uId,
@@ -101,9 +95,9 @@ public class GroupJoinRecordController extends HyggeWriterController {
                     ArrayList<String> result = groupJoinRecordService.queryGroupIdListOfUser(operatorUId, uId);
                     return success(result);
             }
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }

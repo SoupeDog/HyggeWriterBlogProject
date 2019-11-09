@@ -1,9 +1,7 @@
 package org.xavier.blog.user.domain.bo;
 
 import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
-import org.xavier.common.exception.Universal_400_X_Exception;
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
+import org.xavier.common.exception.Universal400Exception;
 
 /**
  * 描述信息：<br/>
@@ -37,10 +35,10 @@ public class UserLoginBO {
      */
     private String refreshKey;
 
-    public UserTokenScopeEnum calculateScope() throws Universal_400_X_Exception {
+    public UserTokenScopeEnum calculateScope() throws Universal400Exception {
         if (scope == null || scope.trim().equals("")) {
             if (scopeByte == null) {
-                throw new Universal_400_X_Exception("[scope]、[scopeByte] can't be null at the same time.");
+                throw new Universal400Exception("[scope]、[scopeByte] can't be null at the same time.");
             } else {
                 return UserTokenScopeEnum.getUserTypeEnum(scopeByte);
             }

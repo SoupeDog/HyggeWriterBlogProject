@@ -11,9 +11,9 @@ import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.user.domain.bo.UserLoginBO;
 import org.xavier.blog.user.domain.bo.UserTokenBO;
 import org.xavier.blog.user.domain.dto.user.UserTokenDTO;
+import org.xavier.blog.user.domain.po.user.UserToken;
 import org.xavier.blog.user.service.UserTokenServiceImpl;
 import org.xavier.common.exception.*;
-import org.xavier.web.annotation.EnableControllerLog;
 
 /**
  * 描述信息：<br/>
@@ -30,60 +30,81 @@ public class UserTokenController extends HyggeWriterController {
     @Autowired
     UserTokenServiceImpl userTokenService;
 
-    @EnableControllerLog
     @PostMapping("/token/login")
     public ResponseEntity<?> createToken(@RequestBody UserLoginBO userLoginBO) {
         try {
             UserTokenDTO result = new UserTokenDTO(userTokenService.login(userLoginBO));
             return success(result);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_400_X_Exception e) {
+        } catch (Universal400Exception e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog
     @PostMapping("/token/validate")
     public ResponseEntity<?> validateToken(@RequestBody UserTokenBO userTokenBO) {
         try {
             userTokenBO.validate();
             userTokenService.validateUserToken(userTokenBO.getuId(), userTokenBO.getToken(), userTokenBO.calculateScope());
             return success(true);
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             // token 错误或过期
             return success(false);
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             // 目标用户 token 不存在
             return success(false);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_400_X_Exception e) {
+        } catch (Universal400Exception e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog
     @PostMapping("/token/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody UserLoginBO userLoginBO) {
         try {
             UserTokenDTO result = new UserTokenDTO(userTokenService.refreshToken(userLoginBO.getuId(), userLoginBO.calculateScope(), userLoginBO.getRefreshKey(), System.currentTimeMillis()));
             return success(result);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_400_X_Exception e) {
+        } catch (Universal400Exception e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
+        }
+    }
+
+    @PostMapping("/token/keep")
+    public ResponseEntity<?> keepToken(@RequestBody UserTokenBO userTokenBO) {
+        try {
+            userTokenBO.validate();
+            UserToken resultTemp = userTokenService.keepAlive(userTokenBO.getuId(), userTokenBO.getToken(), userTokenBO.getRefreshKey(), userTokenBO.calculateScope(), System.currentTimeMillis());
+            if (resultTemp == null) {
+                return success();
+            } else {
+                UserTokenDTO result = new UserTokenDTO(resultTemp);
+                return success(result);
+            }
+        } catch (PropertiesRuntimeException e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        } catch (Universal400Exception e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        } catch (Universal403Exception e) {
+            return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
+        } catch (Universal409Exception e) {
+            return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         }
     }

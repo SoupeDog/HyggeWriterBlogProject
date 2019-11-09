@@ -1,9 +1,9 @@
 package org.xavier.blog.user.domain.bo;
 
 import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
-import org.xavier.common.exception.Universal_400_X_Exception;
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
+import org.xavier.common.exception.Universal400Exception;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 /**
  * 描述信息：<br/>
@@ -38,15 +38,15 @@ public class UserTokenBO {
     private String refreshKey;
 
     public void validate() {
-        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
         propertiesHelper.stringNotNull(token, "[token] can't be null or empty.");
     }
 
-    public UserTokenScopeEnum calculateScope() throws Universal_400_X_Exception {
+    public UserTokenScopeEnum calculateScope() throws Universal400Exception {
         if (scope == null || scope.trim().equals("")) {
             if (scopeByte == null) {
-                throw new Universal_400_X_Exception("[scopeByte]、[scope] can't be null at the same time.");
+                throw new Universal400Exception("[scopeByte]、[scope] can't be null at the same time.");
             } else {
                 return UserTokenScopeEnum.getUserTypeEnum(scopeByte);
             }

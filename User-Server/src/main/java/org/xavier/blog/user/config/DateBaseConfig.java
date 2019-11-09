@@ -1,21 +1,22 @@
 package org.xavier.blog.user.config;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.xavier.blog.user.config.properties.DateBaseProperties;
 import org.xavier.blog.user.domain.enums.UserSexHandler;
 import org.xavier.blog.user.domain.enums.UserTokenScopeHandler;
 import org.xavier.blog.user.domain.enums.UserTypeHandler;
-import org.xavier.common.logging.HyggeLogger;
+import org.xavier.common.logging.core.HyggeLogger;
 
 import javax.sql.DataSource;
 
@@ -40,11 +41,12 @@ public class DateBaseConfig {
 
     @Bean(name = "mySQLDataSource")
     public DataSource mySQLDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://" + dbProperties.getHost() + "/" + dbProperties.getDbName() + "?serverTimezone=UTC&useSSL=false&allowMultiQueries=true");
         dataSource.setUsername(dbProperties.getAc());
         dataSource.setPassword(dbProperties.getPw());
+        dataSource.setMaxActive(5);
         return dataSource;
     }
 

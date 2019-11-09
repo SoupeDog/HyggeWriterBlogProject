@@ -1,7 +1,7 @@
 package org.xavier.blog.user.domain.po.group;
 
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 /**
  * 描述信息：<br/>
@@ -35,7 +35,7 @@ public class Group {
     private Long ts;
 
     public void validate(){
-       PropertiesHelper propertiesHelper= UtilsCreator.getInstance_DefaultPropertiesHelper();
+       PropertiesHelper propertiesHelper= UtilsCreator.getDefaultPropertiesHelperInstance();
        propertiesHelper.stringNotNull(groupOwner,9,10,"[groupOwner] can't be null,and its length should within 9~10.");
        propertiesHelper.stringNotNull(groupName, 1, 32, "[uName] can't be null,and its length should within 32.");
     }
