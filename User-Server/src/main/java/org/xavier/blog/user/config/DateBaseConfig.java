@@ -51,7 +51,7 @@ public class DateBaseConfig {
     }
 
     @Bean(name = "mySQLSessionFactory")
-    public SqlSessionFactory mySQLSessionFactory(DataSource mySQLDataSource) {
+    public SqlSessionFactory mySQLSessionFactory(DruidDataSource mySQLDataSource) {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(mySQLDataSource);
         VFS.addImplClass(SpringBootVFS.class);
