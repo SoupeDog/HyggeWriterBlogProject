@@ -40,7 +40,7 @@ public class DateBaseConfig {
     HyggeLogger logger;
 
     @Bean(name = "mySQLDataSource")
-    public DataSource mySQLDataSource() {
+    public DruidDataSource mySQLDataSource() {
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://" + dbProperties.getHost() + "/" + dbProperties.getDbName() + "?serverTimezone=UTC&useSSL=false&allowMultiQueries=true");

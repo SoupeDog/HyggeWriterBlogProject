@@ -3,8 +3,8 @@ package org.xavier.blog.user.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.common.ErrorCode;
-import org.xavier.blog.user.dao.GroupJoinRecordMapper;
 import org.xavier.blog.common.enums.UserTypeEnum;
+import org.xavier.blog.user.dao.GroupJoinRecordMapper;
 import org.xavier.blog.user.domain.po.group.Group;
 import org.xavier.blog.user.domain.po.group.GroupJoinRecord;
 import org.xavier.blog.user.domain.po.user.User;
@@ -77,13 +77,13 @@ public class GroupJoinRecordServiceImpl extends DefaultUtils {
      * @param uId         目标用户
      */
     public ArrayList<String> queryGroupIdListOfUser(String operatorUId, String uId) throws Universal403Exception {
-        userService.checkRight(operatorUId, uId);
+        userService.checkRight(operatorUId,UserTypeEnum.ROOT, uId);
         ArrayList<String> result = groupJoinRecordMapper.queryGroupIdListOfUser(uId);
         return result;
     }
 
     public Boolean isUserInTargetGroup(String operatorUId, String uId, String gId) throws Universal403Exception {
-        userService.checkRight(operatorUId, uId);
+        userService.checkRight(operatorUId,UserTypeEnum.ROOT, uId);
         ArrayList<GroupJoinRecord> groupJoinRecordList = groupJoinRecordMapper.queryGroupJoinRecordListByGIdAndUIdList(gId, new ArrayList<String>() {{
             add(uId);
         }});

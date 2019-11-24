@@ -3,10 +3,10 @@ package org.xavier.blog.user.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import org.xavier.blog.user.dao.UserTokenMapper;
 import org.xavier.blog.common.ErrorCode;
-import org.xavier.blog.user.domain.bo.UserLoginBO;
 import org.xavier.blog.common.enums.UserTokenScopeEnum;
+import org.xavier.blog.user.dao.UserTokenMapper;
+import org.xavier.blog.user.domain.bo.UserLoginBO;
 import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.blog.user.domain.po.user.UserToken;
 import org.xavier.common.exception.Universal400Exception;
@@ -97,7 +97,7 @@ public class UserTokenServiceImpl extends DefaultUtils {
             if (!userToken.getRefreshKey().equals(refreshKey)) {
                 throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN_REFRESH_KEY.getErrorCod(), "Unexpected refreshKey of User(" + uId + ").");
             }
-            userToken.refresh(System.currentTimeMillis());
+            userToken.refresh(upTs);
             Integer affectedRow = userTokenMapper.refreshToken(uId, scope.getScope(), userToken.getToken(), userToken.getDeadLine(), userToken.getLastToken(), userToken.getLastDeadLine(), userToken.getRefreshKey(), upTs);
             if (affectedRow != 1) {
                 logger.warn(HyggeLoggerMsgBuilder.assertFail("RefreshToken-affectedRow of User(" + uId + ")", "1", affectedRow, null));

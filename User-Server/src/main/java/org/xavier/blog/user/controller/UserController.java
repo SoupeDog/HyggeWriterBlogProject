@@ -11,10 +11,7 @@ import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.user.domain.dto.user.UserDTO;
 import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.blog.user.service.UserServiceImpl;
-import org.xavier.common.exception.PropertiesRuntimeException;
-import org.xavier.common.exception.Universal403Exception;
-import org.xavier.common.exception.Universal404Exception;
-import org.xavier.common.exception.Universal409Exception;
+import org.xavier.common.exception.*;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -75,9 +72,9 @@ public class UserController extends HyggeWriterController {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.USER_EXISTS.getErrorCod(), "Name of User should be unique.");
-        } catch (Universal404Exception e) {
-            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        } catch (Universal403Exception e) {
+        }catch (Universal400Exception e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        }catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.bo.GroupValidateBO;
 import org.xavier.blog.user.domain.po.group.GroupJoinRecord;
 import org.xavier.blog.user.service.GroupJoinRecordServiceImpl;
@@ -37,9 +38,9 @@ public class GroupJoinRecordController extends HyggeWriterController {
     @PostMapping(value = "/group/record")
     public ResponseEntity<?> addGroupJoinRecord(@RequestHeader HttpHeaders headers, @RequestBody GroupJoinRecord groupJoinRecord) {
         try {
-            String operatorUId = headers.getFirst("uId");
+            String currentUserUId = headers.getFirst("uId");
             groupJoinRecord.validate();
-            userService.checkRight(operatorUId, groupJoinRecord.getuId());
+            userService.checkRight(currentUserUId, UserTypeEnum.ROOT, groupJoinRecord.getuId());
             groupJoinRecordService.saveGroupJoinRecord(groupJoinRecord);
             return success();
         } catch (PropertiesRuntimeException e) {

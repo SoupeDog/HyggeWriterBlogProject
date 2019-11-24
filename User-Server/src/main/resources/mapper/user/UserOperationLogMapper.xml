@@ -35,7 +35,7 @@
         Limit #{startPoint},#{size}
     </select>
 
-    <select id="queryUserOperationLogByUIdList_TotalCount" resultType="integer">
+    <select id="queryTotalCountOfUserOperationLogByUIdList" resultType="integer">
         SELECT
         COUNT(*)
         FROM `userOperationLog`

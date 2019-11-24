@@ -2,10 +2,10 @@ package org.xavier.blog.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.xavier.blog.user.dao.UserMapper;
 import org.xavier.blog.common.ErrorCode;
-import org.xavier.blog.user.domain.dto.user.UserDTO;
 import org.xavier.blog.common.enums.UserTypeEnum;
+import org.xavier.blog.user.dao.UserMapper;
+import org.xavier.blog.user.domain.dto.user.UserDTO;
 import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.enums.StringFormatMode;
@@ -150,8 +150,8 @@ public class UserServiceImpl extends DefaultUtils {
         return targetUser;
     }
 
-    public void checkRight(String operatorUId, UserTypeEnum expectedUserType, String... uIdWhiteList) throws Universal403Exception {
-        User currentOperator = queryUserByUId(operatorUId);
+    public void checkRight(String currentUserUId, UserTypeEnum expectedUserType, String... uIdWhiteList) throws Universal403Exception {
+        User currentOperator = queryUserByUId(currentUserUId);
         if (currentOperator == null) {
             throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
         }

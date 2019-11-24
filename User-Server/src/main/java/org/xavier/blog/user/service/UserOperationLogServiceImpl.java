@@ -2,6 +2,7 @@ package org.xavier.blog.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.dao.UserOperationLogMapper;
 import org.xavier.blog.user.domain.po.user.UserOperationLog;
 import org.xavier.common.exception.Universal403Exception;
@@ -27,20 +28,20 @@ public class UserOperationLogServiceImpl extends DefaultUtils {
      */
     public Boolean saveUserOperationLog(String operatorUId, UserOperationLog userOperationLog) throws Universal403Exception {
         userOperationLog.validate();
-        userService.checkRight(operatorUId, "U00000003");
-        Integer saveUserOperationLog_affectedLine = userOperationLogMapper.saveUserOperationLog(userOperationLog);
-        Boolean saveUserOperationLog_Flag = saveUserOperationLog_affectedLine == 1;
-        if (!saveUserOperationLog_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveUserOperationLog_EffectedLine", "1", saveUserOperationLog_affectedLine, userOperationLog));
+        userService.checkRight(operatorUId, UserTypeEnum.ROOT, "U00000003");
+        Integer saveUserOperationLogAffectedRow = userOperationLogMapper.saveUserOperationLog(userOperationLog);
+        Boolean saveUserOperationLogFlag = saveUserOperationLogAffectedRow == 1;
+        if (!saveUserOperationLogFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("save userOperationLog affected row", "1", saveUserOperationLogAffectedRow, userOperationLog));
         }
-        return saveUserOperationLog_Flag;
+        return saveUserOperationLogFlag;
     }
 
     /**
      * 添加用户操作日志
      */
     public PageResult<UserOperationLog> quarryUserOperationLogByUIdList(String operatorUId, ArrayList<String> uIdList, Integer currentPage, Integer size, String orderKey, Boolean isDESC) throws Universal403Exception {
-        userService.checkRight(operatorUId, "U00000003");
+        userService.checkRight(operatorUId, UserTypeEnum.ROOT, "U00000003");
         String order = isDESC ? "DESC" : "ASC";
         switch (orderKey) {
             case "uId":
@@ -54,10 +55,10 @@ public class UserOperationLogServiceImpl extends DefaultUtils {
         Integer totalCount;
         if (uIdList == null || uIdList.size() < 1) {
             dataSet = userOperationLogMapper.queryUserOperationLogByUIdList(uIdList, (currentPage - 1) * size, size, orderKey, order);
-            totalCount = userOperationLogMapper.queryUserOperationLogByUIdList_TotalCount(uIdList, (currentPage - 1) * size, size, orderKey, order);
+            totalCount = userOperationLogMapper.queryTotalCountOfUserOperationLogByUIdList(uIdList, (currentPage - 1) * size, size, orderKey, order);
         } else {
             dataSet = userOperationLogMapper.queryUserOperationLogByUIdList(null, (currentPage - 1) * size, size, orderKey, order);
-            totalCount = userOperationLogMapper.queryUserOperationLogByUIdList_TotalCount(null, (currentPage - 1) * size, size, orderKey, order);
+            totalCount = userOperationLogMapper.queryTotalCountOfUserOperationLogByUIdList(null, (currentPage - 1) * size, size, orderKey, order);
         }
         PageResult<UserOperationLog> result = new PageResult();
         result.setResultSet(dataSet);

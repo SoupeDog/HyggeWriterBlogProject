@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.group.Group;
 import org.xavier.blog.user.service.GroupServiceImpl;
 import org.xavier.blog.user.service.UserServiceImpl;
@@ -94,7 +95,7 @@ public class GroupController extends HyggeWriterController {
         try {
             String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
             // 管理员才能查
-            userService.checkRight(operatorUId, "U00000001");
+            userService.checkRight(operatorUId, UserTypeEnum.ROOT);
             ArrayList<Group> result = groupService.queryGroupByGIdList(gIdList);
             return success(result);
         } catch (PropertiesRuntimeException e) {
