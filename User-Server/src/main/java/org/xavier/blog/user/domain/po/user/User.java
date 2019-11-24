@@ -1,8 +1,8 @@
 package org.xavier.blog.user.domain.po.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.xavier.blog.user.domain.enums.UserSexEnum;
-import org.xavier.blog.user.domain.enums.UserTypeEnum;
+import org.xavier.blog.common.enums.UserSexEnum;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.common.util.PropertiesHelper;
 import org.xavier.common.util.UtilsCreator;
 

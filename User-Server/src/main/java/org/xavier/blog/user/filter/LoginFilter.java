@@ -2,10 +2,8 @@ package org.xavier.blog.user.filter;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.xavier.blog.common.filter.FilterHelper;
-import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
+import org.xavier.blog.common.enums.UserTokenScopeEnum;
 import org.xavier.blog.user.service.UserTokenServiceImpl;
-import org.xavier.common.exception.Universal403Exception;
-import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.exception.base.RequestException;
 import org.xavier.common.exception.base.RequestRuntimeException;
 import org.xavier.common.exception.base.ServiceRuntimeException;

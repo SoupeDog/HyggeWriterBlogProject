@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.xavier.blog.user.dao.UserTokenMapper;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.user.domain.bo.UserLoginBO;
-import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
+import org.xavier.blog.common.enums.UserTokenScopeEnum;
 import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.blog.user.domain.po.user.UserToken;
 import org.xavier.common.exception.Universal400Exception;

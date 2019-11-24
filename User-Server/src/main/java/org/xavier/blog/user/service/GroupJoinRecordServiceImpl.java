@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.user.dao.GroupJoinRecordMapper;
-import org.xavier.blog.user.domain.enums.UserTypeEnum;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.group.Group;
 import org.xavier.blog.user.domain.po.group.GroupJoinRecord;
 import org.xavier.blog.user.domain.po.user.User;

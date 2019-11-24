@@ -5,11 +5,12 @@ import org.springframework.stereotype.Service;
 import org.xavier.blog.user.dao.UserMapper;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.user.domain.dto.user.UserDTO;
-import org.xavier.blog.user.domain.enums.UserTypeEnum;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.enums.StringFormatMode;
 import org.xavier.common.exception.PropertiesRuntimeException;
+import org.xavier.common.exception.Universal400Exception;
 import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
@@ -48,27 +49,27 @@ public class UserServiceImpl extends DefaultUtils {
     /**
      * 添加用户
      */
-    public Boolean saveUser(User user, Long serviceTs) {
+    public Boolean saveUser(User user, Long currentTs) {
         user.validate();
-        user.setRegisterTs(serviceTs);
-        user.setLastUpdateTs(serviceTs);
+        user.setRegisterTs(currentTs);
+        user.setLastUpdateTs(currentTs);
         user.init();
-        Integer saveUserAffectedRow = userMapper.saveUser_Single(user);
-        Boolean saveUser_Flag = saveUserAffectedRow == 1;
-        if (!saveUser_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveUser_EffectedLine", "1", saveUserAffectedRow, user));
+        Integer saveUserAffectedRow = userMapper.saveUser(user);
+        Boolean saveUserFlag = saveUserAffectedRow == 1;
+        if (!saveUserFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("save user affected row", "1", saveUserAffectedRow, user));
         } else {
             user.setuId(getUId(user.getid()));
             HashMap map = new HashMap() {{
                 put("uId", user.getuId());
                 put("lastUpdateTs", user.getRegisterTs() + 1L);
             }};
-            Integer updateUIdAffectedRowT = userMapper.updateById_CASByLastUpdateTs(user.getid(), map, user.getRegisterTs() + 1L);
-            Boolean updateUId_Flag = updateUIdAffectedRowT == 1;
+            Integer updateUIdAffectedRow = userMapper.updateById(user.getid(), map, user.getRegisterTs() + 1L);
+            Boolean updateUId_Flag = updateUIdAffectedRow == 1;
             if (!updateUId_Flag) {
-                logger.warn(HyggeLoggerMsgBuilder.assertFail("updateUId_EffectedLine", "1", updateUIdAffectedRowT, user));
+                logger.warn(HyggeLoggerMsgBuilder.assertFail("update user affected row", "1", updateUIdAffectedRow, user));
             }
-            // 实际上是 saveUser_Flag && updateUId_Flag
+            // 实际上是 saveUserFlag && updateUId_Flag
             return updateUId_Flag;
         }
         return false;
@@ -89,7 +90,7 @@ public class UserServiceImpl extends DefaultUtils {
         Integer removeAffectedRow = userMapper.removeUserLogicallyByUIdMultiple(uIdListForQuery, upTs);
         Boolean removeResult = removeAffectedRow == uIdList.size();
         if (!removeResult) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("removeAffectedRow", propertiesHelper.string(uIdList.size()), removeAffectedRow, uIdList));
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("remove affected row", propertiesHelper.string(uIdList.size()), removeAffectedRow, uIdList));
         }
         return removeResult;
     }
@@ -97,23 +98,20 @@ public class UserServiceImpl extends DefaultUtils {
     /**
      * 更新用户对象
      */
-    public Boolean updateUser(String operatorUId, String uId, Map rowData, Long currentTs) throws Universal404Exception, Universal403Exception {
-        propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
-        checkRight(operatorUId, uId);
-        // 目标用户是否存在
-        User targetUser = queryUserByUIdWithExistValidate(operatorUId);
+    public Boolean updateUser(String targetUId, String currentUserUId, Map rowData, Long currentTs) throws Universal400Exception, Universal403Exception {
+        checkRight(currentUserUId, UserTypeEnum.ROOT, targetUId);
         HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(currentTs, rowData, checkInfo);
         // 不能通过此接口修改经验
         data.remove("exp");
         if (data.size() < 2) {
-            throw new PropertiesRuntimeException("Effective Update-Info was null.");
+            throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }
-        Integer updateAffectedRow = userMapper.updateByUId_CASByLastUpdateTs(uId, data, currentTs);
+        Integer updateAffectedRow = userMapper.updateByUId(currentUserUId, data, currentTs);
         Boolean updateResult = updateAffectedRow == 1;
         if (!updateResult) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("updateAffectedRow", "1", updateAffectedRow, new LinkedHashMap<String, Object>() {{
-                put("operatorUId", operatorUId);
-                put("uId", uId);
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("update affected row", "1", updateAffectedRow, new LinkedHashMap<String, Object>() {{
+                put("targetUId", targetUId);
+                put("currentUserUId", currentUserUId);
                 put("data", data);
                 put("currentTs", currentTs);
             }}));
@@ -152,15 +150,22 @@ public class UserServiceImpl extends DefaultUtils {
         return targetUser;
     }
 
-    public void checkRight(String operatorUId, String expectedUId) throws Universal403Exception {
+    public void checkRight(String operatorUId, UserTypeEnum expectedUserType, String... uIdWhiteList) throws Universal403Exception {
         User currentOperator = queryUserByUId(operatorUId);
         if (currentOperator == null) {
             throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
-        } else {
-            if (UserTypeEnum.ROOT.equals(currentOperator.getUserType()) || operatorUId.equals(expectedUId)) {
-                return;
+        }
+        boolean whiteListUser = false;
+        for (String expectedUId : uIdWhiteList) {
+            if (expectedUId.equals(currentOperator.getuId())) {
+                whiteListUser = true;
+                break;
             }
-            throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+        }
+        if (!whiteListUser) {
+            if (!currentOperator.getUserType().equals(expectedUserType)) {
+                throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+            }
         }
     }
 

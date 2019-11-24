@@ -60,17 +60,19 @@ public class HyggeWriterController extends DefaultController {
     }
 
     @Override
-    protected Object successHook(Object object, ResponseEntity.BodyBuilder builder) {
+    protected Object successHook(Object object) {
         GatewayResponse result = GatewayResponse.GatewayResponseBuilder.buildSuccessGatewayResponse(object);
         return result;
     }
 
     @Override
-    protected Object failHook(ErrorResult errorResult, ResponseEntity.BodyBuilder builder) {
+    protected HttpStatus getFailHttpStatus(HttpStatus status, Number errorCode, String msg) {
+        return HttpStatus.OK;
+    }
+
+    @Override
+    protected Object failHook(ErrorResult errorResult) {
         GatewayResponse result = GatewayResponse.GatewayResponseBuilder.buildFailGatewayResponse(2, errorResult.getErrorCode(), errorResult.getMsg());
-        MediaType mediaType = new MediaType("application", "json", Charset.forName("UTF-8"));
-        builder = ResponseEntity.status(HttpStatus.OK);
-        builder.contentType(mediaType);
         return result;
     }
 }

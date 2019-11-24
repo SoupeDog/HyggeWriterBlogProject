@@ -28,8 +28,8 @@ public class DefaultRemoteService extends DefaultService {
     protected HttpHelpper httpHelpper;
 
     protected static HttpHeaders httpHeaders = new HttpHeaders() {{
-        add("uId", "U00000000");
-        add("token", "0000");
+        add("uId", "U00000003");
+        add("token", "8926c177ac7248668350f20661d547f0");
         add("scope", "web");
     }};
 
@@ -39,6 +39,6 @@ public class DefaultRemoteService extends DefaultService {
             throw new Universal_500_X_Exception_Runtime("Fail to query URI of " + USER_SERVICE_NAME);
         }
         return userService.getUri().toString();
-//        return "http://127.0.0.1:8080/user-service";
+//        return "http://127.0.0.1:8080/";
     }
 }

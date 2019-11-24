@@ -1,6 +1,6 @@
 package org.xavier.blog.user.domain.bo;
 
-import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
+import org.xavier.blog.common.enums.UserTokenScopeEnum;
 import org.xavier.common.exception.Universal400Exception;
 import org.xavier.common.util.PropertiesHelper;
 import org.xavier.common.util.UtilsCreator;
