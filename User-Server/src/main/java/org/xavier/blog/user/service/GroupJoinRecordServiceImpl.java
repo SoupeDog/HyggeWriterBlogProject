@@ -42,7 +42,7 @@ public class GroupJoinRecordServiceImpl extends DefaultUtils {
         if (group == null) {
             throw new Universal404Exception(ErrorCode.GROUP_NOTFOUND.getErrorCod(), "Group(" + groupJoinRecord.getgId() + ") was not found.");
         }
-        Integer saveGroupJoinRecord_affectedLine = groupJoinRecordMapper.saveGroupJoinRecord_Single(groupJoinRecord);
+        Integer saveGroupJoinRecord_affectedLine = groupJoinRecordMapper.saveGroupJoinRecord(groupJoinRecord);
         Boolean saveGroupJoinRecord_Flag = saveGroupJoinRecord_affectedLine == 1;
         if (!saveGroupJoinRecord_Flag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("saveUser_EffectedLine", "1", saveGroupJoinRecord_affectedLine, groupJoinRecord));

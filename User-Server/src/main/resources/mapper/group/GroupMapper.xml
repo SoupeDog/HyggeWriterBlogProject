@@ -9,7 +9,7 @@
     <!--<sql id="All_Column_List">-->
     <!--</sql>-->
 
-    <insert id="saveGroup_Single" parameterType="Group">
+    <insert id="saveGroup" parameterType="Group">
         INSERT INTO `group`(<include refid="Base_Column_List"/>)VALUES (
         #{Group.gId},
         #{Group.groupOwner},
@@ -19,7 +19,7 @@
         )
     </insert>
 
-    <delete id="removeGroupByGId_Multiple">
+    <delete id="removeGroupByGIdMultiple">
         DELETE FROM `group`
         WHERE lastUpdateTs &lt; #{lastUpdateTs}
         AND gId IN
@@ -28,12 +28,12 @@
         </foreach>
     </delete>
 
-    <update id="updateByGId_CASByLastUpdateTs">
+    <update id="updateByGId">
         UPDATE `group`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}
         </foreach>
-        WHERE lastUpdateTs &lt; #{lastUpdateTs_CAS} AND gId=#{gId}
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND gId=#{gId}
     </update>
 
     <select id="queryGroupByGId" resultType="Group">

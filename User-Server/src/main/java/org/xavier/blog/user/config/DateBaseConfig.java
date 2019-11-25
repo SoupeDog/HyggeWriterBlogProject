@@ -12,13 +12,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.xavier.blog.user.config.properties.DateBaseProperties;
 import org.xavier.blog.common.enums.UserSexHandler;
 import org.xavier.blog.common.enums.UserTokenScopeHandler;
 import org.xavier.blog.common.enums.UserTypeHandler;
+import org.xavier.blog.user.config.properties.DateBaseProperties;
 import org.xavier.common.logging.core.HyggeLogger;
-
-import javax.sql.DataSource;
 
 /**
  * 描述信息：<br/>
@@ -47,6 +45,11 @@ public class DateBaseConfig {
         dataSource.setUsername(dbProperties.getAc());
         dataSource.setPassword(dbProperties.getPw());
         dataSource.setMaxActive(5);
+        dataSource.setMinIdle(2);
+//        dataSource.setTestOnBorrow(true);
+//        dataSource.setTestOnReturn(true);
+//        dataSource.setTestWhileIdle(true);
+        dataSource.setMaxWait(2);
         return dataSource;
     }
 
@@ -67,7 +70,8 @@ public class DateBaseConfig {
             registry.register(new UserTypeHandler());
             registry.register(new UserSexHandler());
             registry.register(new UserTokenScopeHandler());
-            return bean.getObject();
+            SqlSessionFactory sqlSessionFactory = bean.getObject();
+            return sqlSessionFactory;
         } catch (Exception e) {
             logger.error("Fail to init mybatis.", e);
             // 主动中断服务

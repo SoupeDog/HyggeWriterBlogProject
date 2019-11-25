@@ -10,7 +10,7 @@
         id,gId,uId,isActive,lastUpdateTs,ts
     </sql>
 
-    <insert id="saveGroupJoinRecord_Single" parameterType="GroupJoinRecord" useGeneratedKeys="true" keyProperty="id">
+    <insert id="saveGroupJoinRecord" parameterType="GroupJoinRecord" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `groupJoinRecord`(<include refid="Base_Column_List"/>)VALUES (
         #{GroupJoinRecord.gId},
         #{GroupJoinRecord.uId},

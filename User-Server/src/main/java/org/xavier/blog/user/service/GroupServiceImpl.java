@@ -44,7 +44,7 @@ public class GroupServiceImpl extends DefaultUtils {
         group.setGroupOwner(operatorUId);
         group.setLastUpdateTs(currentTs);
         group.setTs(currentTs);
-        Integer saveGroup_affectedLine = groupMapper.saveGroup_Single(group);
+        Integer saveGroup_affectedLine = groupMapper.saveGroup(group);
         Boolean saveGroup_Flag = saveGroup_affectedLine == 1;
         if (!saveGroup_Flag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("saveGroup_EffectedLine", "1", saveGroup_affectedLine, group));
@@ -55,7 +55,7 @@ public class GroupServiceImpl extends DefaultUtils {
     public Boolean removeGroup(String operatorUId, String gId, Long upTs) throws Universal403Exception, Universal404Exception {
         propertiesHelper.stringNotNull(gId, 32, 32, "[gId] can't be null,and its length should be 32.");
         checkRight(operatorUId, gId);
-        Integer removeGroup_affectedLine = groupMapper.removeGroupByGId_Multiple(new ArrayList<String>() {{
+        Integer removeGroup_affectedLine = groupMapper.removeGroupByGIdMultiple(new ArrayList<String>() {{
             add(gId);
         }}, upTs);
         Boolean removeGroup_Flag = removeGroup_affectedLine == 1;
@@ -80,7 +80,7 @@ public class GroupServiceImpl extends DefaultUtils {
             throw new PropertiesRuntimeException("Effective Update-Info was null.");
         }
         Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
-        Integer updateGroup_affectedLine = groupMapper.updateByGId_CASByLastUpdateTs(gId, data, upTs);
+        Integer updateGroup_affectedLine = groupMapper.updateByGId(gId, data, upTs);
         Boolean updateGroup_Flag = updateGroup_affectedLine == 1;
         if (!updateGroup_Flag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("updateGroup_affectedLine", "1", updateGroup_affectedLine, new LinkedHashMap() {{
