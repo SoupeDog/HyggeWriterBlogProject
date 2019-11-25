@@ -49,7 +49,7 @@ public class DateBaseConfig {
 //        dataSource.setTestOnBorrow(true);
 //        dataSource.setTestOnReturn(true);
 //        dataSource.setTestWhileIdle(true);
-        dataSource.setMaxWait(2);
+        dataSource.setMaxWait(2000);
         return dataSource;
     }
 
