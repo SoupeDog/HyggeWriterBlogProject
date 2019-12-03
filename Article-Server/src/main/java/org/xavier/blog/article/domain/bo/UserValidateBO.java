@@ -2,9 +2,9 @@ package org.xavier.blog.article.domain.bo;
 
 import org.apache.logging.log4j.core.util.CronExpression;
 import org.xavier.blog.article.domain.dto.UserDTO;
-import org.xavier.blog.article.domain.enums.UserSexEnum;
 import org.xavier.blog.article.domain.po.article.ArticleCategory;
-import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
+import org.xavier.blog.common.enums.UserSexEnum;
+import org.xavier.common.exception.Universal500RuntimeException;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class UserValidateBO {
                     CronExpression cronExpression = new CronExpression(articleCategory.getExtendProperties());
                     result = cronExpression.isSatisfiedBy(new Date());
                 } catch (ParseException e) {
-                    throw new Universal_500_X_Exception_Runtime(555F, "Unexpected cron expression(" + articleCategory.getExtendProperties() + ").");
+                    throw new Universal500RuntimeException(555F, "Unexpected cron expression(" + articleCategory.getExtendProperties() + ").");
                 }
                 break;
             default:

@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.xavier.blog.article.config.properties.DateBaseProperties;
-import org.xavier.blog.article.domain.enums.ArticleAccessPermitHandler;
-import org.xavier.blog.article.domain.enums.ArticleRetainTypeHandler;
+import org.xavier.blog.common.enums.ArticleAccessPermitHandler;
+import org.xavier.blog.common.enums.ArticleRetainTypeHandler;
 import org.xavier.common.logging.core.HyggeLogger;
 
 import javax.sql.DataSource;
@@ -39,7 +39,7 @@ public class DateBaseConfig {
     HyggeLogger logger;
 
     @Bean(name = "mySQLDataSource")
-    public DataSource mySQLDataSource() {
+    public DruidDataSource mySQLDataSource() {
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://" + dbProperties.getHost() + "/" + dbProperties.getDbName() + "?serverTimezone=UTC&useSSL=false&allowMultiQueries=true");
@@ -47,6 +47,7 @@ public class DateBaseConfig {
         dataSource.setUsername(dbProperties.getAc());
         dataSource.setMaxActive(10);
         dataSource.setMinIdle(2);
+        dataSource.setMaxWait(5000);
         return dataSource;
     }
 

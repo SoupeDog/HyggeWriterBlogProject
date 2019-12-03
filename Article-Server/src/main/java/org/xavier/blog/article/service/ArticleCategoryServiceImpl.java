@@ -5,20 +5,21 @@ import org.springframework.stereotype.Service;
 import org.xavier.blog.article.dao.ArticleCategoryMapper;
 import org.xavier.blog.article.domain.bo.UserValidateBO;
 import org.xavier.blog.article.domain.dto.ArticleCategoryDTO;
-import org.xavier.blog.article.domain.enums.ArticleAccessPermitEnum;
-import org.xavier.blog.article.domain.enums.UserSexEnum;
-import org.xavier.blog.article.domain.enums.UserTypeEnum;
 import org.xavier.blog.article.domain.po.article.ArticleCategory;
 import org.xavier.blog.article.domain.po.board.Board;
 import org.xavier.blog.article.service.remote.UserServiceImpl;
 import org.xavier.blog.common.ErrorCode;
+import org.xavier.blog.common.enums.ArticleAccessPermitEnum;
+import org.xavier.blog.common.enums.UserSexEnum;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.common.enums.ColumnType;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
+import org.xavier.common.exception.Universal400Exception;
+import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
-import org.xavier.common.utils.UtilsCreator;
-import org.xavier.common.utils.bo.ColumnInfo;
-import org.xavier.web.extend.DefaultService;
+import org.xavier.common.util.UtilsCreator;
+import org.xavier.common.util.bo.ColumnInfo;
+import org.xavier.webtoolkit.base.DefaultUtils;
 
 import java.util.*;
 
@@ -33,7 +34,7 @@ import java.util.*;
  * @since Jdk 1.8
  */
 @Service
-public class ArticleCategoryServiceImpl extends DefaultService {
+public class ArticleCategoryServiceImpl extends DefaultUtils {
     @Autowired
     ArticleCategoryMapper articleCategoryMapper;
     @Autowired
@@ -45,11 +46,11 @@ public class ArticleCategoryServiceImpl extends DefaultService {
 
     static {
         checkInfo = new ArrayList<ColumnInfo>() {{
-            add(new ColumnInfo(ColumnType.STRING, "boardId", "boardId", false, 1, 32));
-            add(new ColumnInfo(ColumnType.STRING, "articleCategoryName", "articleCategoryName", false, 1, 30));
-            add(new ColumnInfo(ColumnType.STRING, "description", "description", true, 0, 2000));
-            add(new ColumnInfo(ColumnType.STRING, "uId", "uId", false, 1, 10));
-            add(new ColumnInfo(ColumnType.BYTE, "accessPermit", "accessPermit", false, 0, 6));
+            add(new ColumnInfo("boardId", "boardId", ColumnType.STRING, false, 1, 32));
+            add(new ColumnInfo("articleCategoryName", "articleCategoryName", ColumnType.STRING, false, 1, 30));
+            add(new ColumnInfo("description", "description", ColumnType.STRING, true, 0, 2000));
+            add(new ColumnInfo("uId", "uId", ColumnType.STRING, false, 1, 10));
+            add(new ColumnInfo("accessPermit", "accessPermit", ColumnType.BYTE, false, 0, 6));
         }};
     }
 
@@ -59,17 +60,17 @@ public class ArticleCategoryServiceImpl extends DefaultService {
      * @param articleCategory 文章类别实体
      * @param currentTs       瞬时时间戳
      */
-    public Boolean saveArticleCategory(ArticleCategory articleCategory, Long currentTs) throws Universal_403_X_Exception, Universal_404_X_Exception {
+    public Boolean saveArticleCategory(ArticleCategory articleCategory, Long currentTs) throws Universal403Exception, Universal404Exception {
         articleCategory.setLegal_Flag(true);
         articleCategory.setTs(currentTs);
         articleCategory.setLastUpdateTs(currentTs);
-        articleCategory.setArticleCategoryId(UtilsCreator.getInstance_DefaultRandomHelper().getUUID());
+        articleCategory.setArticleCategoryId(UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier());
         switch (articleCategory.getAccessPermit()) {
             case PERSONAL:
                 articleCategory.setExtendProperties(articleCategory.getuId());
                 break;
             case SECRET_KEY:
-                articleCategory.setExtendProperties(UtilsCreator.getInstance_DefaultRandomHelper().getUUID());
+                articleCategory.setExtendProperties(UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier());
                 break;
             case GROUP:
                 propertiesHelper.stringNotNull(articleCategory.getExtendProperties(), "[extendProperties] can't be null.");
@@ -80,12 +81,12 @@ public class ArticleCategoryServiceImpl extends DefaultService {
         }
         Board board = boardService.quarryBoardByBoardId__WithExistValidate(articleCategory.getBoardId());
         articleCategory.setBoardName(board.getBoardName());
-        Integer saveArticleCategory_EffectedLine = articleCategoryMapper.saveArticleCategory(articleCategory);
-        Boolean saveArticleCategory_Flag = saveArticleCategory_EffectedLine == 1;
-        if (!saveArticleCategory_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveArticleCategory_EffectedLine", "1", saveArticleCategory_EffectedLine, board));
+        Integer saveArticleCategoryAffectedRow = articleCategoryMapper.saveArticleCategory(articleCategory);
+        Boolean saveArticleCategoryFlag = saveArticleCategoryAffectedRow == 1;
+        if (!saveArticleCategoryFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveArticleCategoryAffectedRow", "1", saveArticleCategoryAffectedRow, board));
         }
-        return saveArticleCategory_Flag;
+        return saveArticleCategoryFlag;
     }
 
     /**
@@ -95,20 +96,20 @@ public class ArticleCategoryServiceImpl extends DefaultService {
      * @param upTs                  瞬时时间戳
      */
     public Boolean removeArticleCategoryMultipleByIds_Logically(String operatorUId, ArrayList<String> articleCategoryIdList, Long upTs) {
-        ArrayList<String> articleCategoryIdListForQuery = listHelper.filterStringListNotEmpty(articleCategoryIdList, "articleCategoryId", 32, 32);
+        ArrayList<String> articleCategoryIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, articleCategoryIdList, "[articleCategoryIdList] for query can't be empty.", String.class, String.class, (x) -> x.trim());
         articleCategoryIdList = articleCategoryMapper.queryArticleCategoryIdOfUser(operatorUId, articleCategoryIdListForQuery);
-        articleCategoryIdListForQuery = listHelper.filterStringListNotEmpty(articleCategoryIdList, "articleCategoryId", 32, 32);
-        Integer removeArticleCategoryMultiple_EffectedLine = articleCategoryMapper.removeArticleCategoryMultipleByArticleCategoryId_Logically(operatorUId, articleCategoryIdListForQuery, upTs);
-        Boolean removeArticleCategoryMultiple_Flag = removeArticleCategoryMultiple_EffectedLine == articleCategoryIdListForQuery.size();
-        if (!removeArticleCategoryMultiple_Flag) {
+        articleCategoryIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, articleCategoryIdList, "[articleCategoryIdList] can't be empty.", String.class, String.class, (x) -> x.trim());
+        Integer removeArticleCategoryMultipleAffectedRow = articleCategoryMapper.removeArticleCategoryMultipleByArticleCategoryId_Logically(operatorUId, articleCategoryIdListForQuery, upTs);
+        Boolean removeArticleCategoryMultipleFlag = removeArticleCategoryMultipleAffectedRow == articleCategoryIdListForQuery.size();
+        if (!removeArticleCategoryMultipleFlag) {
             ArrayList<String> finalArticleCategoryIdListForQuery = articleCategoryIdListForQuery;
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("removeArticleCategoryMultiple_EffectedLine", "1", removeArticleCategoryMultiple_EffectedLine, new LinkedHashMap() {{
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("removeArticleCategoryMultipleAffectedRow", "1", removeArticleCategoryMultipleAffectedRow, new LinkedHashMap() {{
                 put("operatorUId", operatorUId);
                 put("articleCategoryIdList", finalArticleCategoryIdListForQuery);
                 put("upTs", upTs);
             }}));
         }
-        return removeArticleCategoryMultiple_Flag;
+        return removeArticleCategoryMultipleFlag;
     }
 
 
@@ -118,11 +119,13 @@ public class ArticleCategoryServiceImpl extends DefaultService {
      * @param articleCategoryId 类别唯一表示
      * @param rowData           更新数据
      */
-    public Boolean updateArticleCategory(String operatorUId, String articleCategoryId, Map rowData, Long upTs) throws Universal_403_X_Exception, Universal_404_X_Exception {
-        HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
-        mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
+    public Boolean updateArticleCategory(String operatorUId, String articleCategoryId, Map rowData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
+        if (data.size() < 2) {
+            throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
+        }
         ArticleCategory articleCategory = queryArticleCategoryById_WithExistValidate(articleCategoryId);
-        userService.checkRight(operatorUId, articleCategory.getuId());
+        userService.checkRight(operatorUId, UserTypeEnum.ROOT, articleCategory.getuId());
         if (rowData.containsKey("boardId")) {
             String boardId = propertiesHelper.string(data.get("boardId"));
             boardService.quarryBoardByBoardId__WithExistValidate(boardId);
@@ -186,10 +189,10 @@ public class ArticleCategoryServiceImpl extends DefaultService {
     /**
      * 校验了文章列表非空性的根据 articleCategoryId 查询对象(用于 Service 间调用)
      */
-    public ArticleCategory queryArticleCategoryById_WithExistValidate(String articleCategoryId) throws Universal_404_X_Exception {
+    public ArticleCategory queryArticleCategoryById_WithExistValidate(String articleCategoryId) throws Universal404Exception {
         ArticleCategory targetArticleCategory = queryArticleCategoryByArticleCategoryId(articleCategoryId);
         if (targetArticleCategory == null) {
-            throw new Universal_404_X_Exception(ErrorCode.ARTICLECATEGORY_NOTFOUND.getErrorCod(), "ArticleCategory(" + articleCategoryId + ") was not found.");
+            throw new Universal404Exception(ErrorCode.ARTICLECATEGORY_NOTFOUND.getErrorCod(), "ArticleCategory(" + articleCategoryId + ") was not found.");
         }
         return targetArticleCategory;
     }
@@ -198,7 +201,9 @@ public class ArticleCategoryServiceImpl extends DefaultService {
      * 根据 articleCategoryId 查询对象
      */
     public ArticleCategory queryArticleCategoryByArticleCategoryId(String articleCategoryId) {
-        ArrayList<ArticleCategory> targetArticleCategoryList = articleCategoryMapper.queryArticleCategoryById(listHelper.createSingleList(articleCategoryId));
+        ArrayList<ArticleCategory> targetArticleCategoryList = articleCategoryMapper.queryArticleCategoryById(new ArrayList<String>() {{
+            add(articleCategoryId);
+        }});
         if (targetArticleCategoryList.size() < 1) {
             return null;
         } else {

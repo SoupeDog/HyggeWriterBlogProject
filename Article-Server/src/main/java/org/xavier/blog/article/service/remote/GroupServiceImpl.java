@@ -3,17 +3,12 @@ package org.xavier.blog.article.service.remote;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.xavier.blog.article.domain.bo.UserValidateBO;
-import org.xavier.blog.article.domain.dto.UserDTO;
-import org.xavier.blog.article.domain.enums.UserTypeEnum;
 import org.xavier.blog.common.ErrorCode;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
-import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
-import org.xavier.common.logging.HyggeLogger;
-import org.xavier.common.utils.HttpHelperResponse;
-import org.xavier.common.utils.HttpHelpper;
-import org.xavier.web.extend.GatewayResponse;
+import org.xavier.blog.common.GatewayResponse;
+import org.xavier.common.exception.Universal500RuntimeException;
+import org.xavier.common.logging.core.HyggeLogger;
+import org.xavier.common.util.http.helper.HttpHelper;
+import org.xavier.common.util.http.helper.HttpHelperResponse;
 
 import java.util.ArrayList;
 
@@ -29,19 +24,19 @@ import java.util.ArrayList;
 @Service
 public class GroupServiceImpl extends DefaultRemoteService {
     @Autowired
-    HttpHelpper httpHelpper;
+    HttpHelper httpHelper;
     @Autowired
     HyggeLogger logger;
 
-    private static final TypeReference RESPONSE_TYPEREFERENCE_STRING_LIST = new TypeReference<GatewayResponse<ArrayList<String>>>() {
+    private static final TypeReference RESPONSE_TYPE_REFERENCE_STRING_LIST = new TypeReference<GatewayResponse<ArrayList<String>>>() {
     };
 
     public ArrayList<String> quarryGroupInfoOfUser(String uId) {
         Long ts=System.currentTimeMillis();
-        HttpHelperResponse<GatewayResponse<ArrayList<String>>> response = httpHelpper.get(getUserServicePrefix() + "/user-service/main/group/list?uId=" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_STRING_LIST);
+        HttpHelperResponse<GatewayResponse<ArrayList<String>>> response = httpHelper.get(getUserServicePrefix() + "/user-service/main/group/list?uId=" + uId, httpHeaders, RESPONSE_TYPE_REFERENCE_STRING_LIST);
         System.out.println((System.currentTimeMillis()-ts)+" 毫秒=查询用户群组信息");
         if (response.isFail()) {
-            throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[quarryGroupInfoOfUser].", response.getData().getMsg());
+            throw new Universal500RuntimeException(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[quarryGroupInfoOfUser].", response.getData().getMsg());
         }
         if (response.getData().getData().size() < 1) {
             return null;

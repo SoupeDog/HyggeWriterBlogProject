@@ -6,9 +6,10 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
-import org.xavier.common.utils.HttpHelpper;
-import org.xavier.web.extend.DefaultService;
+import org.xavier.common.exception.Universal500Exception;
+import org.xavier.common.exception.Universal500RuntimeException;
+import org.xavier.common.util.http.helper.HttpHelper;
+import org.xavier.webtoolkit.base.DefaultUtils;
 
 /**
  * 描述信息：<br/>
@@ -19,13 +20,13 @@ import org.xavier.web.extend.DefaultService;
  * @since Jdk 1.8
  */
 @Service
-public class DefaultRemoteService extends DefaultService {
+public class DefaultRemoteService extends DefaultUtils {
     @Value("${remote.user.service.name}")
     protected volatile String USER_SERVICE_NAME;
     @Autowired
     protected LoadBalancerClient client;
     @Autowired
-    protected HttpHelpper httpHelpper;
+    protected HttpHelper httpHelper;
 
     protected static HttpHeaders httpHeaders = new HttpHeaders() {{
         add("uId", "U00000003");
@@ -36,7 +37,7 @@ public class DefaultRemoteService extends DefaultService {
     protected String getUserServicePrefix() {
         ServiceInstance userService = client.choose(USER_SERVICE_NAME);
         if (userService == null) {
-            throw new Universal_500_X_Exception_Runtime("Fail to query URI of " + USER_SERVICE_NAME);
+            throw new Universal500RuntimeException("Fail to query URI of " + USER_SERVICE_NAME);
         }
         return userService.getUri().toString();
 //        return "http://127.0.0.1:8080/";

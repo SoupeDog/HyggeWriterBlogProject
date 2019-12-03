@@ -5,15 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.article.domain.bo.UserValidateBO;
 import org.xavier.blog.article.domain.dto.UserDTO;
-import org.xavier.blog.article.domain.enums.UserTypeEnum;
 import org.xavier.blog.common.ErrorCode;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
-import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
-import org.xavier.common.logging.HyggeLogger;
-import org.xavier.common.utils.HttpHelperResponse;
-import org.xavier.common.utils.HttpHelpper;
-import org.xavier.web.extend.GatewayResponse;
+import org.xavier.blog.common.GatewayResponse;
+import org.xavier.blog.common.enums.UserTypeEnum;
+import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
+import org.xavier.common.exception.Universal500RuntimeException;
+import org.xavier.common.logging.core.HyggeLogger;
+import org.xavier.common.util.http.helper.HttpHelper;
+import org.xavier.common.util.http.helper.HttpHelperResponse;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class UserServiceImpl extends DefaultRemoteService {
     @Autowired
-    HttpHelpper httpHelpper;
+    HttpHelper httpHelper;
     @Autowired
     HyggeLogger logger;
     @Autowired
@@ -53,10 +53,10 @@ public class UserServiceImpl extends DefaultRemoteService {
 
     public UserDTO queryUserByUId(String uId) {
         Long ts = System.currentTimeMillis();
-        HttpHelperResponse<GatewayResponse<ArrayList<UserDTO>>> response = httpHelpper.get(getUserServicePrefix() + "/user-service/main/user/" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_USER_LIST);
+        HttpHelperResponse<GatewayResponse<ArrayList<UserDTO>>> response = httpHelper.get(getUserServicePrefix() + "/user-service/main/user/" + uId, httpHeaders, RESPONSE_TYPEREFERENCE_USER_LIST);
         System.out.println((System.currentTimeMillis() - ts) + " 毫秒=查询用户信息");
         if (response.isFail()) {
-            throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[queryUserByUId].", response.getData().getMsg());
+            throw new Universal500RuntimeException(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[queryUserByUId].", response.getData().getMsg());
         }
         if (response.getData().getData().size() < 1) {
             return null;
@@ -75,9 +75,9 @@ public class UserServiceImpl extends DefaultRemoteService {
                 ts.toString());
         CompletableFuture.runAsync(() -> {
             System.out.println(getUserServicePrefix() + "/main/user/log/operation");
-            HttpHelperResponse<GatewayResponse<String>> response = httpHelpper.post(getUserServicePrefix() + "/user-service/main/user/log/operation", requestJson, httpHeaders, RESPONSE_TYPEREFERENCE_VOID);
+            HttpHelperResponse<GatewayResponse<String>> response = httpHelper.post(getUserServicePrefix() + "/user-service/main/user/log/operation", requestJson, httpHeaders, RESPONSE_TYPEREFERENCE_VOID);
             if (response.isFail()) {
-                throw new Universal_500_X_Exception_Runtime(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[saveUserOperationLog]. " + response.getHttpStatus() + " " + requestJson);
+                throw new Universal500RuntimeException(ErrorCode.REQUEST_FALL_TO_CALL_UPSTREAM_SERVICES.getErrorCod(), "Fall to call User-Service[saveUserOperationLog]. " + response.getHttpStatus() + " " + requestJson);
             }
         }).exceptionally(throwable -> {
             if (throwable != null) {
@@ -87,21 +87,29 @@ public class UserServiceImpl extends DefaultRemoteService {
         });
     }
 
-    public UserDTO queryUserByUId_WithExistValidate(String uId) throws Universal_404_X_Exception {
+    public UserDTO queryUserByUId_WithExistValidate(String uId) throws Universal404Exception {
         UserDTO result = queryUserByUId(uId);
         if (result == null) {
-            throw new Universal_404_X_Exception(ErrorCode.USER_NOTFOUND.getErrorCod(), "User(" + uId + ") was not found.");
+            throw new Universal404Exception(ErrorCode.USER_NOTFOUND.getErrorCod(), "User(" + uId + ") was not found.");
         }
         return result;
     }
 
-    public void checkRight(String operatorUId, String expectedUId) throws Universal_403_X_Exception {
-        UserDTO currentOperator = queryUserByUId(operatorUId);
+    public void checkRight(String currentUserUId, UserTypeEnum expectedUserType, String... uIdWhiteList) throws Universal403Exception {
+        UserDTO currentOperator = queryUserByUId(currentUserUId);
         if (currentOperator == null) {
-            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
-        } else {
-            if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT) && !operatorUId.equals(expectedUId)) {
-                throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+            throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
+        }
+        boolean whiteListUser = false;
+        for (String expectedUId : uIdWhiteList) {
+            if (expectedUId.equals(currentOperator.getuId())) {
+                whiteListUser = true;
+                break;
+            }
+        }
+        if (!whiteListUser) {
+            if (!currentOperator.getUserType().equals(expectedUserType)) {
+                throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
             }
         }
     }

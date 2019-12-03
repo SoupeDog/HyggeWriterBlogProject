@@ -3,7 +3,6 @@ package org.xavier.blog.article.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.xavier.blog.article.dao.ArticleMapper;
 import org.xavier.blog.article.domain.bo.ArticleQuarryBO;
 import org.xavier.blog.article.domain.bo.ArticleSummaryQueryBO;
@@ -16,14 +15,15 @@ import org.xavier.blog.article.domain.po.article.ArticleSummaryQueryPO;
 import org.xavier.blog.article.service.remote.UserServiceImpl;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.PropertiesReminder;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.common.enums.ColumnType;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
+import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
-import org.xavier.common.utils.UtilsCreator;
-import org.xavier.common.utils.bo.ColumnInfo;
-import org.xavier.web.extend.DefaultService;
-import org.xavier.web.extend.PageResult;
+import org.xavier.common.util.UtilsCreator;
+import org.xavier.common.util.bo.ColumnInfo;
+import org.xavier.webtoolkit.base.DefaultUtils;
+import org.xavier.webtoolkit.domain.PageResult;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -38,7 +38,7 @@ import java.util.concurrent.CompletableFuture;
  * @since Jdk 1.8
  */
 @Service
-public class ArticleServiceImpl extends DefaultService {
+public class ArticleServiceImpl extends DefaultUtils {
     @Autowired
     ArticleMapper articleMapper;
     @Autowired
@@ -54,12 +54,12 @@ public class ArticleServiceImpl extends DefaultService {
 
     static {
         checkInfo = new ArrayList<ColumnInfo>() {{
-            add(new ColumnInfo(ColumnType.STRING, "title", "title", false, 1, 50));
-            add(new ColumnInfo(ColumnType.STRING, "articleCategoryId", "articleCategoryId", false, 1, 32));
-            add(new ColumnInfo(ColumnType.STRING, "uId", "uId", false, 1, 10));
-            add(new ColumnInfo(ColumnType.STRING, "statementId", "statementId", true, 1, 32));
-            add(new ColumnInfo(ColumnType.STRING, "summary", "summary", true, 1, 1000));
-            add(new ColumnInfo(ColumnType.STRING, "content", "content", false, 1, 100000));
+            add(new ColumnInfo("title", "title", ColumnType.STRING, false, 1, 50));
+            add(new ColumnInfo("articleCategoryId", "articleCategoryId", ColumnType.STRING, false, 1, 32));
+            add(new ColumnInfo("uId", "uId", ColumnType.STRING, false, 1, 10));
+            add(new ColumnInfo("statementId", "statementId", ColumnType.STRING, true, 1, 32));
+            add(new ColumnInfo("summary", "summary", ColumnType.STRING, true, 1, 1000));
+            add(new ColumnInfo("content", "content", ColumnType.STRING, false, 1, 100000));
         }};
     }
 
@@ -68,25 +68,25 @@ public class ArticleServiceImpl extends DefaultService {
      *
      * @param article 目标文章
      */
-    public Boolean saveArticle(Article article, Long serviceTs) throws Universal_404_X_Exception, Universal_403_X_Exception {
+    public Boolean saveArticle(Article article, Long serviceTs) throws Universal404Exception, Universal403Exception {
         article.setPageViews(0);
         article.setLegal_Flag(true);
         article.setLastUpdateTs(serviceTs);
         article.setTs(serviceTs);
-        article.setArticleId(UtilsCreator.getInstance_DefaultRandomHelper().getUUID());
+        article.setArticleId(UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier());
         ArticleCategory articleCategory = articleCategoryService.queryArticleCategoryById_WithExistValidate(article.getArticleCategoryId());
         if (!articleCategory.getuId().equals(article.getuId())) {
-            throw new Universal_403_X_Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Permission denied.");
+            throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Permission denied.");
         }
         if (article.getStatementId() != null && !article.getStatementId().equals("")) {
             statementService.queryStatementByStatementId_WithExistValidate(article.getStatementId());
         }
-        Integer saveArticle_affectedLine = articleMapper.saveArticle(article);
-        Boolean saveArticle_Flag = saveArticle_affectedLine == 1;
-        if (!saveArticle_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveArticle_affectedLine", "1", saveArticle_affectedLine, article));
+        Integer saveArticleAffectedRow = articleMapper.saveArticle(article);
+        Boolean saveArticleFlag = saveArticleAffectedRow == 1;
+        if (!saveArticleFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveArticleAffectedRow", "1", saveArticleAffectedRow, article));
         }
-        return saveArticle_Flag;
+        return saveArticleFlag;
     }
 
     /**
@@ -94,31 +94,33 @@ public class ArticleServiceImpl extends DefaultService {
      *
      * @param articleIds 文章唯一标识 List
      */
-    public Boolean removeArticleMultipleByIds_Logically(String operatorUId, List<String> articleIds, Long upTs) {
-        ArrayList<String> articleIdListForQuery = listHelper.filterStringListNotEmpty(articleIds, "articleId", 32, 32);
+    public Boolean removeArticleMultipleByIdsLogically(String operatorUId, List<String> articleIds, Long upTs) {
+        ArrayList<String> articleIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, articleIds, "articleIds", String.class, String.class, (x) -> x.trim());
+        propertiesHelper.intRangeNotNull(articleIdListForQuery.size(), 1, Integer.MAX_VALUE, "[articleIds] can't be empty.");
         ArrayList<String> articleIdListForRemove = articleMapper.queryArticleIdLisOfUser(operatorUId, articleIdListForQuery);
-        articleIdListForRemove = listHelper.filterStringListNotEmpty(articleIdListForRemove, "articleId", 32, 32);
-        Integer removeArticleMultiple_affectedLine = articleMapper.removeArticleMultipleByIds_Logically(articleIdListForRemove, operatorUId, upTs);
-        Boolean removeArticleMultiple_Flag = removeArticleMultiple_affectedLine == articleIdListForRemove.size();
-        if (!removeArticleMultiple_Flag) {
+        propertiesHelper.intRangeNotNull(articleIdListForRemove.size(), 1, Integer.MAX_VALUE, "[articleIds] can't be empty.");
+        articleIdListForRemove = collectionHelper.filterCollectionNotEmptyAsArrayList(true, articleIdListForRemove, "articleIds", String.class, String.class, (x) -> x.trim());
+        Integer removeArticleMultipleAffectedRow = articleMapper.removeArticleMultipleByIds_Logically(articleIdListForRemove, operatorUId, upTs);
+        Boolean removeArticleMultipleFlag = removeArticleMultipleAffectedRow == articleIdListForRemove.size();
+        if (!removeArticleMultipleFlag) {
             ArrayList<String> finalArticleIdListForRemove = articleIdListForRemove;
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveArticle_affectedLine", String.valueOf(articleIdListForRemove.size()), removeArticleMultiple_affectedLine, new LinkedHashMap() {{
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveArticleAffectedRow", String.valueOf(articleIdListForRemove.size()), removeArticleMultipleAffectedRow, new LinkedHashMap() {{
                 put("operatorUId", operatorUId);
                 put("articleIdListForRemove", finalArticleIdListForRemove);
                 put("upTs", upTs);
             }}));
         }
-        return removeArticleMultiple_Flag;
+        return removeArticleMultipleFlag;
     }
 
-    public void increasePageViews_Asynchronous(String articleId) {
+    public void increasePageViewsAsynchronous(String articleId) {
         if (articleId == null || articleId.trim().equals("")) {
             return;
         }
         CompletableFuture.runAsync(() -> {
-            Integer autoIncreaseArticlePageViews_affectedLine = articleMapper.autoIncreaseArticlePageViews(articleId);
-            if (autoIncreaseArticlePageViews_affectedLine != 1) {
-                logger.warn(HyggeLoggerMsgBuilder.assertFail("autoIncreaseArticlePageViews_affectedLine", String.valueOf(1), autoIncreaseArticlePageViews_affectedLine, articleId));
+            Integer autoIncreaseArticlePageViewsAffectedRow = articleMapper.autoIncreaseArticlePageViews(articleId);
+            if (autoIncreaseArticlePageViewsAffectedRow != 1) {
+                logger.warn(HyggeLoggerMsgBuilder.assertFail("autoIncreaseArticlePageViewsAffectedRow", String.valueOf(1), autoIncreaseArticlePageViewsAffectedRow, articleId));
             }
         }).exceptionally(throwable -> {
             if (throwable != null) {
@@ -134,32 +136,32 @@ public class ArticleServiceImpl extends DefaultService {
      * @param articleId 文章唯一标识
      * @param rowData   修改原数据
      */
-    public Boolean updateArticle(String operatorUId, String articleId, Map rowData) throws Universal_404_X_Exception, Universal_403_X_Exception {
+    public Boolean updateArticle(String operatorUId, String articleId, Map rowData) throws Universal404Exception, Universal403Exception {
         Article targetArticle = querySingleArticleByArticleId_WithExistValidate(articleId);
-        userService.checkRight(operatorUId, targetArticle.getuId());
-        HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
-        mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
-        if (data.containsKey("statementId")) {
-            String statementId = propertiesHelper.string(data.get("statementId"), 32, 32, "[statementId] can't be null and its length should be 32.");
+        userService.checkRight(operatorUId, UserTypeEnum.ROOT, targetArticle.getuId());
+        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
+
+        if (rowData.containsKey("statementId")) {
+            String statementId = propertiesHelper.string(rowData.get("statementId"), 32, 32, "[statementId] can't be null and its length should be 32.");
             if (statementId != null) {
                 statementService.queryStatementByStatementId_WithExistValidate(statementId);
             } else {
-                data.remove("statementId");
+                rowData.remove("statementId");
             }
         }
-        if (data.containsKey("articleCategoryId")) {
-            String articleCategoryId = propertiesHelper.string(data.get("articleCategoryId"), 32, 32, "[articleCategoryId] can't be null and its length should be 32.");
+        if (rowData.containsKey("articleCategoryId")) {
+            String articleCategoryId = propertiesHelper.string(rowData.get("articleCategoryId"), 32, 32, "[articleCategoryId] can't be null and its length should be 32.");
             if (articleCategoryId != null) {
                 articleCategoryService.queryArticleCategoryById_WithExistValidate(articleCategoryId);
             } else {
-                data.remove("articleCategoryId");
+                rowData.remove("articleCategoryId");
             }
         }
-        if (data.containsKey("content")) {
-            Integer wordCount = data.get("content").toString().trim().length();
-            data.put("wordCount", wordCount);
+        if (rowData.containsKey("content")) {
+            Integer wordCount = rowData.get("content").toString().trim().length();
+            rowData.put("wordCount", wordCount);
         }
-        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
+        HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
         Integer updateArticle_affectedLine = articleMapper.updateArticle(articleId, data, upTs);
         Boolean updateArticle_Flag = updateArticle_affectedLine == 1;
         if (!updateArticle_Flag) {
@@ -184,7 +186,7 @@ public class ArticleServiceImpl extends DefaultService {
         ArticleCategory articleCategoryTemp = articleCategoryService.queryArticleCategoryByArticleCategoryId(result.getArticleCategoryId());
         UserValidateBO currentUser = userService.queryUserValidateBOByUId(operatorUId, secretKey);
         if (currentUser.chekPromission(articleCategoryTemp)) {
-            increasePageViews_Asynchronous(result.getArticleId());
+            increasePageViewsAsynchronous(result.getArticleId());
             userService.addUserLog_Async(operatorUId,
                     PropertiesReminder.浏览文章,
                     result.getTitle(),
@@ -219,9 +221,9 @@ public class ArticleServiceImpl extends DefaultService {
         }
         ArrayList<ArticleSummaryQueryPO> resultSetTemp;
         if (isDESC) {
-            resultSetTemp = articleMapper.queryArticleQuarryBOByArticleIdList(articleCategoryIdList, (currentPage - 1) * size, size, orderKey, DESC);
+            resultSetTemp = articleMapper.queryArticleQuarryBOByArticleIdList(articleCategoryIdList, (currentPage - 1) * size, size, orderKey, "DESC");
         } else {
-            resultSetTemp = articleMapper.queryArticleQuarryBOByArticleIdList(articleCategoryIdList, (currentPage - 1) * size, size, orderKey, ASC);
+            resultSetTemp = articleMapper.queryArticleQuarryBOByArticleIdList(articleCategoryIdList, (currentPage - 1) * size, size, orderKey, "ASC");
         }
         ArrayList<ArticleSummaryQueryBO> resultSet = new ArrayList();
         for (ArticleSummaryQueryPO temp : resultSetTemp) {
@@ -237,12 +239,12 @@ public class ArticleServiceImpl extends DefaultService {
      *
      * @param articleId 文章唯一标识
      * @return 文章对象
-     * @throws Universal_404_X_Exception
+     * @throws Universal404Exception
      */
-    public Article querySingleArticleByArticleId_WithExistValidate(String articleId) throws Universal_404_X_Exception {
+    public Article querySingleArticleByArticleId_WithExistValidate(String articleId) throws Universal404Exception {
         Article result = querySingleArticleByArticleId(articleId);
         if (result == null) {
-            throw new Universal_404_X_Exception(ErrorCode.ARTICLE_NOTFOUND.getErrorCod(), "Article(" + articleId + ") was not found.");
+            throw new Universal404Exception(ErrorCode.ARTICLE_NOTFOUND.getErrorCod(), "Article(" + articleId + ") was not found.");
         }
         return result;
     }
@@ -255,7 +257,9 @@ public class ArticleServiceImpl extends DefaultService {
      */
     public Article querySingleArticleByArticleId(String articleId) {
         propertiesHelper.stringNotNull(articleId, "[articleId] can't be empty.");
-        ArrayList<Article> articleList = articleMapper.queryArticleListByIds(listHelper.createSingleList(articleId));
+        ArrayList<Article> articleList = articleMapper.queryArticleListByIds(new ArrayList<String>() {{
+            add(articleId);
+        }});
         if (articleList.size() > 0) {
             return articleList.get(0);
         } else {

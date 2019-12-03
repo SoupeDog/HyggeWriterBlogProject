@@ -9,7 +9,7 @@ package org.xavier.blog.common;
  * @date 19-10-19
  * @since Jdk 1.8
  */
-public class GatewayResponse {
+public class GatewayResponse<T> {
     /**
      * 请求状态 1 成功  2 失败 3 服务端异常
      */
@@ -25,7 +25,7 @@ public class GatewayResponse {
     /**
      * 返回结果
      */
-    private Object data;
+    private T data;
     /**
      * 响应时间戳
      */
@@ -55,11 +55,11 @@ public class GatewayResponse {
         this.msg = msg;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
 

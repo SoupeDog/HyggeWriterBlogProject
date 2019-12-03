@@ -1,11 +1,9 @@
 package org.xavier.blog.article.domain.dto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.xavier.blog.article.domain.po.statement.Statement;
-import org.xavier.common.exception.Universal_500_X_Exception_Runtime;
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
-import org.xavier.common.utils.base.BaseJsonHelper;
+import org.xavier.common.exception.Universal500RuntimeException;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -53,11 +51,11 @@ public class StatementDTO {
             this.statementId = statement.getStatementId();
             this.uId = statement.getuId();
             this.content = statement.getContent();
-            this.properties = UtilsCreator.getInstance_DefaultJsonHelper(false).getMapper().readValue(statement.getProperties(), LinkedHashMap.class);
+            this.properties = UtilsCreator.getDefaultJsonHelperInstance(false).getMapper().readValue(statement.getProperties(), LinkedHashMap.class);
             this.lastUpdateTs = statement.getLastUpdateTs();
             this.ts = statement.getTs();
         } catch (IOException e) {
-            throw new Universal_500_X_Exception_Runtime("Fail to deserialize [" + statement.getProperties() + "] to Map.");
+            throw new Universal500RuntimeException("Fail to deserialize [" + statement.getProperties() + "] to Map.");
         }
     }
 
@@ -65,7 +63,7 @@ public class StatementDTO {
      * 参数校验
      */
     public void validate() {
-        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         propertiesHelper.stringNotNull(content, 1, 1000, "[content] can't be null,and its length should within 1000.");
     }
 

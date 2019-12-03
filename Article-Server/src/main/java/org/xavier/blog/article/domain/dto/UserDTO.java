@@ -1,6 +1,7 @@
 package org.xavier.blog.article.domain.dto;
 
-import org.xavier.blog.article.domain.enums.UserTypeEnum;
+
+import org.xavier.blog.common.enums.UserTypeEnum;
 
 /**
  * 描述信息：<br/>

@@ -11,8 +11,6 @@ import org.xavier.blog.article.service.StatementServiceImpl;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.common.exception.*;
-import org.xavier.common.utils.UtilsCreator;
-import org.xavier.web.annotation.EnableControllerLog;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -32,58 +30,56 @@ public class StatementController extends HyggeWriterController {
     @Autowired
     StatementServiceImpl statementserviceImpl;
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @PostMapping(value = "/statement")
     public ResponseEntity<?> saveStatement(@RequestHeader HttpHeaders headers, @RequestBody Statement statement) {
         try {
             statement.validate();
             if (!statementserviceImpl.saveStatement(headers.getFirst("uId"), statement, System.currentTimeMillis())) {
-                throw new Universal_500_X_Exception(ErrorCode.DATEBASE_FALL_TO_SAVE.getErrorCod(), "DateBase fail to save.");
+                throw new Universal500RuntimeException(ErrorCode.DATEBASE_FALL_TO_SAVE.getErrorCod(), "DateBase fail to save.");
             }
             return success(statement);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_500_X_Exception e) {
+        } catch (Universal500RuntimeException e) {
             return fail(HttpStatus.INTERNAL_SERVER_ERROR, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @DeleteMapping(value = "/statement/{statementIds}")
     public ResponseEntity<?> deleteStatement(@RequestHeader HttpHeaders headers, @PathVariable("statementIds") ArrayList<String> statementIdList) {
         try {
-            Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a long number.");
+            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a long number.");
             if (!statementserviceImpl.removeStatement_Multiple(headers.getFirst("uId"), statementIdList, upTs)) {
-                throw new Universal_409_X_Exception(ErrorCode.STATEMENT_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
+                throw new Universal409Exception(ErrorCode.STATEMENT_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
             }
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @PutMapping(value = "/statement/{statementId}")
     public ResponseEntity<?> updateStatement(@RequestHeader HttpHeaders headers, @PathVariable("statementId") String statementId, @RequestBody Map data) {
         try {
             if (!statementserviceImpl.updateStatement(headers.getFirst("uId"), statementId, data)) {
-                throw new Universal_409_X_Exception(ErrorCode.STATEMENT_UPDATE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
+                throw new Universal409Exception(ErrorCode.STATEMENT_UPDATE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
             }
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal400Exception e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = {"headers"})
     @GetMapping(value = "/statement/{uId}")
     public ResponseEntity<?> queryStatementListByUId(@PathVariable("uId") String uId,
                                                      @RequestParam(name = "currentPage", required = false, defaultValue = "1") String currentPageStringVal,

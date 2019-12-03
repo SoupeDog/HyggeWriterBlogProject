@@ -4,19 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.article.dao.StatementMapper;
 import org.xavier.blog.article.domain.dto.StatementDTO;
-import org.xavier.blog.article.domain.dto.UserDTO;
-import org.xavier.blog.article.domain.enums.UserTypeEnum;
 import org.xavier.blog.article.domain.po.statement.Statement;
 import org.xavier.blog.article.service.remote.UserServiceImpl;
 import org.xavier.blog.common.ErrorCode;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.common.enums.ColumnType;
-import org.xavier.common.exception.Universal_400_X_Exception_Runtime;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
+import org.xavier.common.exception.Universal400Exception;
+import org.xavier.common.exception.Universal400RuntimeException;
+import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
-import org.xavier.common.utils.UtilsCreator;
-import org.xavier.common.utils.bo.ColumnInfo;
-import org.xavier.web.extend.DefaultService;
+import org.xavier.common.util.UtilsCreator;
+import org.xavier.common.util.bo.ColumnInfo;
+import org.xavier.webtoolkit.base.DefaultUtils;
 
 import java.util.*;
 
@@ -30,88 +30,90 @@ import java.util.*;
  * @since Jdk 1.8
  */
 @Service
-public class StatementServiceImpl extends DefaultService {
+public class StatementServiceImpl extends DefaultUtils {
     @Autowired
     StatementMapper statementMapper;
     @Autowired
     UserServiceImpl userService;
 
     private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
-        add(new ColumnInfo(ColumnType.STRING, "content", "content", false, 1, 300));
-        add(new ColumnInfo(ColumnType.STRING, "properties", "properties", true, 0, 1000));
+        add(new ColumnInfo("content", "content", ColumnType.STRING, false, 1, 300));
+        add(new ColumnInfo("properties", "properties", ColumnType.STRING, true, 0, 1000));
     }};
 
     /**
      * 添加版权声明
      */
     public Boolean saveStatement(String operatorUId, Statement statement, Long currentTs) {
-        statement.setStatementId(UtilsCreator.getInstance_DefaultRandomHelper().getUUID());
+        statement.setStatementId(UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier());
         statement.setuId(operatorUId);
         statement.setLastUpdateTs(currentTs);
         // 校验是否是 Json 串
         if (statement.getProperties() != null) {
             try {
                 jsonHelper.format(statement.getProperties());
-            } catch (Universal_400_X_Exception_Runtime e) {
-                throw new Universal_400_X_Exception_Runtime("[properties] should be json string.");
+            } catch (Universal400RuntimeException e) {
+                throw new Universal400RuntimeException("[properties] should be json string.");
             }
         } else {
             statement.setProperties("");
         }
         statement.setTs(currentTs);
-        Integer saveStatement_affectedLine = statementMapper.saveStatement(statement);
-        Boolean saveStatement_Flag = saveStatement_affectedLine == 1;
-        if (!saveStatement_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveStatement_EffectedLine", "1", saveStatement_affectedLine, statement));
+        Integer saveStatementAffectedRow = statementMapper.saveStatement(statement);
+        Boolean saveStatementFlag = saveStatementAffectedRow == 1;
+        if (!saveStatementFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveStatementAffectedRow", "1", saveStatementAffectedRow, statement));
         }
-        return saveStatement_Flag;
+        return saveStatementFlag;
     }
 
     /**
      * 批量删除版权声明
      */
     public Boolean removeStatement_Multiple(String operatorUId, ArrayList<String> statementIdList, Long upTs) {
-        ArrayList<String> statementIdListForQuery = listHelper.filterStringListNotEmpty(statementIdList, "statementIdList", 32, 32);
+        ArrayList<String> statementIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, statementIdList, "statementIdList", String.class, String.class, (x) -> x.trim());
         statementIdListForQuery = statementMapper.queryStatementListOfUserRange(operatorUId, statementIdListForQuery);
-        ArrayList<String> statementIdListForRemove = listHelper.filterStringListNotEmpty(statementIdListForQuery, "statementIdList", 32, 32);
-        Integer removeStatement_affectedLine = statementMapper.removeStatementMultipleByStatementIdList(statementIdListForRemove, upTs);
-        Boolean removeGroup_Flag = removeStatement_affectedLine == statementIdListForQuery.size();
-        if (!removeGroup_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("removeStatement_affectedLine", "1", removeStatement_affectedLine, new LinkedHashMap() {{
+        ArrayList<String> statementIdListForRemove = collectionHelper.filterCollectionNotEmptyAsArrayList(true, statementIdListForQuery, "statementIdList", String.class, String.class, (x) -> x.trim());
+        Integer removeStatementAffectedRow = statementMapper.removeStatementMultipleByStatementIdList(statementIdListForRemove, upTs);
+        Boolean removeGroupFlag = removeStatementAffectedRow == statementIdListForQuery.size();
+        if (!removeGroupFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("removeStatementAffectedRow", "1", removeStatementAffectedRow, new LinkedHashMap() {{
                 put("operatorUId", operatorUId);
                 put("statementIdList", statementIdListForRemove);
                 put("upTs", upTs);
             }}));
         }
-        return removeGroup_Flag;
+        return removeGroupFlag;
     }
 
     /**
      * 修改版权声明
      */
-    public Boolean updateStatement(String operatorUId, String statementId, Map rowData) throws Universal_404_X_Exception, Universal_403_X_Exception {
+    public Boolean updateStatement(String operatorUId, String statementId, Map rowData) throws Universal404Exception, Universal403Exception, Universal400Exception {
         propertiesHelper.stringNotNull(statementId, 32, 32, "[statementId] can't be null,and its length should be 32.");
         Statement statement = quarryStatementByStatementId(statementId);
         if (statement == null) {
-            throw new Universal_404_X_Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Statement(" + statementId + ") was not found.");
+            throw new Universal404Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Statement(" + statementId + ") was not found.");
         }
-        userService.checkRight(operatorUId, statement.getuId());
+        userService.checkRight(operatorUId, UserTypeEnum.ROOT, statement.getuId());
         if (rowData.containsKey("properties")) {
             try {
                 Object propertiesObj = rowData.get("properties");
                 String properties = jsonHelper.format(propertiesObj);
                 rowData.put("properties", properties);
-            } catch (Universal_400_X_Exception_Runtime e) {
-                throw new Universal_400_X_Exception_Runtime("[properties] should be json string.");
+            } catch (Universal400RuntimeException e) {
+                throw new Universal400RuntimeException("[properties] should be json string.");
             }
         }
-        HashMap data = sqlHelper.createFinalUpdateDataWithTimeStamp(rowData, checkInfo, LASTUPDATETS);
-        mapHelper.mapNotEmpty(data, "Effective Update-Info was null.");
-        Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a long number.");
-        Integer updateStatement_affectedLine = statementMapper.updateStatement(statementId, data, upTs);
-        Boolean updateGroup_Flag = updateStatement_affectedLine == 1;
+        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a long number.");
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
+        if (data.size() < 2) {
+            throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
+        }
+        Integer updateStatementAffectedRow = statementMapper.updateStatement(statementId, data, upTs);
+        Boolean updateGroup_Flag = updateStatementAffectedRow == 1;
         if (!updateGroup_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("updateStatement_affectedLine", "1", updateStatement_affectedLine, new LinkedHashMap() {{
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("updateStatementAffectedRow", "1", updateStatementAffectedRow, new LinkedHashMap() {{
                 put("operatorUId", operatorUId);
                 put("statementId", statementId);
                 put("data", data);
@@ -126,7 +128,9 @@ public class StatementServiceImpl extends DefaultService {
      */
     public Statement quarryStatementByStatementId(String statementId) {
         propertiesHelper.stringNotNull(statementId, 32, 32, "[statementId] can't be null,and its length should be 32.");
-        ArrayList<Statement> resultTemp = statementMapper.queryStatementListByIds(listHelper.createSingleList(statementId));
+        ArrayList<Statement> resultTemp = statementMapper.queryStatementListByIds(new ArrayList<String>() {{
+            add(statementId);
+        }});
         if (resultTemp == null || resultTemp.size() < 1) {
             return null;
         } else {
@@ -137,10 +141,10 @@ public class StatementServiceImpl extends DefaultService {
     /**
      * 根据版权唯一标识查询版权声明
      */
-    public Statement queryStatementByStatementId_WithExistValidate(String statementId) throws Universal_404_X_Exception {
+    public Statement queryStatementByStatementId_WithExistValidate(String statementId) throws Universal404Exception {
         Statement result = quarryStatementByStatementId(statementId);
         if (result == null) {
-            throw new Universal_404_X_Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Statement(" + statementId + ") was not found.");
+            throw new Universal404Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Statement(" + statementId + ") was not found.");
         }
         return result;
     }

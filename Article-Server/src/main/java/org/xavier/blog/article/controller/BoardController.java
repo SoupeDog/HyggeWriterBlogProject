@@ -11,11 +11,7 @@ import org.xavier.blog.article.domain.po.board.Board;
 import org.xavier.blog.article.service.BoardServiceImpl;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
-import org.xavier.common.exception.PropertiesException_Runtime;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
-import org.xavier.common.exception.Universal_409_X_Exception;
-import org.xavier.web.annotation.EnableControllerLog;
+import org.xavier.common.exception.*;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -35,53 +31,51 @@ public class BoardController extends HyggeWriterController {
     @Autowired
     BoardServiceImpl boardService;
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @PostMapping(value = "/board")
     public ResponseEntity<?> saveBoard(@RequestHeader HttpHeaders headers, @RequestBody Board board) {
         try {
             board.validate();
             boardService.saveBoard(headers.getFirst("uId"), board, System.currentTimeMillis());
             return success(boardService.boardToBoardDTO(board));
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.BOARD_EXISTS.getErrorCod(), "Board(" + board.getBoardName() + ") dose exist.");
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @DeleteMapping(value = "/board/{boardIds}")
     public ResponseEntity<?> removeUserMultiple(@RequestHeader HttpHeaders headers, @PathVariable("boardIds") ArrayList<String> boardIdList) {
         try {
-            if (!boardService.removeBoard_Multiple(headers.getFirst("uId"), boardIdList, System.currentTimeMillis())) {
-                throw new Universal_409_X_Exception(ErrorCode.BOARD_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
+            if (!boardService.removeBoardMultiple(headers.getFirst("uId"), boardIdList, System.currentTimeMillis())) {
+                throw new Universal409Exception(ErrorCode.BOARD_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
             }
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @PutMapping(value = "/board/{boardId}")
     public ResponseEntity<?> updateBoard(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId, @RequestBody Map rowData) {
         try {
             boardService.updateBoard(headers.getFirst("uId"), boardId, rowData);
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        }  catch (Universal400Exception e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        }catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @GetMapping(value = "/board/all")
     public ResponseEntity<?> queryBoardAll(@RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") Integer pageSize,

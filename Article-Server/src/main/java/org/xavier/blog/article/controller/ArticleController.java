@@ -8,18 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.article.domain.bo.ArticleQuarryBO;
 import org.xavier.blog.article.domain.bo.ArticleSummaryQueryBO;
-import org.xavier.blog.article.domain.dto.ArticleDTO;
 import org.xavier.blog.article.domain.po.article.Article;
 import org.xavier.blog.article.service.ArticleServiceImpl;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
-import org.xavier.common.exception.PropertiesException_Runtime;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
-import org.xavier.common.exception.Universal_409_X_Exception;
-import org.xavier.common.utils.UtilsCreator;
-import org.xavier.web.annotation.EnableControllerLog;
-import org.xavier.web.extend.PageResult;
+import org.xavier.common.exception.PropertiesRuntimeException;
+import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
+import org.xavier.common.exception.Universal409Exception;
+import org.xavier.webtoolkit.domain.PageResult;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -38,7 +35,6 @@ public class ArticleController extends HyggeWriterController {
     @Autowired
     ArticleServiceImpl articleService;
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @PostMapping(value = "/article")
     public ResponseEntity<?> saveArticle(@RequestHeader HttpHeaders headers, @RequestBody Article article) {
         try {
@@ -50,68 +46,62 @@ public class ArticleController extends HyggeWriterController {
             return success(articleService.articleToArticleDTO(article));
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.ARTICLE_EXISTS.getErrorCod(), "Article(" + article.getTitle() + ") dose exist.");
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @DeleteMapping(value = "/article/{articleIds}")
     public ResponseEntity<?> removeArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleIds") ArrayList<String> articleIds) {
         try {
             String operatorUId = headers.getFirst("uId");
-            Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a long number.");
-            if (!articleService.removeArticleMultipleByIds_Logically(operatorUId, articleIds, upTs)) {
-                throw new Universal_409_X_Exception(ErrorCode.BOARD_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
+            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a long number.");
+            if (!articleService.removeArticleMultipleByIdsLogically(operatorUId, articleIds, upTs)) {
+                throw new Universal409Exception(ErrorCode.BOARD_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
             }
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @PutMapping(value = "/article/{articleId}")
     public ResponseEntity<?> updateArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleId") String articleId, @RequestBody Map data) {
         try {
             String operatorUId = headers.getFirst("uId");
             if (!articleService.updateArticle(operatorUId, articleId, data)) {
-                throw new Universal_409_X_Exception(ErrorCode.ARTICLE_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
+                throw new Universal409Exception(ErrorCode.ARTICLE_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @GetMapping(value = "/article/{article}")
     public ResponseEntity<?> queryArticle(@RequestHeader HttpHeaders headers, @PathVariable("article") String articleId) {
         String operatorUId = headers.getFirst("uId");
         String secretKey = headers.getFirst("secretKey");
         try {
-            String str = UtilsCreator.getInstance_DefaultJsonHelper(true).format(headers);
-            logger.warn(str);
             ArticleQuarryBO result = articleService.queryArticleByArticleId_WithBusinessCheck(headers, operatorUId, secretKey, articleId);
             return success(result);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @GetMapping(value = "/article/summary/{boardId}")
     public ResponseEntity<?> queryArticleSummary(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId,
                                                  @RequestParam(value = "uId", required = false, defaultValue = "U00000001") String uId,
@@ -124,7 +114,7 @@ public class ArticleController extends HyggeWriterController {
         try {
             PageResult<ArticleSummaryQueryBO> result = articleService.queryArticleSummaryOfUser_WithBusinessCheck(operatorUId, uId, boardId, secretKey, currentPage, pageSize, orderKey, isDESC);
             return success(result);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         }
     }

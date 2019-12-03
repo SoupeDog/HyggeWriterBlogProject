@@ -1,10 +1,14 @@
 package org.xavier.blog.article.filter;
 
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.xavier.blog.article.domain.enums.UserTokenScopeEnum;
 import org.xavier.blog.article.service.remote.UserTokenServiceImpl;
+import org.xavier.blog.common.enums.UserTokenScopeEnum;
 import org.xavier.blog.common.filter.FilterHelper;
 import org.xavier.common.exception.base.RequestException;
+import org.xavier.common.exception.base.RequestRuntimeException;
+import org.xavier.common.exception.base.ServiceRuntimeException;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -33,7 +37,7 @@ public class LoginFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
-        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         String uId, token;
         UserTokenScopeEnum scope;
         try {
@@ -54,9 +58,9 @@ public class LoginFilter extends OncePerRequestFilter {
                     break;
                 default:
             }
-        } catch (RequestException_Runtime e) {
+        } catch (RequestRuntimeException e) {
             onError(response, e);
-        } catch (ServiceException_Runtime e) {
+        } catch (ServiceRuntimeException e) {
             onError(response, e);
         } catch (ServletException e) {
             onError(response, e);
@@ -67,11 +71,11 @@ public class LoginFilter extends OncePerRequestFilter {
         }
     }
 
-    private void onError(HttpServletResponse response, RequestException_Runtime e) {
+    private void onError(HttpServletResponse response, RequestRuntimeException e) {
         initResponse(response, e.getStateCode(), e.getMessage());
     }
 
-    private void onError(HttpServletResponse response, ServiceException_Runtime e) {
+    private void onError(HttpServletResponse response, ServiceRuntimeException e) {
         initResponse(response, e.getStateCode(), e.getMessage());
     }
 
@@ -87,7 +91,7 @@ public class LoginFilter extends OncePerRequestFilter {
         initResponse(response, 400F, e.getMessage());
     }
 
-    private void initResponse(HttpServletResponse response, Float stateCode, String message) {
+    private void initResponse(HttpServletResponse response, Number stateCode, String message) {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
         response.setStatus(stateCode.intValue());

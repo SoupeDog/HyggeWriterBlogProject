@@ -2,8 +2,8 @@ package org.xavier.blog.article.domain.po.article;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 /**
  * 描述信息：<br/>
@@ -101,7 +101,7 @@ public class Article {
      * 参数校验
      */
     public void validate() {
-        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         propertiesHelper.stringNotNull(title, 1, 50, "[title] can't be null,and its length should within 50.");
         propertiesHelper.stringNotNull(articleCategoryId, "[articleCategoryId] can't be null.");
         propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");

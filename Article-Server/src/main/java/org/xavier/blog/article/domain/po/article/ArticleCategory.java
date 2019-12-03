@@ -1,8 +1,9 @@
 package org.xavier.blog.article.domain.po.article;
 
-import org.xavier.blog.article.domain.enums.ArticleAccessPermitEnum;
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
+
+import org.xavier.blog.common.enums.ArticleAccessPermitEnum;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 /**
  * 描述信息：<br/>
@@ -63,9 +64,8 @@ public class ArticleCategory {
      * 参数校验
      */
     public void validate() {
-        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         propertiesHelper.stringNotNull(articleCategoryName, 1, 30, "[articleCategoryName] can't be null,and its length should within 30.");
-        propertiesHelper.objNotNull(accessPermit, ArticleAccessPermitEnum.class, "[accessPermit] can't be null.");
     }
 
     public String getArticleCategoryId() {
