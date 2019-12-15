@@ -27,7 +27,7 @@ public interface GroupJoinRecordMapper {
      * @param groupJoinRecord 目标群组加入记录
      * @return 受影响行
      */
-    Integer saveGroupJoinRecord_Single(@Param("GroupJoinRecord") GroupJoinRecord groupJoinRecord);
+    Integer saveGroupJoinRecord(@Param("GroupJoinRecord") GroupJoinRecord groupJoinRecord);
 
     /**
      * 根据 uId gId 删除群组加入记录

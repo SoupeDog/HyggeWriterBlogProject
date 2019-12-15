@@ -2,13 +2,13 @@ package org.xavier.blog.user.filter;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.xavier.blog.common.filter.FilterHelper;
-import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
+import org.xavier.blog.common.enums.UserTokenScopeEnum;
 import org.xavier.blog.user.service.UserTokenServiceImpl;
 import org.xavier.common.exception.base.RequestException;
-import org.xavier.common.exception.base.RequestException_Runtime;
-import org.xavier.common.exception.base.ServiceException_Runtime;
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
+import org.xavier.common.exception.base.RequestRuntimeException;
+import org.xavier.common.exception.base.ServiceRuntimeException;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -37,7 +37,7 @@ public class LoginFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
-        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         String uId, token;
         UserTokenScopeEnum scope;
         try {
@@ -46,40 +46,38 @@ public class LoginFilter extends OncePerRequestFilter {
                 case "POST":
                 case "PUT":
                 case "DELETE":
-                    uId = propertiesHelper.string(request.getHeader("uId"));
-                    token = propertiesHelper.string(request.getHeader("token"));
-                    if (uId == null && token == null) {
-                        FilterHelper.addValueToHeaders(request, "uId", "U00000000");
-                    } else {
-                        scope = UserTokenScopeEnum.getUserTypeEnum(propertiesHelper.stringNotNull(request.getHeader("scope"), "[scope] can't be null."));
-                        userTokenService.validateUserToken(uId, token, scope);
-                    }
+                    uId = propertiesHelper.stringOfNullable(request.getHeader("uId"), "U00000000");
+                    token = propertiesHelper.stringOfNullable(request.getHeader("token"), "0000");
+                    FilterHelper.addValueToHeaders(request, "uId", uId);
+                    FilterHelper.addValueToHeaders(request, "token", token);
+                    scope = UserTokenScopeEnum.getUserTypeEnum(propertiesHelper.stringOfNullable(request.getHeader("scope"), "web"));
+                    userTokenService.validateUserToken(uId, token, scope);
                     filterChain.doFilter(request, response);
                     break;
                 default:
             }
-        } catch (RequestException_Runtime e) {
+        } catch (RequestRuntimeException e) {
             onError(response, e);
-        } catch (ServiceException_Runtime e) {
+        } catch (RequestException e) {
+            onError(response, e);
+        } catch (ServiceRuntimeException e) {
             onError(response, e);
         } catch (ServletException e) {
             onError(response, e);
         } catch (IOException e) {
             onError(response, e);
-        } catch (RequestException e) {
-            onError(response, e);
         }
     }
 
-    private void onError(HttpServletResponse response, RequestException_Runtime e) {
-        initResponse(response, e.getStateCode(), e.getMessage());
-    }
-
-    private void onError(HttpServletResponse response, ServiceException_Runtime e) {
+    private void onError(HttpServletResponse response, RequestRuntimeException e) {
         initResponse(response, e.getStateCode(), e.getMessage());
     }
 
     private void onError(HttpServletResponse response, RequestException e) {
+        initResponse(response, e.getStateCode(), e.getMessage());
+    }
+
+    private void onError(HttpServletResponse response, ServiceRuntimeException e) {
         initResponse(response, e.getStateCode(), e.getMessage());
     }
 
@@ -91,16 +89,16 @@ public class LoginFilter extends OncePerRequestFilter {
         initResponse(response, 400F, e.getMessage());
     }
 
-    private void initResponse(HttpServletResponse response, Float stateCode, String message) {
+    private void initResponse(HttpServletResponse response, Number stateCode, String message) {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
-        response.setStatus(stateCode.intValue());
+        response.setStatus(200);
         PrintWriter out = null;
         try {
             out = response.getWriter();
             out.append("{\n" +
                     "    \"type\": 2,\n" +
-                    "    \"code\": " + stateCode + ",\n" +
+                    "    \"code\": " + stateCode.intValue() + ",\n" +
                     "    \"msg\": \"" + message + "\",\n" +
                     "    \"data\": null,\n" +
                     "    \"ts\": " + System.currentTimeMillis() + "\n" +

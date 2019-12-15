@@ -23,7 +23,7 @@ public interface UserTokenMapper {
      * @param userToken 目标用户 token
      * @return 受影响行
      */
-    Integer saveUserToken_Single(@Param("userToken") UserToken userToken);
+    Integer saveUserToken(@Param("userToken") UserToken userToken);
 
     /**
      * 根据用户唯一标识删除 token
@@ -37,7 +37,7 @@ public interface UserTokenMapper {
     /**
      * 刷新 Token
      */
-    Integer refreshToken_CAS(@Param("uId") String uId, @Param("scope") Byte scope, @Param("token") String token, @Param("deadLine") Long deadLine, @Param("lastToken") String lastToken, @Param("lastDeadLine") Long lastDeadLine, @Param("refreshKey") String refreshKey, @Param("ts_CAS") Long ts_CAS);
+    Integer refreshToken(@Param("uId") String uId, @Param("scope") Byte scope, @Param("token") String token, @Param("deadLine") Long deadLine, @Param("lastToken") String lastToken, @Param("lastDeadLine") Long lastDeadLine, @Param("refreshKey") String refreshKey, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据 uId、scope 查询用户 token

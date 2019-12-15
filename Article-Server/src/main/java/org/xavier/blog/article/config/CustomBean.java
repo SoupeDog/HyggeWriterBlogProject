@@ -10,8 +10,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
-import org.xavier.common.utils.BaseHttpHelper;
-import org.xavier.common.utils.HttpHelpper;
+import org.xavier.common.util.http.helper.BaseHttpHelper;
+import org.xavier.common.util.http.helper.HttpHelper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,8 +28,8 @@ import java.util.List;
 @Configuration
 public class CustomBean {
     @Bean
-    public HttpHelpper httpHelpper() {
-        HttpHelpper baseHttpHelper = new BaseHttpHelper() {
+    public HttpHelper httpHelpper() {
+        HttpHelper baseHttpHelper = new BaseHttpHelper() {
             @Override
             public void initObjectMapper() {
                 mapper = new ObjectMapper();

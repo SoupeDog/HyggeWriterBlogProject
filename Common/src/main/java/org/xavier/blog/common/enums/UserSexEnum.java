@@ -1,4 +1,4 @@
-package org.xavier.blog.article.domain.enums;
+package org.xavier.blog.common.enums;
 
 /**
  * 描述信息：<br/>

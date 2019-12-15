@@ -10,7 +10,7 @@
         id, uId, pw, headIcon, userType, uName, sex, birthday, phone, email, biography, exp, properties, legal_Flag, registerTs, lastUpdateTs
     </sql>
 
-    <insert id="saveUser_Single" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+    <insert id="saveUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `user`(<include refid="Base_Column_List"/>)VALUES (
         #{user.uId},
         #{user.pw},
@@ -30,7 +30,7 @@
         )
     </insert>
 
-    <update id="removeUserByUId_Logically_Multiple">
+    <update id="removeUserLogicallyByUIdMultiple">
         UPDATE `user`
         SET legal_Flag = FALSE, lastUpdateTs = #{lastUpdateTs}
         WHERE uId IN
@@ -39,20 +39,20 @@
         </foreach>
     </update>
 
-    <update id="updateByUId_CASByLastUpdateTs">
+    <update id="updateByUId">
         UPDATE `user`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}
         </foreach>
-        WHERE lastUpdateTs &lt; #{lastUpdateTs_CAS} AND uId=#{uId}
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND uId=#{uId}
     </update>
 
-    <update id="updateById_CASByLastUpdateTs">
+    <update id="updateById">
         UPDATE `user`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}
         </foreach>
-        WHERE lastUpdateTs &lt; #{lastUpdateTs_CAS} AND id=#{id}
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND id=#{id}
     </update>
 
     <select id="queryUserByUId" resultType="User">

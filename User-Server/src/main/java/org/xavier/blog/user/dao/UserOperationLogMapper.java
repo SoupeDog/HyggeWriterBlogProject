@@ -21,5 +21,5 @@ public interface UserOperationLogMapper {
     /**
      * 根据用户唯一标识分页查询日志总记录数
      */
-    Integer queryUserOperationLogByUIdList_TotalCount(@Param("uIdList") ArrayList<String> uIdList, @Param("startPoint") Integer startPoint, @Param("size") Integer size, @Param("orderKey") String orderKey, @Param("order") String order);
+    Integer queryTotalCountOfUserOperationLogByUIdList(@Param("uIdList") ArrayList<String> uIdList, @Param("startPoint") Integer startPoint, @Param("size") Integer size, @Param("orderKey") String orderKey, @Param("order") String order);
 }

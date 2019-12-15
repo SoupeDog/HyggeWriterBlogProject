@@ -1,23 +1,22 @@
 package org.xavier.blog.user.config;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.xavier.blog.common.enums.UserSexHandler;
+import org.xavier.blog.common.enums.UserTokenScopeHandler;
+import org.xavier.blog.common.enums.UserTypeHandler;
 import org.xavier.blog.user.config.properties.DateBaseProperties;
-import org.xavier.blog.user.domain.enums.UserSexHandler;
-import org.xavier.blog.user.domain.enums.UserTokenScopeHandler;
-import org.xavier.blog.user.domain.enums.UserTypeHandler;
-import org.xavier.common.logging.HyggeLogger;
-
-import javax.sql.DataSource;
+import org.xavier.common.logging.core.HyggeLogger;
 
 /**
  * 描述信息：<br/>
@@ -39,17 +38,23 @@ public class DateBaseConfig {
     HyggeLogger logger;
 
     @Bean(name = "mySQLDataSource")
-    public DataSource mySQLDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+    public DruidDataSource mySQLDataSource() {
+        DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://" + dbProperties.getHost() + "/" + dbProperties.getDbName() + "?serverTimezone=UTC&useSSL=false&allowMultiQueries=true");
         dataSource.setUsername(dbProperties.getAc());
         dataSource.setPassword(dbProperties.getPw());
+        dataSource.setMaxActive(5);
+        dataSource.setMinIdle(2);
+//        dataSource.setTestOnBorrow(true);
+//        dataSource.setTestOnReturn(true);
+//        dataSource.setTestWhileIdle(true);
+        dataSource.setMaxWait(2000);
         return dataSource;
     }
 
     @Bean(name = "mySQLSessionFactory")
-    public SqlSessionFactory mySQLSessionFactory(DataSource mySQLDataSource) {
+    public SqlSessionFactory mySQLSessionFactory(DruidDataSource mySQLDataSource) {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(mySQLDataSource);
         VFS.addImplClass(SpringBootVFS.class);
@@ -65,7 +70,8 @@ public class DateBaseConfig {
             registry.register(new UserTypeHandler());
             registry.register(new UserSexHandler());
             registry.register(new UserTokenScopeHandler());
-            return bean.getObject();
+            SqlSessionFactory sqlSessionFactory = bean.getObject();
+            return sqlSessionFactory;
         } catch (Exception e) {
             logger.error("Fail to init mybatis.", e);
             // 主动中断服务

@@ -8,15 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.group.Group;
 import org.xavier.blog.user.service.GroupServiceImpl;
 import org.xavier.blog.user.service.UserServiceImpl;
-import org.xavier.common.exception.PropertiesException_Runtime;
-import org.xavier.common.exception.Universal_403_X_Exception;
-import org.xavier.common.exception.Universal_404_X_Exception;
-import org.xavier.common.exception.Universal_409_X_Exception;
-import org.xavier.common.utils.UtilsCreator;
-import org.xavier.web.annotation.EnableControllerLog;
+import org.xavier.common.exception.PropertiesRuntimeException;
+import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
+import org.xavier.common.exception.Universal409Exception;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -37,75 +36,71 @@ public class GroupController extends HyggeWriterController {
     @Autowired
     UserServiceImpl userService;
 
-    @EnableControllerLog
     @PostMapping(value = "/group")
     public ResponseEntity<?> saveUser(@RequestHeader HttpHeaders headers, @RequestBody Group group) {
         try {
-            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
+            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
             groupService.saveGroup(operatorUId, group);
             return success(group);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.GROUP_EXISTS.getErrorCod(), "Group(" + group.getGroupName() + ") dose exist.");
         }
     }
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @DeleteMapping(value = "/group/{gId}")
     public ResponseEntity<?> removeGroup(@RequestHeader HttpHeaders headers, @PathVariable("gId") String gId) {
         try {
-            Long upTs = UtilsCreator.getInstance_DefaultPropertiesHelper().longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a number.");
-            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
+            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a number.");
+            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
             if (!groupService.removeGroup(operatorUId, gId, upTs)) {
-                throw new Universal_409_X_Exception(ErrorCode.GROUP_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
+                throw new Universal409Exception(ErrorCode.GROUP_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
             }
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog(ignoreProperties = {"headers"})
     @PutMapping(value = "/group/{gId}")
     public ResponseEntity<?> updateGroup(@RequestHeader HttpHeaders headers, @PathVariable("gId") String gId, @RequestBody Map rowData) {
         try {
-            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
-            if (!groupService.updateGroup(operatorUId, gId, rowData)) {
-                throw new Universal_409_X_Exception(ErrorCode.GROUP_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
+            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
+            if (!groupService.updateGroup(operatorUId, gId, rowData, System.currentTimeMillis())) {
+                throw new Universal409Exception(ErrorCode.GROUP_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.GROUP_EXISTS.getErrorCod(), "Name of Group should be unique.");
-        } catch (Universal_404_X_Exception e) {
+        } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog
     @GetMapping(value = "/group/{gIds}")
     public ResponseEntity<?> queryGroupMultiple(@RequestHeader HttpHeaders headers, @PathVariable("gIds") ArrayList<String> gIdList) {
         try {
-            String operatorUId = UtilsCreator.getInstance_DefaultPropertiesHelper().stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
+            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
             // 管理员才能查
-            userService.checkRight(operatorUId, "U00000001");
+            userService.checkRight(operatorUId, UserTypeEnum.ROOT);
             ArrayList<Group> result = groupService.queryGroupByGIdList(gIdList);
             return success(result);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }

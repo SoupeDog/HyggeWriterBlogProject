@@ -1,10 +1,10 @@
 package org.xavier.blog.user.domain.po.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.xavier.blog.user.domain.enums.UserSexEnum;
-import org.xavier.blog.user.domain.enums.UserTypeEnum;
-import org.xavier.common.utils.PropertiesHelper;
-import org.xavier.common.utils.UtilsCreator;
+import org.xavier.blog.common.enums.UserSexEnum;
+import org.xavier.blog.common.enums.UserTypeEnum;
+import org.xavier.common.util.PropertiesHelper;
+import org.xavier.common.util.UtilsCreator;
 
 /**
  * 描述信息：<br/>
@@ -86,12 +86,12 @@ public class User {
      * 参数校验
      */
     public void validate() {
-        PropertiesHelper propertiesHelper = UtilsCreator.getInstance_DefaultPropertiesHelper();
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         propertiesHelper.stringNotNull(uName, 1, 20, "[uName] can't be null,and its length should within 20.");
         propertiesHelper.stringNotNull(pw, 6, 20, "[pw] can't be null,and its length should be between 6~20.");
         propertiesHelper.string(properties, 0, 1000, "Length of [properties] should within 1000.");
         if (properties != null) {
-            properties = UtilsCreator.getInstance_DefaultJsonHelper(false).format(properties);
+            properties = UtilsCreator.getDefaultJsonHelperInstance(false).format(properties);
         }
     }
 

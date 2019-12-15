@@ -1,4 +1,4 @@
-package org.xavier.blog.article.domain.enums;
+package org.xavier.blog.common.enums;
 
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;

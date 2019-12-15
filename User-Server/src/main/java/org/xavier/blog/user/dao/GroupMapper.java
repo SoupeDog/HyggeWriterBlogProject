@@ -26,7 +26,7 @@ public interface GroupMapper {
      * @param group 目标组
      * @return 受影响行
      */
-    Integer saveGroup_Single(@Param("Group") Group group);
+    Integer saveGroup(@Param("Group") Group group);
 
     /**
      * 根据 gId List 批量删除组
@@ -34,17 +34,17 @@ public interface GroupMapper {
      * @param gIdList gId List
      * @return 受影响行
      */
-    Integer removeGroupByGId_Multiple(@Param("gIdList") ArrayList<String> gIdList, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer removeGroupByGIdMultiple(@Param("gIdList") ArrayList<String> gIdList, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据 gId 更新组信息
      *
      * @param gId              组唯一标识
      * @param data             修改数据
-     * @param lastUpdateTs_CAS CAS 用字段
+     * @param lastUpdateTs CAS 用字段
      * @return 受影响行
      */
-    Integer updateByGId_CASByLastUpdateTs(@Param("gId") String gId, @Param("data") Map data, @Param("lastUpdateTs_CAS") Long lastUpdateTs_CAS);
+    Integer updateByGId(@Param("gId") String gId, @Param("data") Map data, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据 UId 查询用户信息

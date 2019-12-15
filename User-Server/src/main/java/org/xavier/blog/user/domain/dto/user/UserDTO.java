@@ -1,7 +1,7 @@
 package org.xavier.blog.user.domain.dto.user;
 
 
-import org.xavier.blog.user.domain.enums.UserTypeEnum;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.user.User;
 
 /**

@@ -1,8 +1,8 @@
 package org.xavier.blog.user.domain.po.user;
 
 
-import org.xavier.blog.user.domain.enums.UserTokenScopeEnum;
-import org.xavier.common.utils.UtilsCreator;
+import org.xavier.blog.common.enums.UserTokenScopeEnum;
+import org.xavier.common.util.UtilsCreator;
 
 /**
  * 描述信息：<br/>
@@ -58,22 +58,22 @@ public class UserToken {
 
     public void firstInit(String uId, UserTokenScopeEnum scope, Long currentTs) {
         this.uId = uId;
-        this.token = UtilsCreator.getInstance_DefaultRandomHelper().getUUID();
+        this.token = UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier();
         this.deadLine = currentTs + 7200000L;
         this.lastToken = "";
         this.lastDeadLine = 0L;
         this.scope = scope;
         this.ts = currentTs;
         this.lastUpdateTs = currentTs;
-        this.refreshKey = UtilsCreator.getInstance_DefaultRandomHelper().getUUID();
+        this.refreshKey = UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier();
     }
 
     public void refresh(Long currentTs) {
         this.lastToken = this.token;
         this.lastDeadLine = currentTs + 120000L;
-        this.token = UtilsCreator.getInstance_DefaultRandomHelper().getUUID();
+        this.token = UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier();
         this.deadLine = currentTs + 7200000L;
-        this.refreshKey = UtilsCreator.getInstance_DefaultRandomHelper().getUUID();
+        this.refreshKey = UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier();
         this.lastUpdateTs = currentTs;
     }
 

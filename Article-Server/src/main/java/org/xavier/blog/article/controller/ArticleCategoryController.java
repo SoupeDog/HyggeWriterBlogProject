@@ -12,8 +12,7 @@ import org.xavier.blog.article.domain.po.board.Board;
 import org.xavier.blog.article.service.ArticleCategoryServiceImpl;
 import org.xavier.blog.article.service.BoardServiceImpl;
 import org.xavier.blog.common.HyggeWriterController;
-import org.xavier.common.exception.PropertiesException_Runtime;
-import org.xavier.web.annotation.EnableControllerLog;
+import org.xavier.common.exception.PropertiesRuntimeException;
 
 import java.util.ArrayList;
 
@@ -25,7 +24,6 @@ public class ArticleCategoryController extends HyggeWriterController {
     @Autowired
     BoardServiceImpl boardService;
 
-    @EnableControllerLog(ignoreProperties = "headers")
     @GetMapping(value = "/article/category/all")
     public ResponseEntity<?> queryArticleSummary(@RequestHeader HttpHeaders headers,
                                                  @RequestParam(value = "uId", required = false, defaultValue = "U00000001") String uId) {
@@ -41,7 +39,7 @@ public class ArticleCategoryController extends HyggeWriterController {
                 }
             }
             return success(result);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         }
     }

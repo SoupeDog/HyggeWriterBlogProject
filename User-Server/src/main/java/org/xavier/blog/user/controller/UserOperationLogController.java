@@ -6,15 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.HyggeWriterController;
-import org.xavier.blog.user.domain.bo.UserLoginBO;
-import org.xavier.blog.user.domain.bo.UserTokenBO;
-import org.xavier.blog.user.domain.dto.user.UserTokenDTO;
 import org.xavier.blog.user.domain.po.user.UserOperationLog;
 import org.xavier.blog.user.service.UserOperationLogServiceImpl;
-import org.xavier.blog.user.service.UserTokenServiceImpl;
-import org.xavier.common.exception.*;
-import org.xavier.web.annotation.EnableControllerLog;
-import org.xavier.web.extend.PageResult;
+import org.xavier.common.exception.PropertiesRuntimeException;
+import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal409Exception;
+import org.xavier.webtoolkit.domain.PageResult;
 
 import java.util.ArrayList;
 
@@ -33,26 +30,24 @@ public class UserOperationLogController extends HyggeWriterController {
     @Autowired
     UserOperationLogServiceImpl userOperationLogService;
 
-    @EnableControllerLog
     @PostMapping("/user/log/operation")
     public ResponseEntity<?> addUserOperationLog(@RequestHeader HttpHeaders headers, @RequestBody UserOperationLog userOperationLog) {
         try {
             userOperationLog.validate();
             String operatorUId = headers.getFirst("uId");
             if (!userOperationLogService.saveUserOperationLog(operatorUId, userOperationLog)) {
-                throw new Universal_409_X_Exception("Fall to save UserOperationLog:" + jsonHelper.format(userOperationLogService));
+                throw new Universal409Exception("Fall to save UserOperationLog:" + jsonHelper.format(userOperationLogService));
             }
             return success();
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal_409_X_Exception e) {
+        } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-    @EnableControllerLog
     @GetMapping("/user/log/operation/list/{uIdList}")
     public ResponseEntity<?> queryUserOperationLogMultiple(@RequestHeader HttpHeaders headers, @PathVariable(name = "uIdList") ArrayList<String> uIdList,
                                                            @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
@@ -63,9 +58,9 @@ public class UserOperationLogController extends HyggeWriterController {
             String operatorUId = headers.getFirst("uId");
             PageResult<UserOperationLog> result = userOperationLogService.quarryUserOperationLogByUIdList(operatorUId, uIdList, currentPage, pageSize, orderKey, isDESC);
             return success(result);
-        } catch (PropertiesException_Runtime e) {
+        } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal_403_X_Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
