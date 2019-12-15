@@ -35,15 +35,13 @@ public class UserServiceImpl extends DefaultUtils {
     UserMapper userMapper;
 
     private static final ArrayList<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
-        add(new ColumnInfo("uName", null, ColumnType.STRING, false, 0, 20));
-        add(new ColumnInfo("pw", null, ColumnType.STRING, false, 6, 20));
-        add(new ColumnInfo("headIcon", null, ColumnType.STRING, true, 0, 30));
+        add(new ColumnInfo("pw", null, ColumnType.STRING, false, 6, 50));
+        add(new ColumnInfo("userName", null, ColumnType.STRING, true, 1, 20));
+        add(new ColumnInfo("userAvatar", null, ColumnType.STRING, true, 1, 200));
+        add(new ColumnInfo("biography", null, ColumnType.STRING, true, 0, 200));
         add(new ColumnInfo("birthday", null, ColumnType.LONG, true, 0, Long.MAX_VALUE));
         add(new ColumnInfo("phone", null, ColumnType.STRING, true, 0, 15));
         add(new ColumnInfo("email", null, ColumnType.STRING, false, 0, 50));
-        add(new ColumnInfo("biography", null, ColumnType.STRING, true, 0, 200));
-        add(new ColumnInfo("exp", null, ColumnType.INTEGER, false, 0, Integer.MAX_VALUE));
-        add(new ColumnInfo("properties", null, ColumnType.STRING, true, 0, 1000));
     }};
 
     /**
@@ -51,26 +49,24 @@ public class UserServiceImpl extends DefaultUtils {
      */
     public Boolean saveUser(User user, Long currentTs) {
         user.validate();
-        user.setRegisterTs(currentTs);
-        user.setLastUpdateTs(currentTs);
-        user.init();
+        user.init(currentTs);
         Integer saveUserAffectedRow = userMapper.saveUser(user);
         Boolean saveUserFlag = saveUserAffectedRow == 1;
         if (!saveUserFlag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("save user affected row", "1", saveUserAffectedRow, user));
         } else {
-            user.setuId(getUId(user.getid()));
+            user.setUid(getUId(user.getUserId()));
             HashMap map = new HashMap() {{
-                put("uId", user.getuId());
-                put("lastUpdateTs", user.getRegisterTs() + 1L);
+                put("uid", user.getUid());
+                put("lastUpdateTs", user.getLastUpdateTs() + 1L);
             }};
-            Integer updateUIdAffectedRow = userMapper.updateById(user.getid(), map, user.getRegisterTs() + 1L);
-            Boolean updateUId_Flag = updateUIdAffectedRow == 1;
-            if (!updateUId_Flag) {
-                logger.warn(HyggeLoggerMsgBuilder.assertFail("update user affected row", "1", updateUIdAffectedRow, user));
+            Integer updateUidAffectedRow = userMapper.updateByUserId(user.getUserId(), map, user.getLastUpdateTs() + 1L);
+            Boolean updateUidFlag = updateUidAffectedRow == 1;
+            if (!updateUidFlag) {
+                logger.warn(HyggeLoggerMsgBuilder.assertFail("update user affected row", "1", updateUidAffectedRow, user));
             }
             // 实际上是 saveUserFlag && updateUId_Flag
-            return updateUId_Flag;
+            return updateUidFlag;
         }
         return false;
     }
@@ -78,95 +74,88 @@ public class UserServiceImpl extends DefaultUtils {
     /**
      * 根据 uId 批量逻辑删除用户
      */
-    public Boolean removeUserByUIdLogicallyMultiple(String operatorUId, List<String> uIdList, Long upTs) throws Universal403Exception {
-        User currentOperator = queryUserByUId(operatorUId);
-        if (currentOperator == null || !currentOperator.getUserType().equals(UserTypeEnum.ROOT)) {
-            throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
-        }
-        ArrayList<String> uIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uIdList, "[uIdList] for remove can't be empty.", String.class, String.class, (uId) -> uId.trim());
+    public Boolean removeUserByUidLogicallyMultiple(String loginUid, List<String> uidList, Long upTs) throws Universal403Exception, Universal404Exception {
+        User loginUser = queryUserNotNull(loginUid);
+        checkRight(loginUser, UserTypeEnum.ROOT);
+        ArrayList<String> uIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uidList, "[uidList] for remove can't be empty.", String.class, String.class, (uId) -> uId.trim());
         if (uIdListForQuery.size() < 1) {
-            throw new PropertiesRuntimeException("[uIdList] can't be empty.");
+            throw new PropertiesRuntimeException("[uidList] can't be empty.");
         }
-        Integer removeAffectedRow = userMapper.removeUserLogicallyByUIdMultiple(uIdListForQuery, upTs);
-        Boolean removeResult = removeAffectedRow == uIdList.size();
-        if (!removeResult) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("remove affected row", propertiesHelper.string(uIdList.size()), removeAffectedRow, uIdList));
+        Integer removeAffectedRow = userMapper.removeUserLogicallyByUidMultiple(uIdListForQuery, upTs);
+        Boolean removeFlag = removeAffectedRow == uidList.size();
+        if (!removeFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("removeUserByUidLogicallyMultiple affected row", propertiesHelper.string(uidList.size()), removeAffectedRow, uidList));
         }
-        return removeResult;
+        return removeFlag;
     }
 
     /**
      * 更新用户对象
      */
-    public Boolean updateUser(String targetUId, String currentUserUId, Map rowData, Long currentTs) throws Universal400Exception, Universal403Exception {
-        checkRight(currentUserUId, UserTypeEnum.ROOT, targetUId);
+    public Boolean updateUser(String targetUid, String loginUid, Map rowData, Long currentTs) throws Universal400Exception, Universal403Exception, Universal404Exception {
+        User loginUser = queryUserNotNull(loginUid);
+        checkRight(loginUser, UserTypeEnum.ROOT, targetUid);
         HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(currentTs, rowData, checkInfo);
-        // 不能通过此接口修改经验
-        data.remove("exp");
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }
-        Integer updateAffectedRow = userMapper.updateByUId(currentUserUId, data, currentTs);
-        Boolean updateResult = updateAffectedRow == 1;
-        if (!updateResult) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("update affected row", "1", updateAffectedRow, new LinkedHashMap<String, Object>() {{
-                put("targetUId", targetUId);
-                put("currentUserUId", currentUserUId);
+        Integer updateAffectedRow = userMapper.updateByUid(targetUid, data, currentTs);
+        Boolean updateFlag = updateAffectedRow == 1;
+        if (!updateFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("updateUser affected row", "1", updateAffectedRow, new LinkedHashMap<String, Object>() {{
+                put("targetUId", targetUid);
+                put("loginUid", loginUid);
                 put("data", data);
                 put("currentTs", currentTs);
             }}));
         }
-        return updateResult;
+        return updateFlag;
     }
 
     /**
      * 根据 uId 查询单个用户
      */
-    public User queryUserByUId(String uId) {
-        User targetUser = userMapper.queryUserByUId(uId);
+    public User queryUserByUId(String uid) {
+        User targetUser = userMapper.queryUserByUid(uid);
+        return targetUser;
+    }
+
+    /**
+     * 根据 uId 查询单个用户 要求不为空
+     */
+    public User queryUserNotNull(String uid) throws Universal404Exception {
+        User targetUser = queryUserByUId(uid);
+        if (targetUser == null) {
+            throw new Universal404Exception(ErrorCode.USER_NOTFOUND.getErrorCod(), "User(" + uid + ") was not found.");
+        }
         return targetUser;
     }
 
     /**
      * 根据 uId 批量查询用户
      */
-    public ArrayList<User> queryUserListByUId(List<String> uIdList) {
-        ArrayList<String> uIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uIdList, "[uIdList] for query can't be empty.", String.class, String.class, (uId) -> uId.trim());
-        if (uIdListForQuery.size() < 1) {
-            throw new PropertiesRuntimeException("[uIdList] can't be empty.");
+    public ArrayList<User> queryUserListByUid(List<String> uidList) {
+        ArrayList<String> uidListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uidList, "[uidList] for query can't be empty.", String.class, String.class, (uId) -> uId.trim());
+        if (uidListForQuery.size() < 1) {
+            throw new PropertiesRuntimeException("[uidList] can't be empty.");
         }
-        ArrayList<User> targetUser = userMapper.queryUserListByUId(uIdListForQuery);
+        ArrayList<User> targetUser = userMapper.queryUserListByUid(uidListForQuery);
         return targetUser;
     }
 
-    /**
-     * 校验了用户非空性的根据 uId 查询对象(用于 Service 间调用)
-     */
-    public User queryUserByUIdWithExistValidate(String uId) throws Universal404Exception {
-        User targetUser = userMapper.queryUserByUId(uId);
-        if (targetUser == null) {
-            throw new Universal404Exception(ErrorCode.USER_NOTFOUND.getErrorCod(), "User(" + uId + ") was not found.");
-        }
-        return targetUser;
-    }
-
-    public void checkRight(String currentUserUId, UserTypeEnum expectedUserType, String... uIdWhiteList) throws Universal403Exception {
-        User currentOperator = queryUserByUId(currentUserUId);
-        if (currentOperator == null) {
+    public void checkRight(User loginUser, UserTypeEnum expectedUserType, String... uidWhiteList) throws Universal403Exception {
+        if (loginUser == null) {
             throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
         }
-        boolean whiteListUser = false;
-        for (String expectedUId : uIdWhiteList) {
-            if (expectedUId.equals(currentOperator.getuId())) {
-                whiteListUser = true;
-                break;
+        if (loginUser.getUserType().equals(expectedUserType)) {
+            return;
+        }
+        for (String expectedUid : uidWhiteList) {
+            if (expectedUid.equals(loginUser.getUid())) {
+                return;
             }
         }
-        if (!whiteListUser) {
-            if (!currentOperator.getUserType().equals(expectedUserType)) {
-                throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
-            }
-        }
+        throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
     }
 
     public String getUId(Integer id) {

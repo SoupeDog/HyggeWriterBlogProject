@@ -1,5 +1,7 @@
 package org.xavier.blog.common.enums;
 
+import org.xavier.common.exception.PropertiesRuntimeException;
+
 /**
  * 描述信息：<br/>
  * 用户类型
@@ -11,8 +13,7 @@ package org.xavier.blog.common.enums;
  */
 public enum UserTypeEnum {
     ROOT((byte) 0, "超级管理员"),
-    WRITER((byte) 1, "作者"),
-    READER((byte) 2, "读者");
+    NORMAL((byte) 1, "普通用户");
     private Byte authority;
     private String description;
 
@@ -42,11 +43,9 @@ public enum UserTypeEnum {
             case (byte) 0:
                 return UserTypeEnum.ROOT;
             case (byte) 1:
-                return UserTypeEnum.WRITER;
-            case (byte) 2:
-                return UserTypeEnum.READER;
+                return UserTypeEnum.NORMAL;
             default:
-                throw new IllegalArgumentException("Unexpected authority of UserTypeEnum.");
+                throw new PropertiesRuntimeException("Unexpected authority of UserTypeEnum.");
         }
     }
 }

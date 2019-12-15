@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.xavier.blog.common.enums.UserSexHandler;
+import org.xavier.blog.common.enums.UserStateHandler;
 import org.xavier.blog.common.enums.UserTokenScopeHandler;
 import org.xavier.blog.common.enums.UserTypeHandler;
 import org.xavier.blog.user.config.properties.DateBaseProperties;
@@ -70,6 +71,7 @@ public class DateBaseConfig {
             registry.register(new UserTypeHandler());
             registry.register(new UserSexHandler());
             registry.register(new UserTokenScopeHandler());
+            registry.register(new UserStateHandler());
             SqlSessionFactory sqlSessionFactory = bean.getObject();
             return sqlSessionFactory;
         } catch (Exception e) {

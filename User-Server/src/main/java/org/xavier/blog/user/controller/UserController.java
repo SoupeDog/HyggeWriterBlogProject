@@ -35,20 +35,21 @@ public class UserController extends HyggeWriterController {
     public ResponseEntity<?> saveUser(@RequestBody User user) {
         try {
             userService.saveUser(user, System.currentTimeMillis());
-            return success(userService.userToUserDTO(user));
+            return success(user);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
-            return fail(HttpStatus.CONFLICT, ErrorCode.USER_EXISTS.getErrorCod(), "User(" + user.getuName() + ") dose exist.");
+            return fail(HttpStatus.CONFLICT, ErrorCode.USER_EXISTS.getErrorCod(), "User(" + user.getUserName() + ") dose exist.");
         }
     }
 
 
-    @DeleteMapping(value = "/user/{uIds}")
-    public ResponseEntity<?> removeUserMultiple(@RequestHeader HttpHeaders headers, @PathVariable("uIds") ArrayList<String> uIdList) {
+    @DeleteMapping(value = "/user/{uidList}")
+    public ResponseEntity<?> removeUserMultiple(@RequestHeader HttpHeaders headers, @PathVariable("uidList") ArrayList<String> uidList) {
         try {
-            Long currentTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
-            if (!userService.removeUserByUIdLogicallyMultiple(headers.getFirst("uId"), uIdList, currentTs)) {
+            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
+            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            if (!userService.removeUserByUidLogicallyMultiple(loginUid, uidList, upTs)) {
                 throw new Universal409Exception(ErrorCode.USER_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
             }
             return success();
@@ -56,15 +57,19 @@ public class UserController extends HyggeWriterController {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
+        } catch (Universal404Exception e) {
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-    @PutMapping(value = "/user/{uId}")
-    public ResponseEntity<?> updateUser(@RequestHeader HttpHeaders headers, @PathVariable("uId") String uId, @RequestBody Map rowData) {
+    @PutMapping(value = "/user/{uid}")
+    public ResponseEntity<?> updateUser(@RequestHeader HttpHeaders headers, @PathVariable("uid") String uid, @RequestBody Map rowData) {
         try {
-            if (!userService.updateUser(headers.getFirst("uId"), uId, rowData, System.currentTimeMillis())) {
+            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
+            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            if (!userService.updateUser(loginUid, uid, rowData, upTs)) {
                 throw new Universal409Exception(ErrorCode.USER_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();
@@ -72,20 +77,21 @@ public class UserController extends HyggeWriterController {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.USER_EXISTS.getErrorCod(), "Name of User should be unique.");
-        }catch (Universal400Exception e) {
+        } catch (Universal400Exception e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        }catch (Universal403Exception e) {
+        } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
+        } catch (Universal404Exception e) {
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
         }
     }
 
-
-    @GetMapping(value = "/user/{uIds}")
-    public ResponseEntity<?> queryUserMultiple(@PathVariable("uIds") ArrayList<String> uIdList) {
+    @GetMapping(value = "/user/{uidList}")
+    public ResponseEntity<?> queryUserMultiple(@PathVariable("uidList") ArrayList<String> uidList) {
         try {
-            ArrayList<UserDTO> result = userService.userToUserDTO(userService.queryUserListByUId(uIdList));
+            ArrayList<User> result = userService.queryUserListByUid(uidList);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

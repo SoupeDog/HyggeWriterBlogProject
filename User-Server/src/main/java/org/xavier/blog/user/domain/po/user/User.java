@@ -2,6 +2,7 @@ package org.xavier.blog.user.domain.po.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.xavier.blog.common.enums.UserSexEnum;
+import org.xavier.blog.common.enums.UserStateEnum;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.common.util.PropertiesHelper;
 import org.xavier.common.util.UtilsCreator;
@@ -20,31 +21,35 @@ public class User {
     /**
      * 唯一标示
      */
-    private Integer id;
+    private Integer userId;
     /**
      * 账号
      */
-    private String uId;
-    /**
-     * 密码
-     */
-    private String pw;
-    /**
-     * 头像 url
-     */
-    private String headIcon;
+    private String uid;
     /**
      * 用户类型
      */
     private UserTypeEnum userType;
     /**
+     * 密码
+     */
+    private String pw;
+    /**
      * 用户昵称
      */
-    private String uName;
+    private String userName;
+    /**
+     * 头像 url
+     */
+    private String userAvatar;
     /**
      * 性别标识
      */
     private UserSexEnum sex;
+    /**
+     * 个人简介
+     */
+    private String biography;
     /**
      * 生日毫秒级时间戳
      */
@@ -58,115 +63,50 @@ public class User {
      */
     private String email;
     /**
-     * 个人简介
+     * 用户状态
      */
-    private String biography;
-    /**
-     * 经验值
-     */
-    private Integer exp;
-    /**
-     * 用户自定义配置
-     */
-    private String properties;
-    /**
-     * 合法性标识
-     */
-    private Boolean legal_Flag;
+    private UserStateEnum userState;
     /**
      * 注册毫秒级时间戳
      */
-    private Long registerTs;
+    private Long createTs;
     /**
      * 最后修改毫秒级时间戳
      */
     private Long lastUpdateTs;
 
-    /**
-     * 参数校验
-     */
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
-        propertiesHelper.stringNotNull(uName, 1, 20, "[uName] can't be null,and its length should within 20.");
-        propertiesHelper.stringNotNull(pw, 6, 20, "[pw] can't be null,and its length should be between 6~20.");
-        propertiesHelper.string(properties, 0, 1000, "Length of [properties] should within 1000.");
-        if (properties != null) {
-            properties = UtilsCreator.getDefaultJsonHelperInstance(false).format(properties);
-        }
+        propertiesHelper.stringNotNull(pw, 6, 50, "[pw] can't be null,and it should be a string[6,50].");
+        propertiesHelper.stringNotNull(userName, 1, 50, "[pw] can't be null,and it should be a string[1,50].");
     }
 
-    /**
-     * 初始化可空默认参数
-     */
-    public void init() {
-        if (uId == null) {
-            uId = "";
+    public void init(Long currentTs) {
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
+        this.userType = UserTypeEnum.NORMAL;
+        this.userAvatar = propertiesHelper.stringOfNullable(this.userAvatar, "默认头像.png", 1, 200, "[userAvatar] should be a string[1,200]");
+        if (this.sex == null) {
+            this.sex = UserSexEnum.SECRET;
         }
-        if (headIcon == null) {
-            headIcon = "/img/headIcon/default.png";
-        }
-        if (userType == null) {
-            userType = UserTypeEnum.READER;
-        }
-        if (sex == null) {
-            sex = UserSexEnum.SECRET;
-        }
-        if (birthday == null) {
-            birthday = 0L;
-        }
-        if (phone == null) {
-            phone = "";
-        }
-        if (email == null) {
-            email = "";
-        }
-        if (biography == null) {
-            biography = "这家伙很懒，什么都没有留下。";
-        }
-        if (exp == null) {
-            exp = 0;
-        }
-        if (properties == null) {
-            properties = "";
-        }
-        if (legal_Flag == null) {
-            legal_Flag = true;
-        }
+        this.biography = propertiesHelper.stringOfNullable(this.biography, "这家伙很懒，什么都没留下~", 0, 200, "[biography] should be a string[1,200]");
+        this.createTs = currentTs;
+        this.lastUpdateTs = currentTs;
     }
 
-    public User() {
+    public Integer getUserId() {
+        return userId;
     }
 
-    public Integer getid() {
-        return id;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public void setid(Integer id) {
-        this.id = id;
+    public String getUid() {
+        return uid;
     }
 
-    public String getuId() {
-        return uId;
-    }
-
-    public void setuId(String uId) {
-        this.uId = uId;
-    }
-
-    public String getPw() {
-        return pw;
-    }
-
-    public void setPw(String pw) {
-        this.pw = pw;
-    }
-
-    public String getHeadIcon() {
-        return headIcon;
-    }
-
-    public void setHeadIcon(String headIcon) {
-        this.headIcon = headIcon;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public UserTypeEnum getUserType() {
@@ -177,12 +117,28 @@ public class User {
         this.userType = userType;
     }
 
-    public String getuName() {
-        return uName;
+    public String getPw() {
+        return pw;
     }
 
-    public void setuName(String uName) {
-        this.uName = uName;
+    public void setPw(String pw) {
+        this.pw = pw;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserAvatar() {
+        return userAvatar;
+    }
+
+    public void setUserAvatar(String userAvatar) {
+        this.userAvatar = userAvatar;
     }
 
     public UserSexEnum getSex() {
@@ -191,6 +147,14 @@ public class User {
 
     public void setSex(UserSexEnum sex) {
         this.sex = sex;
+    }
+
+    public String getBiography() {
+        return biography;
+    }
+
+    public void setBiography(String biography) {
+        this.biography = biography;
     }
 
     public Long getBirthday() {
@@ -217,44 +181,20 @@ public class User {
         this.email = email;
     }
 
-    public String getBiography() {
-        return biography;
+    public UserStateEnum getUserState() {
+        return userState;
     }
 
-    public void setBiography(String biography) {
-        this.biography = biography;
+    public void setUserState(UserStateEnum userState) {
+        this.userState = userState;
     }
 
-    public Integer getExp() {
-        return exp;
+    public Long getCreateTs() {
+        return createTs;
     }
 
-    public void setExp(Integer exp) {
-        this.exp = exp;
-    }
-
-    public String getProperties() {
-        return properties;
-    }
-
-    public void setProperties(String properties) {
-        this.properties = properties;
-    }
-
-    public Boolean getLegal_Flag() {
-        return legal_Flag;
-    }
-
-    public void setLegal_Flag(Boolean legal_Flag) {
-        this.legal_Flag = legal_Flag;
-    }
-
-    public Long getRegisterTs() {
-        return registerTs;
-    }
-
-    public void setRegisterTs(Long registerTs) {
-        this.registerTs = registerTs;
+    public void setCreateTs(Long createTs) {
+        this.createTs = createTs;
     }
 
     public Long getLastUpdateTs() {

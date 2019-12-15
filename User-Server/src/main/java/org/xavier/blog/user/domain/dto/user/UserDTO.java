@@ -1,6 +1,8 @@
 package org.xavier.blog.user.domain.dto.user;
 
 
+import org.xavier.blog.common.enums.UserSexEnum;
+import org.xavier.blog.common.enums.UserStateEnum;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.user.User;
 
@@ -14,47 +16,54 @@ import org.xavier.blog.user.domain.po.user.User;
  * @since Jdk 1.8
  */
 public class UserDTO {
-
+    /**
+     * 唯一标示
+     */
+    private Integer userId;
     /**
      * 账号
      */
-    private String uId;
-    /**
-     * 头像 url
-     */
-    private String headIcon;
+    private String uid;
     /**
      * 用户类型
      */
     private UserTypeEnum userType;
     /**
+     * 密码
+     */
+    private String pw;
+    /**
      * 用户昵称
      */
-    private String uName;
+    private String userName;
+    /**
+     * 头像 url
+     */
+    private String userAvatar;
     /**
      * 性别标识
      */
-    private String sex;
-    /**
-     * 生日毫秒级时间戳
-     */
-    private Long birthday;
+    private UserSexEnum sex;
     /**
      * 个人简介
      */
     private String biography;
     /**
-     * 经验值
+     * 生日毫秒级时间戳
      */
-    private Integer exp;
+    private Long birthday;
     /**
-     * 用户自定义配置
+     * 联系邮箱
      */
-    private String properties;
+    private String email;
+    /**
+     * 用户状态
+     */
+    private UserStateEnum userState;
     /**
      * 注册毫秒级时间戳
      */
-    private Long registerTs;
+    private Long createTs;
     /**
      * 最后修改毫秒级时间戳
      */
@@ -64,33 +73,33 @@ public class UserDTO {
     }
 
     public UserDTO(User user) {
-        uId = user.getuId();
-        headIcon = user.getHeadIcon();
-        userType = user.getUserType();
-        uName = user.getuName();
-        sex = user.getSex().getDescription();
-        birthday = user.getBirthday();
-        biography = user.getBiography();
-        exp = user.getExp();
-        properties = user.getProperties();
-        registerTs = user.getRegisterTs();
-        lastUpdateTs = user.getLastUpdateTs();
+        this.uid = user.getUid();
+        this.userType = user.getUserType();
+        this.userName = user.getUserName();
+        this.userAvatar = user.getUserAvatar();
+        this.sex = user.getSex();
+        this.biography = user.getBiography();
+        this.birthday = user.getBirthday();
+        this.email = user.getEmail();
+        this.userState = user.getUserState();
+        this.createTs = user.getCreateTs();
+        this.lastUpdateTs = user.getLastUpdateTs();
     }
 
-    public String getuId() {
-        return uId;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setuId(String uId) {
-        this.uId = uId;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public String getHeadIcon() {
-        return headIcon;
+    public String getUid() {
+        return uid;
     }
 
-    public void setHeadIcon(String headIcon) {
-        this.headIcon = headIcon;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public UserTypeEnum getUserType() {
@@ -101,28 +110,36 @@ public class UserDTO {
         this.userType = userType;
     }
 
-    public String getuName() {
-        return uName;
+    public String getPw() {
+        return pw;
     }
 
-    public void setuName(String uName) {
-        this.uName = uName;
+    public void setPw(String pw) {
+        this.pw = pw;
     }
 
-    public String getSex() {
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserAvatar() {
+        return userAvatar;
+    }
+
+    public void setUserAvatar(String userAvatar) {
+        this.userAvatar = userAvatar;
+    }
+
+    public UserSexEnum getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(UserSexEnum sex) {
         this.sex = sex;
-    }
-
-    public Long getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Long birthday) {
-        this.birthday = birthday;
     }
 
     public String getBiography() {
@@ -133,28 +150,36 @@ public class UserDTO {
         this.biography = biography;
     }
 
-    public Integer getExp() {
-        return exp;
+    public Long getBirthday() {
+        return birthday;
     }
 
-    public void setExp(Integer exp) {
-        this.exp = exp;
+    public void setBirthday(Long birthday) {
+        this.birthday = birthday;
     }
 
-    public String getProperties() {
-        return properties;
+    public String getEmail() {
+        return email;
     }
 
-    public void setProperties(String properties) {
-        this.properties = properties;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public Long getRegisterTs() {
-        return registerTs;
+    public UserStateEnum getUserState() {
+        return userState;
     }
 
-    public void setRegisterTs(Long registerTs) {
-        this.registerTs = registerTs;
+    public void setUserState(UserStateEnum userState) {
+        this.userState = userState;
+    }
+
+    public Long getCreateTs() {
+        return createTs;
+    }
+
+    public void setCreateTs(Long createTs) {
+        this.createTs = createTs;
     }
 
     public Long getLastUpdateTs() {

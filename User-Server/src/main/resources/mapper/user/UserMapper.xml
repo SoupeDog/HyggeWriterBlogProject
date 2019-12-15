@@ -2,78 +2,76 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.xavier.blog.user.dao.UserMapper">
 
-    <sql id="Base_Column_List">
-        uId, pw, headIcon, userType, uName, sex, birthday, phone, email, biography, exp, properties, legal_Flag, registerTs, lastUpdateTs
+    <sql id="BaseColumnList">
+       uid, userType, pw, userName, userAvatar, sex, biography, birthday, phone, email, userState, createTs, lastUpdateTs
     </sql>
 
-    <sql id="All_Column_List">
-        id, uId, pw, headIcon, userType, uName, sex, birthday, phone, email, biography, exp, properties, legal_Flag, registerTs, lastUpdateTs
+    <sql id="AllColumnList">
+       userId, uid, userType, pw, userName, userAvatar, sex, biography, birthday, phone, email, userState, createTs, lastUpdateTs
     </sql>
 
-    <insert id="saveUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO `user`(<include refid="Base_Column_List"/>)VALUES (
-        #{user.uId},
-        #{user.pw},
-        #{user.headIcon},
+    <insert id="saveUser" parameterType="User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO `user`(<include refid="BaseColumnList"/>)VALUES (
+        #{user.uid},
         #{user.userType},
-        #{user.uName},
+        #{user.pw},
+        #{user.userName},
+        #{user.userAvatar},
         #{user.sex},
+        #{user.biography},
         #{user.birthday},
         #{user.phone},
         #{user.email},
-        #{user.biography},
-        #{user.exp},
-        #{user.properties},
-        #{user.legal_Flag},
-        #{user.registerTs},
+        #{user.userState},
+        #{user.createTs},
         #{user.lastUpdateTs}
         )
     </insert>
 
-    <update id="removeUserLogicallyByUIdMultiple">
+    <update id="removeUserLogicallyByUidMultiple">
         UPDATE `user`
-        SET legal_Flag = FALSE, lastUpdateTs = #{lastUpdateTs}
-        WHERE uId IN
-        <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
+        SET userState = 0, lastUpdateTs = #{lastUpdateTs}
+        WHERE uid IN
+        <foreach collection="uidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </update>
 
-    <update id="updateByUId">
+    <update id="updateByUid">
         UPDATE `user`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}
         </foreach>
-        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND uId=#{uId}
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND uid=#{uid}
     </update>
 
-    <update id="updateById">
+    <update id="updateByUserId">
         UPDATE `user`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}
         </foreach>
-        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND id=#{id}
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND userId=#{userId}
     </update>
 
-    <select id="queryUserByUId" resultType="User">
+    <select id="queryUserByUid" resultType="User">
         SELECT
-        <include refid="All_Column_List"/>
-        FROM `user` WHERE legal_Flag=TRUE AND uId=#{uId} LIMIT 1
+        <include refid="AllColumnList"/>
+        FROM `user` WHERE uid=#{uid} LIMIT 1
     </select>
 
-    <select id="queryUserListByUId" resultType="User">
+    <select id="queryUserListByUid" resultType="User">
         SELECT
-        <include refid="All_Column_List"/>
-        FROM `user` WHERE legal_Flag=TRUE AND uId IN
-        <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
+        <include refid="AllColumnList"/>
+        FROM `user` WHERE uid IN
+        <foreach collection="uidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
 
-    <select id="queryUserMapByUId" resultType="User">
+    <select id="queryUserMapByUid" resultType="User">
         SELECT
-        <include refid="All_Column_List"/>
-        FROM `user` WHERE legal_Flag=TRUE AND uId IN
+        <include refid="AllColumnList"/>
+        FROM `user` WHERE uid IN
         <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
