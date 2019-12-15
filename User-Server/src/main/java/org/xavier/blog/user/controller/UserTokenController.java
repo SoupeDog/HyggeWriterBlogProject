@@ -1,17 +1,18 @@
 package org.xavier.blog.user.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.HyggeWriterController;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.bo.UserLoginBO;
 import org.xavier.blog.user.domain.bo.UserTokenBO;
 import org.xavier.blog.user.domain.dto.user.UserTokenDTO;
+import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.blog.user.domain.po.user.UserToken;
+import org.xavier.blog.user.service.UserServiceImpl;
 import org.xavier.blog.user.service.UserTokenServiceImpl;
 import org.xavier.common.exception.*;
 
@@ -29,11 +30,13 @@ import org.xavier.common.exception.*;
 public class UserTokenController extends HyggeWriterController {
     @Autowired
     UserTokenServiceImpl userTokenService;
+    @Autowired
+    UserServiceImpl userService;
 
     @PostMapping("/token/login")
-    public ResponseEntity<?> createToken(@RequestBody UserLoginBO userLoginBO) {
+    public ResponseEntity<?> login(@RequestBody UserLoginBO userLoginBO) {
         try {
-            UserTokenDTO result = new UserTokenDTO(userTokenService.login(userLoginBO));
+            UserTokenDTO result = new UserTokenDTO(userTokenService.login(userLoginBO, System.currentTimeMillis()));
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
@@ -49,10 +52,13 @@ public class UserTokenController extends HyggeWriterController {
     }
 
     @PostMapping("/token/validate")
-    public ResponseEntity<?> validateToken(@RequestBody UserTokenBO userTokenBO) {
+    public ResponseEntity<?> validateToken(@RequestHeader HttpHeaders headers, @RequestBody UserTokenBO userTokenBO) {
         try {
             userTokenBO.validate();
-            userTokenService.validateUserToken(userTokenBO.getuId(), userTokenBO.getToken(), userTokenBO.calculateScope());
+            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            User loginUser = userService.queryUserNotNull(loginUid);
+            userService.checkRight(loginUser, UserTypeEnum.ROOT);
+            userTokenService.validateUserToken(userTokenBO.getUid(), userTokenBO.getToken(), userTokenBO.calculateScope(), System.currentTimeMillis());
             return success(true);
         } catch (Universal403Exception e) {
             // token 错误或过期
@@ -67,35 +73,13 @@ public class UserTokenController extends HyggeWriterController {
         }
     }
 
-    @PostMapping("/token/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody UserLoginBO userLoginBO) {
-        try {
-            UserTokenDTO result = new UserTokenDTO(userTokenService.refreshToken(userLoginBO.getuId(), userLoginBO.calculateScope(), userLoginBO.getRefreshKey(), System.currentTimeMillis()));
-            return success(result);
-        } catch (PropertiesRuntimeException e) {
-            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal400Exception e) {
-            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal403Exception e) {
-            return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
-        } catch (Universal409Exception e) {
-            return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
-        } catch (Universal404Exception e) {
-            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        }
-    }
-
     @PostMapping("/token/keep")
     public ResponseEntity<?> keepToken(@RequestBody UserTokenBO userTokenBO) {
         try {
             userTokenBO.validate();
-            UserToken resultTemp = userTokenService.keepAlive(userTokenBO.getuId(), userTokenBO.getToken(), userTokenBO.getRefreshKey(), userTokenBO.calculateScope(), System.currentTimeMillis());
-            if (resultTemp == null) {
-                return success();
-            } else {
-                UserTokenDTO result = new UserTokenDTO(resultTemp);
-                return success(result);
-            }
+            UserToken resultTemp = userTokenService.keepAlive(userTokenBO.getUid(), userTokenBO.getToken(), userTokenBO.getRefreshKey(), userTokenBO.calculateScope(), System.currentTimeMillis());
+            UserTokenDTO result = new UserTokenDTO(resultTemp);
+            return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (Universal400Exception e) {

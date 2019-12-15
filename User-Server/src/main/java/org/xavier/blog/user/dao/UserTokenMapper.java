@@ -26,25 +26,16 @@ public interface UserTokenMapper {
     Integer saveUserToken(@Param("userToken") UserToken userToken);
 
     /**
-     * 根据用户唯一标识删除 token
-     *
-     * @param uId   用户唯一标识
-     * @param scope token 作用域
-     * @return 受影响行
-     */
-    Integer removeUserToken(@Param("uId") String uId, @Param("scope") Byte scope);
-
-    /**
      * 刷新 Token
      */
-    Integer refreshToken(@Param("uId") String uId, @Param("scope") Byte scope, @Param("token") String token, @Param("deadLine") Long deadLine, @Param("lastToken") String lastToken, @Param("lastDeadLine") Long lastDeadLine, @Param("refreshKey") String refreshKey, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer refreshToken(@Param("uid") String uid, @Param("scope") Byte scope, @Param("token") String token, @Param("deadLine") Long deadLine, @Param("lastToken") String lastToken, @Param("lastDeadLine") Long lastDeadLine, @Param("refreshKey") String refreshKey, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
-     * 根据 uId、scope 查询用户 token
+     * 根据 uid、scope 查询用户 token
      *
-     * @param uId   用户唯一标识
+     * @param uid   用户唯一标识
      * @param scope token 作用域
      * @return 查询结果
      */
-    UserToken queryUserByUIdAndScope(@Param("uId") String uId, @Param("scope") Byte scope);
+    UserToken queryUserByUidAndScope(@Param("uid") String uid, @Param("scope") Byte scope);
 }

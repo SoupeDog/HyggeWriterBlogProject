@@ -3,7 +3,7 @@
 <mapper namespace="org.xavier.blog.user.dao.GroupMapper">
 
     <sql id="Base_Column_List">
-        gId,groupOwner,groupName,lastUpdateTs,ts
+        gId,groupOwner,groupName,lastUpdateTs,createTs
     </sql>
 
     <!--<sql id="All_Column_List">-->
@@ -15,7 +15,7 @@
         #{Group.groupOwner},
         #{Group.groupName},
         #{Group.lastUpdateTs},
-        #{Group.ts}
+        #{Group.createTs}
         )
     </insert>
 

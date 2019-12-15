@@ -16,6 +16,8 @@ import org.xavier.common.exception.Universal409Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
 import org.xavier.webtoolkit.base.DefaultUtils;
 
+import java.util.LinkedHashMap;
+
 
 /**
  * 描述信息：<br/>
@@ -33,77 +35,94 @@ public class UserTokenServiceImpl extends DefaultUtils {
     @Autowired
     UserServiceImpl userService;
 
-    public UserToken login(UserLoginBO loginBO) throws Universal403Exception, Universal409Exception, Universal400Exception, Universal404Exception {
-        User targetUser = userService.queryUserByUIdWithExistValidate(loginBO.getuId());
-        if (targetUser.getPw().equals(loginBO.getPw()) != true) {
-            throw new Universal403Exception(ErrorCode.UNEXPECTED_PASSWORD_OR_UID.getErrorCod(), "Unexpected password or unexpected uId.");
+    public UserToken login(UserLoginBO loginBO, Long currentTs) throws Universal403Exception, Universal409Exception, Universal400Exception, Universal404Exception {
+        User targetUser = userService.queryUserNotNull(loginBO.getUid());
+        UserTokenScopeEnum currentUserTokenScope = loginBO.calculateScope();
+        if (!targetUser.getPw().equals(loginBO.getPw())) {
+            throw new Universal403Exception(ErrorCode.UNEXPECTED_PASSWORD_OR_UID.getErrorCod(), "Unexpected password or unexpected uid.");
         }
-        UserToken userToken = new UserToken();
-        userToken.firstInit(loginBO.getuId(), loginBO.calculateScope(), System.currentTimeMillis());
-        userTokenMapper.removeUserToken(loginBO.getuId(), userToken.getScope().getScope());
-        try {
-            userTokenMapper.saveUserToken(userToken);
-        } catch (DuplicateKeyException e) {
-            throw new Universal409Exception(ErrorCode.TOKEN_CREATE_CONFLICT.getErrorCod(), "Login conflict,please try it again later.");
+        UserToken currentUserToken = userTokenMapper.queryUserByUidAndScope(loginBO.getUid(), currentUserTokenScope.getScope());
+        if (currentUserToken == null) {
+            currentUserToken = new UserToken();
+            currentUserToken.firstInit(targetUser.getUid(), currentUserTokenScope, currentTs);
+            try {
+                userTokenMapper.saveUserToken(currentUserToken);
+            } catch (DuplicateKeyException e) {
+                throw new Universal409Exception(ErrorCode.TOKEN_CREATE_CONFLICT.getErrorCod(), "Login conflict,please try it again later.");
+            }
+        } else {
+            currentUserToken = refreshToken(currentTs, targetUser.getUid(), currentUserTokenScope, currentUserToken);
         }
-        return userToken;
+        return currentUserToken;
     }
 
-    public UserToken keepAlive(String uId, String token, String refreshKey, UserTokenScopeEnum scope, Long currentTs) throws Universal404Exception, Universal409Exception, Universal403Exception {
-        UserToken userToken = userTokenMapper.queryUserByUIdAndScope(uId, scope.getScope());
-        if (userToken == null) {
-            throw new Universal404Exception(ErrorCode.TOKEN_NOTFOUND.getErrorCod(), "Token of User(" + uId + ") was not found.");
-        } else {
+    public UserToken keepAlive(String uid, String token, String refreshKey, UserTokenScopeEnum scope, Long currentTs) throws Universal404Exception, Universal409Exception, Universal403Exception {
+        UserToken userToken = queryUserByUidAndScopeNotNull(uid, scope.getScope());
+        if (userToken.getDeadLine() > currentTs) {
             if (!userToken.getToken().equals(token) || !userToken.getScope().equals(scope)) {
-                if (userToken.getRefreshKey().equals(refreshKey)) {
-                    userToken = refreshToken(uId, scope, refreshKey, currentTs);
+                // 新令牌失效
+                if (userToken.getLastDeadLine() > currentTs) {
+                    if (!userToken.getLastToken().equals(token) || !userToken.getScope().equals(scope)) {
+                        throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN.getErrorCod(), "Unexpected Token(" + token + ") of User(" + uid + ").");
+                    }
                 } else {
-                    throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN.getErrorCod(), "Unexpected Token(" + token + ") of User(" + uId + ").");
+                    // 旧令牌已过期
+                    userToken = refreshTokenForKeepAlive(uid, token, refreshKey, scope, currentTs, userToken);
                 }
             }
+        } else {
+            // 新令牌已过期
+            userToken = refreshTokenForKeepAlive(uid, token, refreshKey, scope, currentTs, userToken);
         }
         return userToken;
     }
 
-    public void validateUserToken(String uId, String token, UserTokenScopeEnum scope) throws Universal404Exception, Universal403Exception {
-        UserToken userToken = userTokenMapper.queryUserByUIdAndScope(uId, scope.getScope());
-        if (userToken == null) {
-            throw new Universal404Exception(ErrorCode.TOKEN_NOTFOUND.getErrorCod(), "Token of User(" + uId + ") was not found.");
+    public void validateUserToken(String uid, String token, UserTokenScopeEnum scope, Long currentTs) throws Universal404Exception, Universal403Exception {
+        UserToken userToken = queryUserByUidAndScopeNotNull(uid, scope.getScope());
+        if (currentTs > userToken.getDeadLine()) {
+            throw new Universal403Exception(ErrorCode.TOKEN_OVERDUE.getErrorCod(), "Token(" + token + ") of User(" + uid + ") was overdue.");
         } else {
-            Long currentTs = System.currentTimeMillis();
-            if (currentTs > userToken.getDeadLine()) {
-                throw new Universal403Exception(ErrorCode.TOKEN_OVERDUE.getErrorCod(), "Token(" + token + ") of User(" + uId + ") was overdue.");
-            } else {
-                if (!token.equals(userToken.getToken())) {
-                    if (currentTs > userToken.getLastDeadLine()) {
-                        throw new Universal403Exception(ErrorCode.TOKEN_OVERDUE.getErrorCod(), "Token(" + token + ") of User(" + uId + ") was overdue.");
-                    }
-                    if (!token.equals(userToken.getLastToken())) {
-                        throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN.getErrorCod(), "Unexpected Token(" + token + ") of User(" + uId + ").");
-                    }
+            if (!token.equals(userToken.getToken())) {
+                if (currentTs > userToken.getLastDeadLine()) {
+                    throw new Universal403Exception(ErrorCode.TOKEN_OVERDUE.getErrorCod(), "Token(" + token + ") of User(" + uid + ") was overdue.");
+                }
+                if (!token.equals(userToken.getLastToken())) {
+                    throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN.getErrorCod(), "Unexpected Token(" + token + ") of User(" + uid + ").");
                 }
             }
         }
     }
 
-    public UserToken refreshToken(String uId, UserTokenScopeEnum scope, String refreshKey, Long upTs) throws Universal403Exception, Universal404Exception, Universal409Exception {
-        UserToken userToken = userTokenMapper.queryUserByUIdAndScope(uId, scope.getScope());
+    public UserToken queryUserByUidAndScopeNotNull(String uid, Byte scope) throws Universal404Exception {
+        UserToken userToken = userTokenMapper.queryUserByUidAndScope(uid, scope);
         if (userToken == null) {
-            throw new Universal404Exception(ErrorCode.TOKEN_NOTFOUND.getErrorCod(), "Token of User(" + uId + ") was not found.");
-        } else {
-            if (!userToken.getScope().getScope().equals(scope.getScope())) {
-                throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN_SCOPE.getErrorCod(), "Unexpected scope of token.");
-            }
-            if (!userToken.getRefreshKey().equals(refreshKey)) {
-                throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN_REFRESH_KEY.getErrorCod(), "Unexpected refreshKey of User(" + uId + ").");
-            }
-            userToken.refresh(upTs);
-            Integer affectedRow = userTokenMapper.refreshToken(uId, scope.getScope(), userToken.getToken(), userToken.getDeadLine(), userToken.getLastToken(), userToken.getLastDeadLine(), userToken.getRefreshKey(), upTs);
-            if (affectedRow != 1) {
-                logger.warn(HyggeLoggerMsgBuilder.assertFail("RefreshToken-affectedRow of User(" + uId + ")", "1", affectedRow, null));
-                throw new Universal409Exception(ErrorCode.TOKEN_REFRESH_CONFLICT.getErrorCod(), "Refresh token conflicting,please try it again later.");
-            }
+            throw new Universal404Exception(ErrorCode.TOKEN_NOTFOUND.getErrorCod(), "Token of User(" + uid + ") was not found.");
         }
         return userToken;
+    }
+
+    private UserToken refreshTokenForKeepAlive(String uid, String token, String refreshKey, UserTokenScopeEnum scope, Long currentTs, UserToken userToken) throws Universal403Exception {
+        if (!userToken.getRefreshKey().equals(refreshKey)) {
+            // 刷新 key 有误
+            throw new Universal403Exception(ErrorCode.UNEXPECTED_TOKEN.getErrorCod(), "Unexpected refreshKey(" + refreshKey + ") of Token(" + token + ").");
+        }
+        userToken = refreshToken(currentTs, uid, scope, userToken);
+        return userToken;
+    }
+
+    private UserToken refreshToken(Long currentTs, String uid, UserTokenScopeEnum currentUserTokenScope, UserToken currentUserToken) {
+        currentUserToken.refresh(currentTs);
+        Integer updateAffectedRow = userTokenMapper.refreshToken(uid, currentUserTokenScope.getScope(),
+                currentUserToken.getToken(), currentUserToken.getDeadLine(),
+                currentUserToken.getLastToken(), currentUserToken.getLastDeadLine(), currentUserToken.getRefreshKey(), currentTs);
+        Boolean updateFlag = updateAffectedRow == 1;
+        if (!updateFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("refreshToken affected row", "1", updateAffectedRow, new LinkedHashMap<String, Object>() {{
+                put("uid", uid);
+                put("currentUserToken", currentUserToken);
+                put("currentTs", currentTs);
+            }}));
+        }
+        return currentUserToken;
     }
 }

@@ -51,7 +51,7 @@ public class LoginFilter extends OncePerRequestFilter {
                     FilterHelper.addValueToHeaders(request, "uId", uId);
                     FilterHelper.addValueToHeaders(request, "token", token);
                     scope = UserTokenScopeEnum.getUserTypeEnum(propertiesHelper.stringOfNullable(request.getHeader("scope"), "web"));
-                    userTokenService.validateUserToken(uId, token, scope);
+                    userTokenService.validateUserToken(uId, token, scope, System.currentTimeMillis());
                     filterChain.doFilter(request, response);
                     break;
                 default:

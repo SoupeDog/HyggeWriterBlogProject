@@ -3,22 +3,22 @@
 <mapper namespace="org.xavier.blog.article.dao.BoardMapper">
 
     <sql id="Base_Column_List">
-        uId, boardName, legal_Flag, lastUpdateTs, ts
+        uid, boardName, legal_Flag, lastUpdateTs, createTs
     </sql>
 
     <sql id="All_Column_List">
-        boardId, uId, boardName, legal_Flag, lastUpdateTs, ts
+        boardId, uid, boardName, legal_Flag, lastUpdateTs, createTs
     </sql>
 
 
     <insert id="saveBoard" parameterType="Board">
         INSERT INTO `board`(<include refid="All_Column_List"/>)VALUES (
         #{board.boardId},
-        #{board.uId},
+        #{board.uid},
         #{board.boardName},
         #{board.legal_Flag},
         #{board.lastUpdateTs},
-        #{board.ts}
+        #{board.createTs}
         )
     </insert>
 

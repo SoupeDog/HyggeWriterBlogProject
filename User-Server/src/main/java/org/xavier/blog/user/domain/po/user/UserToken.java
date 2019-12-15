@@ -17,7 +17,7 @@ public class UserToken {
     /**
      * 用户唯一标识
      */
-    private String uId;
+    private String uid;
     /**
      * 当前 token
      */
@@ -50,20 +50,20 @@ public class UserToken {
     /**
      * 创建 UTC 毫秒级时间戳
      */
-    private Long ts;
+    private Long createTs;
     /**
      * 最后修改 UTC 毫秒级时间戳
      */
     private Long lastUpdateTs;
 
     public void firstInit(String uId, UserTokenScopeEnum scope, Long currentTs) {
-        this.uId = uId;
+        this.uid = uId;
         this.token = UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier();
         this.deadLine = currentTs + 7200000L;
         this.lastToken = "";
         this.lastDeadLine = 0L;
         this.scope = scope;
-        this.ts = currentTs;
+        this.createTs = currentTs;
         this.lastUpdateTs = currentTs;
         this.refreshKey = UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier();
     }
@@ -77,12 +77,12 @@ public class UserToken {
         this.lastUpdateTs = currentTs;
     }
 
-    public String getuId() {
-        return uId;
+    public String getUid() {
+        return uid;
     }
 
-    public void setuId(String uId) {
-        this.uId = uId;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getToken() {
@@ -133,12 +133,12 @@ public class UserToken {
         this.refreshKey = refreshKey;
     }
 
-    public Long getTs() {
-        return ts;
+    public Long getCreateTs() {
+        return createTs;
     }
 
-    public void setTs(Long ts) {
-        this.ts = ts;
+    public void setCreateTs(Long createTs) {
+        this.createTs = createTs;
     }
 
     public Long getLastUpdateTs() {

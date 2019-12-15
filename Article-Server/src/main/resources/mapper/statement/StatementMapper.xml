@@ -3,21 +3,21 @@
 <mapper namespace="org.xavier.blog.article.dao.StatementMapper">
 
     <sql id="Base_Column_List">
-        statementId,uId,content,properties,ts,lastUpdateTs
+        statementId,uid,content,properties,createTs,lastUpdateTs
     </sql>
 
     <sql id="All_Column_List">
-        statementId,uId,content,properties,ts,lastUpdateTs
+        statementId,uid,content,properties,createTs,lastUpdateTs
     </sql>
 
 
     <insert id="saveStatement" parameterType="Statement">
         INSERT INTO `statement`(<include refid="All_Column_List"/>)VALUES (
         #{statement.statementId},
-        #{statement.uId},
+        #{statement.uid},
         #{statement.content},
         #{statement.properties},
-        #{statement.ts},
+        #{statement.createTs},
         #{statement.lastUpdateTs}
         )
     </insert>
@@ -50,13 +50,13 @@
     <select id="queryStatementMapByUId" resultType="Statement">
         SELECT
         <include refid="All_Column_List"/>
-        FROM `statement` WHERE uId= #{uId}
+        FROM `statement` WHERE uid= #{uid}
     </select>
 
     <select id="queryStatementListOfUserRange" resultType="string">
         SELECT statementId
         FROM `statement`
-        WHERE uId = #{uId} AND statementId IN
+        WHERE uid = #{uid} AND statementId IN
         <foreach collection="rangeStatementIdList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -66,6 +66,6 @@
         SELECT
         <include refid="All_Column_List"/>
         FROM `statement`
-        WHERE uId = #{uId}
+        WHERE uid = #{uid}
     </select>
 </mapper>

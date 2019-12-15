@@ -3,21 +3,21 @@
 <mapper namespace="org.xavier.blog.article.dao.ArticleMapper">
 
     <sql id="Summary_Column_List">
-       articleId,uId,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,ts,lastUpdateTs
+       articleId,uid,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,createTs,lastUpdateTs
     </sql>
 
     <sql id="All_Column_List">
-        articleId,uId,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,ts,lastUpdateTs
+        articleId,uid,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,createTs,lastUpdateTs
     </sql>
 
     <sql id="ArticleSummaryQueryPO_Column_List">
-        articleId,uId,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,ts,lastUpdateTs
+        articleId,uid,articleCategoryId,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,createTs,lastUpdateTs
     </sql>
 
     <insert id="saveArticle" parameterType="Article">
         INSERT INTO `article`(<include refid="All_Column_List"/>)VALUES (
         #{article.articleId},
-        #{article.uId},
+        #{article.uid},
         #{article.articleCategoryId},
         #{article.statementId},
         #{article.title},
@@ -27,7 +27,7 @@
         #{article.pageViews},
         #{article.properties},
         #{article.legal_Flag},
-        #{article.ts},
+        #{article.createTs},
         #{article.lastUpdateTs}
         )
     </insert>
@@ -35,7 +35,7 @@
     <update id="removeArticleMultipleByIds_Logically">
         UPDATE `article`
         SET legal_Flag = FALSE, lastUpdateTs = #{lastUpdateTs}
-        WHERE uId = #{uId} AND articleId IN
+        WHERE uid = #{uid} AND articleId IN
         <foreach collection="articleIdList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -86,7 +86,7 @@
         <foreach collection="articleCategoryRangeList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
-        ORDER BY ts DESC
+        ORDER BY createTs DESC
     </select>
 
     <select id="queryArticleListByArticleCategoryId" resultType="Article">
@@ -126,7 +126,7 @@
     <select id="queryArticleIdLisOfUser" resultType="string">
         SELECT
         articleId
-        FROM `article` WHERE legal_Flag=TRUE AND uId = #{uId} AND articleId IN
+        FROM `article` WHERE legal_Flag=TRUE AND uid = #{uid} AND articleId IN
         <foreach collection="rangeArticleIdListList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -135,7 +135,7 @@
 
     <select id="queryArticleQuarryBOByArticleId" resultType="ArticleQuarryPO">
         SELECT t3.articleId,
-               t3.uId,
+               t3.uid,
                statement.statementId,
                statement.content                                     AS "statementContent",
                statement.properties                                  AS "statementProperties",
@@ -148,9 +148,9 @@
                t3.wordCount,
                t3.properties,
                t3.lastUpdateTs,
-               t3.ts
+               t3.createTs
         FROM (SELECT articleId,
-                     uId,
+                     uid,
                      statementId,
                      boardName,
                      article.articleCategoryId,
@@ -160,7 +160,7 @@
                      wordCount,
                      properties,
                      article.lastUpdateTs,
-                     article.ts
+                     article.createTs
               FROM article
                        LEFT JOIN (SELECT articleCategoryId, boardName, articleCategoryName
                                   FROM articleCategory
@@ -174,7 +174,7 @@
     <select id="queryArticleQuarryBOByArticleIdList" resultType="ArticleSummaryQueryPO">
         SELECT
         articleId,
-        uId,
+        uid,
         boardName,
         quarryArticleCategoryPathToRoot(article.articleCategoryId) AS "articleCategoryPathStringVal",
         title,
@@ -183,7 +183,7 @@
         wordCount,
         properties,
         article.lastUpdateTs,
-        article.ts
+        article.createTs
         FROM article
         LEFT JOIN (SELECT articleCategoryId, boardName, articleCategoryName
         FROM articleCategory

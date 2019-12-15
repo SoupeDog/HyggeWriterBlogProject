@@ -2,30 +2,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.xavier.blog.user.dao.UserTokenMapper">
 
-    <sql id="Base_Column_List">
+    <sql id="BaseColumnList">
+       uid, token, deadLine, scope, lastToken, lastDeadLine, refreshKey, createTs, lastUpdateTs
     </sql>
 
-    <sql id="All_Column_List">
-        uId, token, deadLine, scope, lastToken, lastDeadLine, refreshKey, ts, lastUpdateTs
+    <sql id="AllColumnList">
+       tokenId, uid, token, deadLine, scope, lastToken, lastDeadLine, refreshKey, createTs, lastUpdateTs
     </sql>
 
     <insert id="saveUserToken" parameterType="UserToken">
-        INSERT INTO `userToken`(<include refid="All_Column_List"/>)VALUES (
-        #{userToken.uId},
+        INSERT INTO `userToken`(<include refid="BaseColumnList"/>)VALUES (
+        #{userToken.uid},
         #{userToken.token},
         #{userToken.deadLine},
         #{userToken.scope},
         #{userToken.lastToken},
         #{userToken.lastDeadLine},
         #{userToken.refreshKey},
-        #{userToken.ts},
+        #{userToken.createTs},
         #{userToken.lastUpdateTs}
         )
     </insert>
-
-    <delete id="removeUserToken">
-        DELETE FROM `userToken` where uId=#{uId} AND scope=#{scope}
-    </delete>
 
     <update id="refreshToken">
         UPDATE `userToken`
@@ -34,13 +31,13 @@
             lastToken    = #{lastToken},
             lastDeadLine = #{lastDeadLine},
             refreshKey   = #{refreshKey}
-        WHERE scope = #{scope} AND uId = #{uId} AND #{lastUpdateTs} &gt; lastUpdateTs
+        WHERE scope = #{scope} AND uid = #{uid} AND #{lastUpdateTs} &gt; lastUpdateTs
     </update>
 
-    <select id="queryUserByUIdAndScope" resultType="UserToken">
+    <select id="queryUserByUidAndScope" resultType="UserToken">
         SELECT
-        <include refid="All_Column_List"/>
-        FROM `userToken` WHERE scope=#{scope} AND uId=#{uId} LIMIT 1
+        <include refid="AllColumnList"/>
+        FROM `userToken` WHERE scope=#{scope} AND uid=#{uid} LIMIT 1
     </select>
 
 </mapper>

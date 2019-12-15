@@ -18,7 +18,7 @@ public class UserTokenBO {
     /**
      * 用户唯一标识
      */
-    private String uId;
+    private String uid;
     /**
      * 用户 token
      */
@@ -39,7 +39,7 @@ public class UserTokenBO {
 
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
-        propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
+        propertiesHelper.stringNotNull(uid, 9, 10, "[uid] can't be null,and its length should be between 9~10.");
         propertiesHelper.stringNotNull(token, "[token] can't be null or empty.");
     }
 
@@ -55,12 +55,12 @@ public class UserTokenBO {
         }
     }
 
-    public String getuId() {
-        return uId;
+    public String getUid() {
+        return uid;
     }
 
-    public void setuId(String uId) {
-        this.uId = uId;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getToken() {

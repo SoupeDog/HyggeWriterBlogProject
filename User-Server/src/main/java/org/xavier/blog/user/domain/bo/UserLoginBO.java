@@ -16,7 +16,7 @@ public class UserLoginBO {
     /**
      * 用户唯一标识
      */
-    private String uId;
+    private String uid;
     /**
      * 用户密码
      */
@@ -47,12 +47,12 @@ public class UserLoginBO {
         }
     }
 
-    public String getuId() {
-        return uId;
+    public String getUid() {
+        return uid;
     }
 
-    public void setuId(String uId) {
-        this.uId = uId;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getPw() {

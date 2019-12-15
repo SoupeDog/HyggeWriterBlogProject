@@ -3,18 +3,18 @@
 <mapper namespace="org.xavier.blog.article.dao.ArticleCategoryMapper">
 
     <sql id="Base_Column_List">
-        articleCategoryId,uId,boardId,articleCategoryName,description,accessPermit,extendProperties,legal_Flag,lastUpdateTs,ts
+        articleCategoryId,uid,boardId,articleCategoryName,description,accessPermit,extendProperties,legal_Flag,lastUpdateTs,createTs
     </sql>
 
     <sql id="All_Column_List">
-        articleCategoryId,uId,boardId,articleCategoryName,description,accessPermit,extendProperties,legal_Flag,lastUpdateTs,ts
+        articleCategoryId,uid,boardId,articleCategoryName,description,accessPermit,extendProperties,legal_Flag,lastUpdateTs,createTs
     </sql>
 
     <insert id="saveArticleCategory" parameterType="ArticleCategory" useGeneratedKeys="true"
             keyProperty="ArticleCategory.articleCategoryId">
         INSERT INTO `articleCategory`(<include refid="Base_Column_List"/>)VALUES (
         #{articleCategory.articleCategoryId},
-        #{articleCategory.uId},
+        #{articleCategory.uid},
         #{articleCategory.boardName},
         #{articleCategory.boardId},
         #{articleCategory.articleCategoryName},
@@ -23,7 +23,7 @@
         #{articleCategory.extendProperties},
         #{articleCategory.legal_Flag},
         #{articleCategory.lastUpdateTs},
-        #{articleCategory.ts}
+        #{articleCategory.createTs}
         )
     </insert>
 
@@ -35,7 +35,7 @@
         <foreach collection="articleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
-        AND uId = #{uId}
+        AND uid = #{uid}
     </update>
 
     <update id="updateArticleCategory">
@@ -49,7 +49,7 @@
     <select id="queryArticleCategoryByUId" resultType="ArticleCategory">
         SELECT
         <include refid="All_Column_List"/>
-        FROM `articleCategory` WHERE boardId=#{boardId} AND legal_Flag=TRUE AND uId=#{uId}
+        FROM `articleCategory` WHERE boardId=#{boardId} AND legal_Flag=TRUE AND uid=#{uid}
         <if test="accessPermitRangeList != null">
             AND accessPermit IN
             <foreach collection="accessPermitRangeList" index="index" item="item" open="(" separator="," close=")">
@@ -70,7 +70,7 @@
     <select id="queryArticleCategoryByArticleId" resultType="ArticleCategory">
         SELECT
         category.articleCategoryId,
-        category.uId,
+        category.uid,
         category.boardId,
         category.articleCategoryName,
         category.description,
@@ -78,7 +78,7 @@
         category.extendProperties,
         category.legal_Flag,
         category.lastUpdateTs,
-        category.ts
+        category.createTs
         FROM `articleCategory` as category INNER JOIN `article` AS article
         ON category.articleCategoryId=article.articleCategoryId
         WHERE article.legal_Flag=TRUE
@@ -93,7 +93,7 @@
         SELECT articleCategoryId
         FROM `articleCategory`
         WHERE legal_Flag = TRUE
-        AND uId = #{uId}
+        AND uid = #{uid}
         AND articleCategoryId IN
         <foreach collection="rangeArticleCategoryIdList" index="index" item="item" open="(" separator="," close=")">
             #{item}

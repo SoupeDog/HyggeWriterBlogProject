@@ -3,21 +3,21 @@
 <mapper namespace="org.xavier.blog.user.dao.UserOperationLogMapper">
 
     <sql id="Base_Column_List">
-        uId,behavior,mainPoints,realIp,userAgent,ts
+        uid,behavior,mainPoints,realIp,userAgent,createTs
     </sql>
 
     <sql id="All_Column_List">
-        id,uId,behavior,mainPoints,realIp,userAgent,ts
+        id,uid,behavior,mainPoints,realIp,userAgent,createTs
     </sql>
 
     <insert id="saveUserOperationLog" parameterType="UserOperationLog" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `userOperationLog`(<include refid="Base_Column_List"/>)VALUES (
-        #{userOperationLog.uId},
+        #{userOperationLog.uid},
         #{userOperationLog.behavior},
         #{userOperationLog.mainPoints},
         #{userOperationLog.realIp},
         #{userOperationLog.userAgent},
-        #{userOperationLog.ts}
+        #{userOperationLog.createTs}
         )
     </insert>
 
@@ -26,7 +26,7 @@
         <include refid="All_Column_List"/>
         FROM `userOperationLog`
         <if test="uIdList != null">
-            WHERE uId IN
+            WHERE uid IN
             <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
@@ -40,7 +40,7 @@
         COUNT(*)
         FROM `userOperationLog`
         <if test="uIdList != null">
-            WHERE uId IN
+            WHERE uid IN
             <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
