@@ -6,18 +6,29 @@ import '../../css/index.less';
 
 import csdnLogo from '../../img/csdnLogo.png';
 
-import {Layout, Menu, Icon, Avatar, BackTop,message, notification} from 'antd';
+import {Layout, Menu, Icon, Avatar, BackTop, Tabs, Empty, message, notification} from 'antd';
 import URLHelper from "../utils/URLHelper.jsx";
 import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
 
-const {Header, Sider, Content} = Layout;
+const {Header, Sider, Content, Footer} = Layout;
+const {TabPane} = Tabs;
+
+
+message.config({
+    top: 80,
+    maxCount: 3
+});
+
+notification.config({
+    top: 80
+});
 
 class IndexContainer extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            headerTransparent: true,
+            headerTransparent: false,
             mainMenuCollapsed: true
         };
         LogHelper.info({className: "IndexContainer", msg: "constructor----------"});
@@ -117,8 +128,60 @@ class IndexContainer extends React.Component {
                         "myContentCollapsed": this.state.mainMenuCollapsed,
                         "myContent": !this.state.mainMenuCollapsed
                     })}>
-                        Content
+                        <Tabs defaultActiveKey="2">
+                            <TabPane
+                                tab={
+                                    <span>
+                                      技术
+                                    </span>
+                                }
+                                key="1"
+                            >
+                                Tab 1
+                            </TabPane>
+                            <TabPane
+                                tab={
+                                    <span>
+                                      杂谈
+                                    </span>
+                                }
+                                key="2"
+                            >
+                                Tab 2
+                            </TabPane>
+                            <TabPane
+                                tab={
+                                    <span>
+                                      搜索
+                                    </span>
+                                }
+                                key="3"
+                            >
+                                <Empty description={"搜索功能未启用"}/>
+                            </TabPane>
+                        </Tabs>
                     </Content>
+                    <Footer className={clsx('myFooter')}>
+                        <div>
+                            <div>
+                                <span>©2019 Xavier </span><span>Power by</span> <a className="dependentLink" target="_blank"
+                                                         href="https://react.docschina.org">React</a>
+                                <span>&nbsp;&amp;&nbsp;</span> <a className="dependentLink" target="_blank"
+                                                                  href="https://ant.design/index-cn">Ant Design</a>
+                            </div>
+                        </div>
+
+                        <div><a
+                            className="textItem policeLink" target="_blank"
+                            href="http://www.beian.miit.gov.cn">津ICP备18004196号-1</a>
+                            <a target="_blank"
+                               href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
+                               className="textItem policeLink">
+                                <img src="https://www.xavierwang.cn/images/icon-police.png"/>
+                                <span>&nbsp;津公网安备12010402000667号</span>
+                            </a>
+                        </div>
+                    </Footer>
                 </Layout>
                 <BackTop>
                     <div id="ant-back-top-inner">Top</div>
@@ -130,16 +193,16 @@ class IndexContainer extends React.Component {
     componentDidMount() {
         let _react = this;
         LogHelper.info({className: "IndexContainer", msg: "componentDidMount----------"});
-        WindowsEventHelper.addCallback_Scroll({
-            name: "APPBar 透明判定", delta: 50, callbackFunction: function ({currentScrollY}) {
-                if (currentScrollY > 270) {
-                    _react.setState({headerTransparent: false});
-                } else {
-                    _react.setState({headerTransparent: true});
-                }
-            }
-        });
-        WindowsEventHelper.start_OnScroll();
+        // WindowsEventHelper.addCallback_Scroll({
+        //     name: "APPBar 透明判定", delta: 50, callbackFunction: function ({currentScrollY}) {
+        //         if (currentScrollY > 270) {
+        //             _react.setState({headerTransparent: false});
+        //         } else {
+        //             _react.setState({headerTransparent: true});
+        //         }
+        //     }
+        // });
+        // WindowsEventHelper.start_OnScroll();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -150,8 +213,11 @@ class IndexContainer extends React.Component {
         LogHelper.debug({msg: ""});
     }
 
-    componentWillUnmount() {
-        LogHelper.info({className: "IndexContainer", msg: "componentWillUnmount----------"});
+    componentDidCatch(error, info) {
+        LogHelper.info({className: "IndexContainer", msg: "componentDidCatch----------"});
+        LogHelper.debug({className: "IndexContainer", tag: "error", msg: error, isJson: true});
+        LogHelper.debug({className: "IndexContainer", tag: "info", msg: info, isJson: true});
+        LogHelper.debug({msg: ""});
     }
 }
 
