@@ -1,11 +1,11 @@
 import React from 'react';
-import LogHelper from "../../utils/LogHelper.jsx";
+import LogHelper from "./utils/LogHelper.jsx";
 
 class Template extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {hasError: false};
         LogHelper.info({className: "Template", msg: "constructor----------"});
     }
 
@@ -17,6 +17,16 @@ class Template extends React.Component {
         return nextProps;
     }
 
+    render() {
+        if (this.state.hasError) {
+            return <h1>Something went wrong.</h1>;
+        } else {
+            return (
+                null
+            );
+        }
+    }
+
     shouldComponentUpdate(nextProps, nextState, nextContext) {
         LogHelper.info({className: "Template", msg: "shouldComponentUpdate----------"});
         LogHelper.debug({className: "Template", tag: "nextProps", msg: nextProps, isJson: true});
@@ -26,14 +36,16 @@ class Template extends React.Component {
         return true;
     }
 
-    render() {
-        return (
-            null
-        );
-    }
-
     componentDidMount() {
         LogHelper.info({className: "Template", msg: "componentDidMount----------"});
+        LogHelper.debug({msg: ""});
+    }
+
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        LogHelper.info({className: "Template", msg: "getSnapshotBeforeUpdate----------"});
+        LogHelper.debug({className: "Template", tag: "prevProps", msg: prevProps, isJson: true});
+        LogHelper.debug({className: "Template", tag: "prevState", msg: prevState, isJson: true});
+        LogHelper.debug({msg: ""});
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -44,8 +56,18 @@ class Template extends React.Component {
         LogHelper.debug({msg: ""});
     }
 
-    componentWillUnmount() {
-        LogHelper.info({className: "Template", msg: "componentWillUnmount----------"});
+    static getDerivedStateFromError(error) {
+        LogHelper.info({className: "Template", msg: "getDerivedStateFromError----------"});
+        LogHelper.debug({className: "Template", tag: "error", msg: error, isJson: true});
+        LogHelper.debug({msg: ""});
+        return {hasError: true};
+    }
+
+    componentDidCatch(error, info) {
+        LogHelper.info({className: "Template", msg: "componentDidCatch----------"});
+        LogHelper.debug({className: "Template", tag: "error", msg: error, isJson: true});
+        LogHelper.debug({className: "Template", tag: "info", msg: info, isJson: true});
+        LogHelper.debug({msg: ""});
     }
 }
 

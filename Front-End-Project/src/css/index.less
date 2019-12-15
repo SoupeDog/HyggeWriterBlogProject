@@ -9,7 +9,7 @@ body {
     padding: 0;
     position: fixed;
     margin-left: 200px;
-    zIndex: 1;
+    z-index: 9999;
     width: 100%;
     transition: 0.2s;
   }
@@ -17,7 +17,7 @@ body {
     padding: 0;
     position: fixed;
     margin-left: 80px;
-    zIndex: 1;
+    z-index: 9999;
     width: 100%;
     transition: 0.2s;
   }
@@ -61,19 +61,25 @@ body {
     }
 
     .myContent {
-      margin: 64px 16px 24px 216px;
+      margin: 84px 16px 24px 216px;
       padding: 24px;
       background: #FFF;
       height: 2800px;
       transition: 0.2s;
+      border-radius: 10px;
     }
 
     .myContentCollapsed {
-      margin: 64px 16px 24px 96px;
+      margin: 84px 16px 24px 96px;
       padding: 24px;
       background: #FFF;
       height: 2800px;
       transition: 0.2s;
+      border-radius: 10px;
     }
+  }
+  .myFooter{
+    text-align: center;
+    line-height: 20px;
   }
 }
