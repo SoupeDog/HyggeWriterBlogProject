@@ -3,16 +3,17 @@
 <mapper namespace="org.xavier.blog.user.dao.GroupRelationshipMapper">
 
     <sql id="BaseColumnList">
-        uid,createTs
+        uid,gid,createTs
     </sql>
 
     <sql id="AllColumnList">
         grid,uid,createTs
     </sql>
 
-    <insert id="saveGroupRelationship" parameterType="GroupRelationship" useGeneratedKeys="true" keyProperty="id">
+    <insert id="saveGroupRelationship" parameterType="GroupRelationship" useGeneratedKeys="true" keyProperty="grid">
         INSERT INTO `groupRelationship`(<include refid="BaseColumnList"/>)VALUES (
         #{GroupRelationship.uid},
+        #{GroupRelationship.gid},
         #{GroupRelationship.createTs}
         )
     </insert>
@@ -37,7 +38,7 @@
         gid
         FROM `groupRelationship` WHERE uid=#{uid}
     </select>
-    
+
     <select id="queryGroupJoinRecordMapByGIdAndUIdList" resultType="Group">
         SELECT
         <include refid="AllColumnList"/>
