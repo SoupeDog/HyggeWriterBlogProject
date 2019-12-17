@@ -10,12 +10,10 @@ import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.domain.po.group.Group;
+import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.blog.user.service.GroupServiceImpl;
 import org.xavier.blog.user.service.UserServiceImpl;
-import org.xavier.common.exception.PropertiesRuntimeException;
-import org.xavier.common.exception.Universal403Exception;
-import org.xavier.common.exception.Universal404Exception;
-import org.xavier.common.exception.Universal409Exception;
+import org.xavier.common.exception.*;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -39,8 +37,8 @@ public class GroupController extends HyggeWriterController {
     @PostMapping(value = "/group")
     public ResponseEntity<?> saveUser(@RequestHeader HttpHeaders headers, @RequestBody Group group) {
         try {
-            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
-            groupService.saveGroup(operatorUId, group);
+            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            groupService.saveGroup(loginUid, group, System.currentTimeMillis());
             return success(group);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
@@ -52,9 +50,9 @@ public class GroupController extends HyggeWriterController {
     @DeleteMapping(value = "/group/{gId}")
     public ResponseEntity<?> removeGroup(@RequestHeader HttpHeaders headers, @PathVariable("gId") String gId) {
         try {
-            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null,and it should be a number.");
-            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
-            if (!groupService.removeGroup(operatorUId, gId, upTs)) {
+            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
+            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            if (!groupService.removeGroup(loginUid, gId, upTs)) {
                 throw new Universal409Exception(ErrorCode.GROUP_DELETE_CONFLICT.getErrorCod(), "Remove conflict,please try it again if target still exists.");
             }
             return success();
@@ -72,12 +70,15 @@ public class GroupController extends HyggeWriterController {
     @PutMapping(value = "/group/{gId}")
     public ResponseEntity<?> updateGroup(@RequestHeader HttpHeaders headers, @PathVariable("gId") String gId, @RequestBody Map rowData) {
         try {
-            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
-            if (!groupService.updateGroup(operatorUId, gId, rowData, System.currentTimeMillis())) {
+            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
+            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            if (!groupService.updateGroup(loginUid, gId, rowData, upTs)) {
                 throw new Universal409Exception(ErrorCode.GROUP_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();
         } catch (PropertiesRuntimeException e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        } catch (Universal400Exception e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.GROUP_EXISTS.getErrorCod(), "Name of Group should be unique.");
@@ -93,10 +94,11 @@ public class GroupController extends HyggeWriterController {
     @GetMapping(value = "/group/{gIds}")
     public ResponseEntity<?> queryGroupMultiple(@RequestHeader HttpHeaders headers, @PathVariable("gIds") ArrayList<String> gIdList) {
         try {
-            String operatorUId = propertiesHelper.stringNotNull(headers.getFirst("uId"), 9, 10, "[uId] can't be null,and its length should within 9~10.");
+            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            User loginUser = userService.queryUserByUId(loginUid);
             // 管理员才能查
-            userService.checkRight(operatorUId, UserTypeEnum.ROOT);
-            ArrayList<Group> result = groupService.queryGroupByGIdList(gIdList);
+            userService.checkRight(loginUser, UserTypeEnum.ROOT);
+            ArrayList<Group> result = groupService.queryGroupByGidList(gIdList);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

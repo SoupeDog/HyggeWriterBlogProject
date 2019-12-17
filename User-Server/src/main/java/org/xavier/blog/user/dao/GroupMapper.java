@@ -1,8 +1,6 @@
 package org.xavier.blog.user.dao;
 
-import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.*;
 import org.xavier.blog.user.domain.po.group.Group;
 
 import java.util.ArrayList;
@@ -31,43 +29,44 @@ public interface GroupMapper {
     /**
      * 根据 gId List 批量删除组
      *
-     * @param gIdList gId List
+     * @param gidList gId List
      * @return 受影响行
      */
-    Integer removeGroupByGIdMultiple(@Param("gIdList") ArrayList<String> gIdList, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer removeGroupByGidMultiple(@Param("gidList") ArrayList<String> gidList, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
-     * 根据 gId 更新组信息
+     * 根据 gid 更新组信息
      *
-     * @param gId              组唯一标识
-     * @param data             修改数据
+     * @param gid          组唯一标识
+     * @param data         修改数据
      * @param lastUpdateTs CAS 用字段
      * @return 受影响行
      */
-    Integer updateByGId(@Param("gId") String gId, @Param("data") Map data, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer updateByGid(@Param("gid") String gid, @Param("data") Map data, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据 UId 查询用户信息
      *
-     * @param gId 组唯一标识
+     * @param gid 组唯一标识
      * @return 查询结果
      */
-    Group queryGroupByGId(@Param("gId") String gId);
+    @Select("select * from group where gid=#{gid} limit 1")
+    Group queryGroupByGid(@Param("gid") String gid);
 
     /**
      * 根据 gId List 批量查询用户信息
      *
-     * @param gIdList gId List
+     * @param gidList gId List
      * @return 查询结果
      */
-    ArrayList<Group> queryGroupListByGId(@Param("gIdList") ArrayList<String> gIdList);
+    ArrayList<Group> queryGroupListByGid(@Param("gidList") ArrayList<String> gidList);
 
     /**
      * 根据 gId List 批量查询组信息
      *
-     * @param gIdList gId List
+     * @param gidList gId List
      * @return 查询结果
      */
     @MapKey("gId")
-    HashMap<String, Group> queryGroupMapByGId(@Param("gIdList") ArrayList<String> gIdList);
+    HashMap<String, Group> queryGroupMapByGid(@Param("gidList") ArrayList<String> gidList);
 }

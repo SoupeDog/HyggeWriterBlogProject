@@ -2,60 +2,54 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.xavier.blog.user.dao.GroupMapper">
 
-    <sql id="Base_Column_List">
-        gId,groupOwner,groupName,lastUpdateTs,createTs
+    <sql id="BaseColumnList">
+        groupName,groupOwner,createTs,lastUpdateTs
     </sql>
 
-    <!--<sql id="All_Column_List">-->
-    <!--</sql>-->
+    <sql id="AllColumnList">
+        gid,groupName,groupOwner,createTs,lastUpdateTs
+    </sql>
 
-    <insert id="saveGroup" parameterType="Group">
-        INSERT INTO `group`(<include refid="Base_Column_List"/>)VALUES (
-        #{Group.gId},
-        #{Group.groupOwner},
+    <insert id="saveGroup" parameterType="Group" useGeneratedKeys="true" keyProperty="gid">
+        INSERT INTO `group`(<include refid="BaseColumnList"/>)VALUES (
         #{Group.groupName},
-        #{Group.lastUpdateTs},
-        #{Group.createTs}
+        #{Group.groupOwner},
+        #{Group.createTs},
+        #{Group.lastUpdateTs}
         )
     </insert>
 
-    <delete id="removeGroupByGIdMultiple">
+    <delete id="removeGroupByGidMultiple">
         DELETE FROM `group`
         WHERE lastUpdateTs &lt; #{lastUpdateTs}
-        AND gId IN
-        <foreach collection="gIdList" index="index" item="item" open="(" separator="," close=")">
+        AND gid IN
+        <foreach collection="gidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </delete>
 
-    <update id="updateByGId">
+    <update id="updateByGid">
         UPDATE `group`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}
         </foreach>
-        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND gId=#{gId}
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND gid=#{gid}
     </update>
 
-    <select id="queryGroupByGId" resultType="Group">
+    <select id="queryGroupListByGid" resultType="Group">
         SELECT
-        <include refid="Base_Column_List"/>
-        FROM `group` WHERE  gId=#{gId} LIMIT 1
-    </select>
-
-    <select id="queryGroupListByGId" resultType="Group">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM `group` WHERE gId IN
-        <foreach collection="gIdList" index="index" item="item" open="(" separator="," close=")">
+        <include refid="AllColumnList"/>
+        FROM `group` WHERE gid IN
+        <foreach collection="gidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
 
-    <select id="queryGroupMapByGId" resultType="Group">
+    <select id="queryGroupMapByGid" resultType="Group">
         SELECT
-        <include refid="Base_Column_List"/>
-        FROM `group` WHERE gId IN
-        <foreach collection="gIdList" index="index" item="item" open="(" separator="," close=")">
+        <include refid="AllColumnList"/>
+        FROM `group` WHERE gid IN
+        <foreach collection="gidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>

@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.user.dao.UserOperationLogMapper;
+import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.blog.user.domain.po.user.UserOperationLog;
 import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
 import org.xavier.webtoolkit.base.DefaultUtils;
 import org.xavier.webtoolkit.domain.PageResult;
@@ -26,9 +28,10 @@ public class UserOperationLogServiceImpl extends DefaultUtils {
     /**
      * 添加用户操作日志
      */
-    public Boolean saveUserOperationLog(String operatorUId, UserOperationLog userOperationLog) throws Universal403Exception {
+    public Boolean saveUserOperationLog(String loginUid, UserOperationLog userOperationLog) throws Universal403Exception, Universal404Exception {
         userOperationLog.validate();
-        userService.checkRight(operatorUId, UserTypeEnum.ROOT, "U00000003");
+        User loginUser = userService.queryUserNotNull(loginUid);
+        userService.checkRight(loginUser, UserTypeEnum.ROOT);
         Integer saveUserOperationLogAffectedRow = userOperationLogMapper.saveUserOperationLog(userOperationLog);
         Boolean saveUserOperationLogFlag = saveUserOperationLogAffectedRow == 1;
         if (!saveUserOperationLogFlag) {
@@ -40,8 +43,9 @@ public class UserOperationLogServiceImpl extends DefaultUtils {
     /**
      * 添加用户操作日志
      */
-    public PageResult<UserOperationLog> quarryUserOperationLogByUIdList(String operatorUId, ArrayList<String> uIdList, Integer currentPage, Integer size, String orderKey, Boolean isDESC) throws Universal403Exception {
-        userService.checkRight(operatorUId, UserTypeEnum.ROOT, "U00000003");
+    public PageResult<UserOperationLog> quarryUserOperationLogByUidList(String loginUid, ArrayList<String> uIdList, Integer currentPage, Integer size, String orderKey, Boolean isDESC) throws Universal403Exception, Universal404Exception {
+        User loginUser = userService.queryUserNotNull(loginUid);
+        userService.checkRight(loginUser, UserTypeEnum.ROOT);
         String order = isDESC ? "DESC" : "ASC";
         switch (orderKey) {
             case "uId":

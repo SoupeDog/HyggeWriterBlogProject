@@ -78,7 +78,7 @@ public class User {
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         propertiesHelper.stringNotNull(pw, 6, 50, "[pw] can't be null,and it should be a string[6,50].");
-        propertiesHelper.stringNotNull(userName, 1, 50, "[pw] can't be null,and it should be a string[1,50].");
+        propertiesHelper.stringNotNull(userName, 1, 50, "[userName] can't be null,and it should be a string[1,50].");
     }
 
     public void init(Long currentTs) {
@@ -88,6 +88,7 @@ public class User {
         if (this.sex == null) {
             this.sex = UserSexEnum.SECRET;
         }
+        this.userState = UserStateEnum.ACTIVE;
         this.biography = propertiesHelper.stringOfNullable(this.biography, "这家伙很懒，什么都没留下~", 0, 200, "[biography] should be a string[1,200]");
         this.createTs = currentTs;
         this.lastUpdateTs = currentTs;

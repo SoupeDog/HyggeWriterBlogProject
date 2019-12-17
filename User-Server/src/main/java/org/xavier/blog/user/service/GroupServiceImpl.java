@@ -9,6 +9,7 @@ import org.xavier.blog.user.domain.po.group.Group;
 import org.xavier.blog.user.domain.po.user.User;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.exception.PropertiesRuntimeException;
+import org.xavier.common.exception.Universal400Exception;
 import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
@@ -34,34 +35,33 @@ public class GroupServiceImpl extends DefaultUtils {
     UserServiceImpl userService;
 
     private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
-        add(new ColumnInfo("groupOwner", "groupOwner", ColumnType.STRING, false, 9, 10));
         add(new ColumnInfo("groupName", "groupName", ColumnType.STRING, false, 1, 32));
+        add(new ColumnInfo("groupOwner", "groupOwner", ColumnType.STRING, false, 1, 32));
     }};
 
-    public Boolean saveGroup(String operatorUId, Group group) {
-        Long currentTs = System.currentTimeMillis();
-        group.setgId(UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier());
-        group.setGroupOwner(operatorUId);
+    public Boolean saveGroup(String loginUid, Group group, Long currentTs) {
+        group.setGid(UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier());
+        group.setGroupOwner(loginUid);
         group.setLastUpdateTs(currentTs);
-        group.setTs(currentTs);
-        Integer saveGroup_affectedLine = groupMapper.saveGroup(group);
-        Boolean saveGroup_Flag = saveGroup_affectedLine == 1;
-        if (!saveGroup_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveGroup_EffectedLine", "1", saveGroup_affectedLine, group));
+        group.setCreateTs(currentTs);
+        Integer saveGroupAffectedRow = groupMapper.saveGroup(group);
+        Boolean saveGroupFlag = saveGroupAffectedRow == 1;
+        if (!saveGroupFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("saveGroupAffectedRow", "1", saveGroupAffectedRow, group));
         }
-        return saveGroup_Flag;
+        return saveGroupFlag;
     }
 
-    public Boolean removeGroup(String operatorUId, String gId, Long upTs) throws Universal403Exception, Universal404Exception {
-        propertiesHelper.stringNotNull(gId, 32, 32, "[gId] can't be null,and its length should be 32.");
-        checkRight(operatorUId, gId);
-        Integer removeGroup_affectedLine = groupMapper.removeGroupByGIdMultiple(new ArrayList<String>() {{
+    public Boolean removeGroup(String loginUid, String gId, Long upTs) throws Universal403Exception, Universal404Exception {
+        Group targetGroup = queryGroupByGidNotNull(gId);
+        checkRight(loginUid, targetGroup);
+        Integer removeGroup_affectedLine = groupMapper.removeGroupByGidMultiple(new ArrayList<String>() {{
             add(gId);
         }}, upTs);
         Boolean removeGroup_Flag = removeGroup_affectedLine == 1;
         if (!removeGroup_Flag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("removeGroup_affectedLine", "1", removeGroup_affectedLine, new LinkedHashMap() {{
-                put("operatorUId", operatorUId);
+                put("loginUid", loginUid);
                 put("gId", gId);
                 put("upTs", upTs);
             }}));
@@ -69,51 +69,57 @@ public class GroupServiceImpl extends DefaultUtils {
         return removeGroup_Flag;
     }
 
-    public Boolean updateGroup(String operatorUId, String gId, Map rowData, Long currentTs) throws Universal403Exception, Universal404Exception {
-        propertiesHelper.stringNotNull(gId, 32, 32, "[gId] can't be null,and its length should be 32.");
-        checkRight(operatorUId, gId);
-        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(currentTs, rowData, checkInfo);
+    public Boolean updateGroup(String loginUid, String gid, Map rowData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
+        propertiesHelper.stringNotNull(gid, 32, 32, "[gid] can't be null,and its length should be 32.");
+        Group targetGroup = queryGroupByGidNotNull(gid);
+        checkRight(loginUid, targetGroup);
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
         if (data.containsKey("groupOwner")) {
-            userService.queryUserByUIdWithExistValidate(propertiesHelper.string(data.get("groupOwner")));
+            userService.queryUserNotNull(propertiesHelper.string(data.get("groupOwner")));
         }
         if (data.size() < 2) {
-            throw new PropertiesRuntimeException("Effective Update-Info was null.");
+            throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }
-        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
-        Integer updateGroup_affectedLine = groupMapper.updateByGId(gId, data, upTs);
-        Boolean updateGroup_Flag = updateGroup_affectedLine == 1;
-        if (!updateGroup_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("updateGroup_affectedLine", "1", updateGroup_affectedLine, new LinkedHashMap() {{
-                put("operatorUId", operatorUId);
-                put("gId", gId);
-                put("data", data);
-                put("upTs", upTs);
+        Integer updateGroupAffectedRow = groupMapper.updateByGid(gid, data, upTs);
+        Boolean updateGroupFlag = updateGroupAffectedRow == 1;
+        if (!updateGroupFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("updateGroupAffectedRow", "1", updateGroupAffectedRow, new LinkedHashMap() {{
+                put("loginUid", loginUid);
+                put("gid", gid);
+                put("rowData", rowData);
             }}));
         }
-        return updateGroup_Flag;
+        return updateGroupFlag;
     }
 
-    public Group queryGroupByGId(String gId) {
-        propertiesHelper.stringNotNull(gId, 32, 32, "[gId] can't be null,and its length should be 32.");
-        return groupMapper.queryGroupByGId(gId);
+    public Group queryGroupByGid(String gid) {
+        propertiesHelper.stringNotNull(gid, 32, 32, "[gid] can't be null,and its length should be 32.");
+        return groupMapper.queryGroupByGid(gid);
     }
 
-    public ArrayList<Group> queryGroupByGIdList(List<String> gIdList) {
-        ArrayList<String> gIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, gIdList, "Item of [gIdList] can't be null.", String.class, String.class,
-                (item) -> propertiesHelper.stringNotNull(item, "[gId] can't be empty. "));
-        return groupMapper.queryGroupListByGId(gIdListForQuery);
-    }
-
-    private void checkRight(String operatorUId, String gId) throws Universal403Exception, Universal404Exception {
-        Group group = queryGroupByGId(gId);
-        if (group == null) {
-            throw new Universal404Exception(ErrorCode.GROUP_NOTFOUND.getErrorCod(), "Group(" + gId + ") was not found.");
+    public Group queryGroupByGidNotNull(String gid) throws Universal404Exception {
+        Group result = queryGroupByGid(gid);
+        if (result == null) {
+            throw new Universal404Exception(ErrorCode.GROUP_NOTFOUND.getErrorCod(), "Group(" + gid + ") was not found.");
         }
-        User currentOperator = userService.queryUserByUId(operatorUId);
+        return result;
+    }
+
+    public ArrayList<Group> queryGroupByGidList(List<String> gidList) {
+        ArrayList<String> gidListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, gidList, "Item of [gidList] can't be null.", String.class, String.class,
+                (item) -> propertiesHelper.stringNotNull(item, "[gid] can't be empty. "));
+        if (gidListForQuery.size() < 1) {
+            throw new PropertiesRuntimeException("[gidList] can't be empty.");
+        }
+        return groupMapper.queryGroupListByGid(gidListForQuery);
+    }
+
+    private void checkRight(String loginUid, Group group) throws Universal403Exception {
+        User currentOperator = userService.queryUserByUId(loginUid);
         if (currentOperator == null) {
             throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
         } else {
-            if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT) && !group.getGroupOwner().equals(operatorUId)) {
+            if (!currentOperator.getUserType().equals(UserTypeEnum.ROOT) && !group.getGroupOwner().equals(loginUid)) {
                 throw new Universal403Exception(ErrorCode.INSUFFICIENT_PERMISSIONS.getErrorCod(), "Insufficient Permissions.");
             }
         }

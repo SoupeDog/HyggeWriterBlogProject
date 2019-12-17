@@ -16,7 +16,7 @@ public class Group {
     /**
      * 组唯一标识
      */
-    private String gId;
+    private String gid;
     /**
      * 群主
      */
@@ -32,7 +32,7 @@ public class Group {
     /**
      * 创建时间 utc 毫秒级时间戳
      */
-    private Long ts;
+    private Long createTs;
 
     public void validate(){
        PropertiesHelper propertiesHelper= UtilsCreator.getDefaultPropertiesHelperInstance();
@@ -40,12 +40,12 @@ public class Group {
        propertiesHelper.stringNotNull(groupName, 1, 32, "[uName] can't be null,and its length should within 32.");
     }
 
-    public String getgId() {
-        return gId;
+    public String getGid() {
+        return gid;
     }
 
-    public void setgId(String gId) {
-        this.gId = gId;
+    public void setGid(String gid) {
+        this.gid = gid;
     }
 
     public String getGroupOwner() {
@@ -72,11 +72,11 @@ public class Group {
         this.lastUpdateTs = lastUpdateTs;
     }
 
-    public Long getTs() {
-        return ts;
+    public Long getCreateTs() {
+        return createTs;
     }
 
-    public void setTs(Long ts) {
-        this.ts = ts;
+    public void setCreateTs(Long createTs) {
+        this.createTs = createTs;
     }
 }

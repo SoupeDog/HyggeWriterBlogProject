@@ -18,31 +18,31 @@ public class GroupValidateBO {
     /**
      * 用户唯一标识
      */
-    private String uId;
+    private String uid;
     /**
      * 群组唯一标识
      */
-    private String gId;
+    private String gid;
 
-    public String getuId() {
-        return uId;
+    public String getUid() {
+        return uid;
     }
 
-    public void setuId(String uId) {
-        this.uId = uId;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
-    public String getgId() {
-        return gId;
+    public String getGid() {
+        return gid;
     }
 
-    public void setgId(String gId) {
-        this.gId = gId;
+    public void setGid(String gid) {
+        this.gid = gid;
     }
 
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
-        propertiesHelper.stringNotNull(uId, 9, 10, "[uId] can't be null,and its length should be between 9~10.");
-        propertiesHelper.stringNotNull(gId, 32, 32, "Length of [gId] should be 32");
+        propertiesHelper.stringNotNull(uid, 9, 10, "[uid] can't be null,and its length should be between 9~10.");
+        propertiesHelper.stringNotNull(gid, 32, 32, "Length of [gid] should be 32");
     }
 }

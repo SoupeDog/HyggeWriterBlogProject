@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.user.dao.GroupRelationshipMapper">
+
+    <sql id="BaseColumnList">
+        uid,createTs
+    </sql>
+
+    <sql id="AllColumnList">
+        grid,uid,createTs
+    </sql>
+
+    <insert id="saveGroupRelationship" parameterType="GroupRelationship" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `groupRelationship`(<include refid="BaseColumnList"/>)VALUES (
+        #{GroupRelationship.uid},
+        #{GroupRelationship.createTs}
+        )
+    </insert>
+
+    <delete id="removeGroupRelationshipByUidAndGid">
+        DELETE FROM `groupRelationship`
+        WHERE lastUpdateTs &lt; #{lastUpdateTs}
+        AND gid =#{gid} AND uid=#{uid}
+    </delete>
+
+    <select id="queryGroupRelationshipListByGidAndUidList" resultType="GroupRelationship">
+        SELECT
+        <include refid="AllColumnList"/>
+        FROM `groupRelationship` WHERE gid=#{gid} AND uid IN
+        <foreach collection="uidList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryGroupIdListOfUser" resultType="string">
+        SELECT
+        gid
+        FROM `groupRelationship` WHERE uid=#{uid}
+    </select>
+    
+    <select id="queryGroupJoinRecordMapByGIdAndUIdList" resultType="Group">
+        SELECT
+        <include refid="AllColumnList"/>
+        FROM `groupRelationship` WHERE gid=#{gid} AND uid IN
+        <foreach collection="uidList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

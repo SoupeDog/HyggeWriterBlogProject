@@ -10,6 +10,7 @@ import org.xavier.blog.user.domain.po.user.UserOperationLog;
 import org.xavier.blog.user.service.UserOperationLogServiceImpl;
 import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal403Exception;
+import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.exception.Universal409Exception;
 import org.xavier.webtoolkit.domain.PageResult;
 
@@ -45,6 +46,8 @@ public class UserOperationLogController extends HyggeWriterController {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         } catch (Universal409Exception e) {
             return fail(HttpStatus.CONFLICT, e.getStateCode(), e.getMessage());
+        } catch (Universal404Exception e) {
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         }
     }
 
@@ -56,12 +59,14 @@ public class UserOperationLogController extends HyggeWriterController {
                                                            @RequestParam(value = "isDESC", required = false, defaultValue = "true") Boolean isDESC) {
         try {
             String operatorUId = headers.getFirst("uId");
-            PageResult<UserOperationLog> result = userOperationLogService.quarryUserOperationLogByUIdList(operatorUId, uIdList, currentPage, pageSize, orderKey, isDESC);
+            PageResult<UserOperationLog> result = userOperationLogService.quarryUserOperationLogByUidList(operatorUId, uIdList, currentPage, pageSize, orderKey, isDESC);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
+        } catch (Universal404Exception e) {
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         }
     }
 }
