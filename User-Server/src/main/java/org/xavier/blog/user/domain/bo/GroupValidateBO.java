@@ -22,7 +22,9 @@ public class GroupValidateBO {
     /**
      * 群组唯一标识
      */
-    private String gid;
+    private Integer gid;
+
+    private String gno;
 
     public String getUid() {
         return uid;
@@ -32,12 +34,20 @@ public class GroupValidateBO {
         this.uid = uid;
     }
 
-    public String getGid() {
+    public Integer getGid() {
         return gid;
     }
 
-    public void setGid(String gid) {
+    public void setGid(Integer gid) {
         this.gid = gid;
+    }
+
+    public String getGno() {
+        return gno;
+    }
+
+    public void setGno(String gno) {
+        this.gno = gno;
     }
 
     public void validate() {

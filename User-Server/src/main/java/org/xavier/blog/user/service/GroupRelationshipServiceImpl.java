@@ -33,9 +33,10 @@ public class GroupRelationshipServiceImpl extends DefaultUtils {
     GroupServiceImpl groupService;
 
     public Boolean saveGroupRelationship(String loginUid, GroupRelationship groupRelationship, Long currentTs) throws Universal404Exception, Universal403Exception {
+        groupRelationship.validate();
         User loginUser = userService.queryUserNotNull(loginUid);
         userService.checkRight(loginUser, UserTypeEnum.ROOT);
-        groupRelationship.setUid(loginUid);
+        Group targetGroup = groupService.queryGroupByGidNotNull(groupRelationship.getGno());
         groupRelationship.setCreateTs(currentTs);
         Integer saveGroupRelationshipAffectedRow = groupRelationshipMapper.saveGroupRelationship(groupRelationship);
         Boolean saveGroupRelationshipFlag = saveGroupRelationshipAffectedRow == 1;
@@ -49,7 +50,7 @@ public class GroupRelationshipServiceImpl extends DefaultUtils {
         User loginUser = userService.queryUserNotNull(loginUid);
         userService.checkRight(loginUser, UserTypeEnum.ROOT, targetUid);
         Group group = groupService.queryGroupByGidNotNull(gid);
-        Integer removeAffectedRow = groupRelationshipMapper.removeGroupRelationshipByUidAndGid(targetUid, gid, upTs);
+        Integer removeAffectedRow = groupRelationshipMapper.removeGroupRelationshipByUidAndGno(targetUid, gid, upTs);
         Boolean removeResult = removeAffectedRow == 1;
         if (!removeResult) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("removeAffectedRow", String.valueOf(1), removeAffectedRow, new LinkedHashMap<String, Object>() {{
@@ -78,10 +79,10 @@ public class GroupRelationshipServiceImpl extends DefaultUtils {
         return result;
     }
 
-    public Boolean isUserInTargetGroup(String loginUid, String uid, String gid) throws Universal403Exception, Universal404Exception {
+    public Boolean isUserInTargetGroup(String loginUid, String uid, String gno) throws Universal403Exception, Universal404Exception {
         User loginUser = userService.queryUserNotNull(loginUid);
         userService.checkRight(loginUser, UserTypeEnum.ROOT);
-        ArrayList<GroupRelationship> groupRelationshipList = groupRelationshipMapper.queryGroupRelationshipListByGidAndUidList(gid, new ArrayList<String>() {{
+        ArrayList<GroupRelationship> groupRelationshipList = groupRelationshipMapper.queryGroupRelationshipListByGnoAndUidList(gno, new ArrayList<String>() {{
             add(uid);
         }});
         return groupRelationshipList.size() > 0;

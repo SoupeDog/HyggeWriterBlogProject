@@ -134,8 +134,10 @@ public class UserServiceImpl extends DefaultUtils {
     /**
      * 根据 uId 批量查询用户
      */
-    public ArrayList<User> queryUserListByUid(List<String> uidList) {
+    public ArrayList<User> queryUserListByUid(List<String> uidList,String loginUid) throws Universal404Exception, Universal403Exception {
         ArrayList<String> uidListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uidList, "[uidList] for query can't be empty.", String.class, String.class, (uId) -> uId.trim());
+        User loginUser = queryUserNotNull(loginUid);
+        checkRight(loginUser, UserTypeEnum.ROOT);
         if (uidListForQuery.size() < 1) {
             throw new PropertiesRuntimeException("[uidList] can't be empty.");
         }

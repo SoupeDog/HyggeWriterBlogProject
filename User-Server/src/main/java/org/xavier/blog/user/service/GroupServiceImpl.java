@@ -40,10 +40,10 @@ public class GroupServiceImpl extends DefaultUtils {
     }};
 
     public Boolean saveGroup(String loginUid, Group group, Long currentTs) {
-        group.setGid(UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier());
         group.setGroupOwner(loginUid);
         group.setLastUpdateTs(currentTs);
         group.setCreateTs(currentTs);
+        group.setGno(UtilsCreator.getDefaultRandomHelperInstance().getUniversallyUniqueIdentifier());
         Integer saveGroupAffectedRow = groupMapper.saveGroup(group);
         Boolean saveGroupFlag = saveGroupAffectedRow == 1;
         if (!saveGroupFlag) {
@@ -52,26 +52,26 @@ public class GroupServiceImpl extends DefaultUtils {
         return saveGroupFlag;
     }
 
-    public Boolean removeGroup(String loginUid, String gId, Long upTs) throws Universal403Exception, Universal404Exception {
-        Group targetGroup = queryGroupByGidNotNull(gId);
+    public Boolean removeGroup(String loginUid, String gno, Long upTs) throws Universal403Exception, Universal404Exception {
+        Group targetGroup = queryGroupByGidNotNull(gno);
         checkRight(loginUid, targetGroup);
-        Integer removeGroup_affectedLine = groupMapper.removeGroupByGidMultiple(new ArrayList<String>() {{
-            add(gId);
+        Integer removeGroup_affectedLine = groupMapper.removeGroupByGnoMultiple(new ArrayList<String>() {{
+            add(gno);
         }}, upTs);
         Boolean removeGroup_Flag = removeGroup_affectedLine == 1;
         if (!removeGroup_Flag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("removeGroup_affectedLine", "1", removeGroup_affectedLine, new LinkedHashMap() {{
                 put("loginUid", loginUid);
-                put("gId", gId);
+                put("gno", gno);
                 put("upTs", upTs);
             }}));
         }
         return removeGroup_Flag;
     }
 
-    public Boolean updateGroup(String loginUid, String gid, Map rowData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
-        propertiesHelper.stringNotNull(gid, 32, 32, "[gid] can't be null,and its length should be 32.");
-        Group targetGroup = queryGroupByGidNotNull(gid);
+    public Boolean updateGroup(String loginUid, String gno, Map rowData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
+        propertiesHelper.stringNotNull(gno, 32, 32, "[gno] can't be null,and its length should be 32.");
+        Group targetGroup = queryGroupByGidNotNull(gno);
         checkRight(loginUid, targetGroup);
         HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
         if (data.containsKey("groupOwner")) {
@@ -80,27 +80,27 @@ public class GroupServiceImpl extends DefaultUtils {
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }
-        Integer updateGroupAffectedRow = groupMapper.updateByGid(gid, data, upTs);
+        Integer updateGroupAffectedRow = groupMapper.updateByGno(gno, data, upTs);
         Boolean updateGroupFlag = updateGroupAffectedRow == 1;
         if (!updateGroupFlag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("updateGroupAffectedRow", "1", updateGroupAffectedRow, new LinkedHashMap() {{
                 put("loginUid", loginUid);
-                put("gid", gid);
+                put("gno", gno);
                 put("rowData", rowData);
             }}));
         }
         return updateGroupFlag;
     }
 
-    public Group queryGroupByGid(String gid) {
-        propertiesHelper.stringNotNull(gid, 32, 32, "[gid] can't be null,and its length should be 32.");
-        return groupMapper.queryGroupByGid(gid);
+    public Group queryGroupByGno(String gno) {
+        propertiesHelper.stringNotNull(gno, 32, 32, "[gno] can't be null,and its length should be 32.");
+        return groupMapper.queryGroupByGno(gno);
     }
 
-    public Group queryGroupByGidNotNull(String gid) throws Universal404Exception {
-        Group result = queryGroupByGid(gid);
+    public Group queryGroupByGidNotNull(String gno) throws Universal404Exception {
+        Group result = queryGroupByGno(gno);
         if (result == null) {
-            throw new Universal404Exception(ErrorCode.GROUP_NOTFOUND.getErrorCod(), "Group(" + gid + ") was not found.");
+            throw new Universal404Exception(ErrorCode.GROUP_NOTFOUND.getErrorCod(), "Group(" + gno + ") was not found.");
         }
         return result;
     }
@@ -111,7 +111,7 @@ public class GroupServiceImpl extends DefaultUtils {
         if (gidListForQuery.size() < 1) {
             throw new PropertiesRuntimeException("[gidList] can't be empty.");
         }
-        return groupMapper.queryGroupListByGid(gidListForQuery);
+        return groupMapper.queryGroupListByGno(gidListForQuery);
     }
 
     private void checkRight(String loginUid, Group group) throws Universal403Exception {

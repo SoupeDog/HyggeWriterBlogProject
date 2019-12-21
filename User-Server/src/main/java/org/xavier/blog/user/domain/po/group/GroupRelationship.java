@@ -20,7 +20,8 @@ public class GroupRelationship {
     /**
      * 群组唯一标识
      */
-    private String gid;
+    private Integer gid;
+    private String gno;
     /**
      * 用户唯一标识
      */
@@ -38,12 +39,20 @@ public class GroupRelationship {
         this.grid = grid;
     }
 
-    public String getGid() {
+    public Integer getGid() {
         return gid;
     }
 
-    public void setGid(String gid) {
+    public void setGid(Integer gid) {
         this.gid = gid;
+    }
+
+    public String getGno() {
+        return gno;
+    }
+
+    public void setGno(String gno) {
+        this.gno = gno;
     }
 
     public String getUid() {
@@ -65,6 +74,6 @@ public class GroupRelationship {
     public void validate() {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         propertiesHelper.stringNotNull(uid, 1, 32, "[uid] can't be null,and its length should be between 9~10.");
-        propertiesHelper.stringNotNull(gid, 32, 32, "Length of [gid] should be 32");
+        propertiesHelper.stringNotNull(gno, 0, 32, "[gno] can't be null,and its length should be 32.");
     }
 }

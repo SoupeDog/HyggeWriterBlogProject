@@ -28,22 +28,22 @@ public interface GroupRelationshipMapper {
     Integer saveGroupRelationship(@Param("GroupRelationship") GroupRelationship groupRelationship);
 
     /**
-     * 根据 uid gid 删除群组加入记录
+     * 根据 uid gno 删除群组加入记录
      *
      * @param uid 用户唯一标识
-     * @param gid 群组唯一标识
+     * @param gno 群组唯一标识
      * @return 受影响行
      */
-    Integer removeGroupRelationshipByUidAndGid(@Param("uid") String uid, @Param("gid") String gid, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer removeGroupRelationshipByUidAndGno(@Param("uid") String uid, @Param("gno") String gno, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 查询目标群组下符合条件的用户加入记录
      *
-     * @param gid     群组唯一标识
+     * @param gno     群组唯一标识
      * @param uidList uId List
      * @return 查询结果
      */
-    ArrayList<GroupRelationship> queryGroupRelationshipListByGidAndUidList(@Param("gid") String gid, @Param("uidList") ArrayList<String> uidList);
+    ArrayList<GroupRelationship> queryGroupRelationshipListByGnoAndUidList(@Param("gno") String gno, @Param("uidList") ArrayList<String> uidList);
 
     /**
      * 查询目标用户名下的全部群组唯一标识
@@ -56,10 +56,10 @@ public interface GroupRelationshipMapper {
     /**
      * 查询目标群组下符合条件的用户加入记录
      *
-     * @param gid     群组唯一标识
+     * @param gno     群组唯一标识
      * @param uidList uId List
      * @return 查询结果
      */
     @MapKey("uId")
-    HashMap<String, GroupRelationship> queryGroupJoinRecordMapByGIdAndUIdList(@Param("gid") String gid, @Param("uidList") ArrayList<String> uidList);
+    HashMap<String, GroupRelationship> queryGroupJoinRecordMapByGnoAndUIdList(@Param("gno") String gno, @Param("uidList") ArrayList<String> uidList);
 }

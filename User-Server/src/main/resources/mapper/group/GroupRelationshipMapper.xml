@@ -3,31 +3,31 @@
 <mapper namespace="org.xavier.blog.user.dao.GroupRelationshipMapper">
 
     <sql id="BaseColumnList">
-        uid,gid,createTs
+        gno,uid,createTs
     </sql>
 
     <sql id="AllColumnList">
-        grid,uid,createTs
+        grid,gno,uid,createTs
     </sql>
 
     <insert id="saveGroupRelationship" parameterType="GroupRelationship" useGeneratedKeys="true" keyProperty="grid">
         INSERT INTO `groupRelationship`(<include refid="BaseColumnList"/>)VALUES (
+        #{GroupRelationship.gno},
         #{GroupRelationship.uid},
-        #{GroupRelationship.gid},
         #{GroupRelationship.createTs}
         )
     </insert>
 
-    <delete id="removeGroupRelationshipByUidAndGid">
+    <delete id="removeGroupRelationshipByUidAndGno">
         DELETE FROM `groupRelationship`
         WHERE lastUpdateTs &lt; #{lastUpdateTs}
-        AND gid =#{gid} AND uid=#{uid}
+        AND gno =#{gno} AND uid=#{uid}
     </delete>
 
-    <select id="queryGroupRelationshipListByGidAndUidList" resultType="GroupRelationship">
+    <select id="queryGroupRelationshipListByGnoAndUidList" resultType="GroupRelationship">
         SELECT
         <include refid="AllColumnList"/>
-        FROM `groupRelationship` WHERE gid=#{gid} AND uid IN
+        FROM `groupRelationship` WHERE gno=#{gno} AND uid IN
         <foreach collection="uidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -35,14 +35,14 @@
 
     <select id="queryGroupIdListOfUser" resultType="string">
         SELECT
-        gid
+        gno
         FROM `groupRelationship` WHERE uid=#{uid}
     </select>
 
-    <select id="queryGroupJoinRecordMapByGIdAndUIdList" resultType="Group">
+    <select id="queryGroupJoinRecordMapByGnoAndUIdList" resultType="Group">
         SELECT
         <include refid="AllColumnList"/>
-        FROM `groupRelationship` WHERE gid=#{gid} AND uid IN
+        FROM `groupRelationship` WHERE gno=#{gno} AND uid IN
         <foreach collection="uidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>

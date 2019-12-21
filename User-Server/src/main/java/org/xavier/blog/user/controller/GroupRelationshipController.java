@@ -43,7 +43,7 @@ public class GroupRelationshipController extends HyggeWriterController {
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (DuplicateKeyException e) {
-            return fail(HttpStatus.CONFLICT, ErrorCode.GROUP_JOIN_CORD_EXISTS.getErrorCod(), "GroupRelationship(" + groupRelationship.getGid() + "-" + groupRelationship.getUid() + ") dose exist,or it is still under review.");
+            return fail(HttpStatus.CONFLICT, ErrorCode.GROUP_JOIN_CORD_EXISTS.getErrorCod(), "GroupRelationship(" + groupRelationship.getGno() + "-" + groupRelationship.getUid() + ") dose exist,or it is still under review.");
         } catch (Universal403Exception e) {
             return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         } catch (Universal404Exception e) {
@@ -57,7 +57,7 @@ public class GroupRelationshipController extends HyggeWriterController {
             Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
             String loginUid = propertiesHelper.string(headers.getFirst("uid"));
             groupRelationship.validate();
-            groupJoinRecordService.removeGroupRelationship(loginUid, groupRelationship.getGid(), groupRelationship.getUid(), upTs);
+            groupJoinRecordService.removeGroupRelationship(loginUid, groupRelationship.getGno(), groupRelationship.getUid(), upTs);
             return success();
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
@@ -75,7 +75,7 @@ public class GroupRelationshipController extends HyggeWriterController {
         try {
             String loginUid = propertiesHelper.string(headers.getFirst("uid"));
             groupValidateBO.validate();
-            Boolean result = groupJoinRecordService.isUserInTargetGroup(loginUid, groupValidateBO.getUid(), groupValidateBO.getGid());
+            Boolean result = groupJoinRecordService.isUserInTargetGroup(loginUid, groupValidateBO.getUid(), groupValidateBO.getGno());
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

@@ -89,12 +89,17 @@ public class UserController extends HyggeWriterController {
     }
 
     @GetMapping(value = "/user/{uidList}")
-    public ResponseEntity<?> queryUserMultiple(@PathVariable("uidList") ArrayList<String> uidList) {
+    public ResponseEntity<?> queryUserMultiple(@RequestHeader HttpHeaders headers,@PathVariable("uidList") ArrayList<String> uidList) {
         try {
-            ArrayList<User> result = userService.queryUserListByUid(uidList);
+            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            ArrayList<User> result = userService.queryUserListByUid(uidList,loginUid);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        }catch (Universal404Exception e) {
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
+        }  catch (Universal403Exception e) {
+            return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         }
     }
 }

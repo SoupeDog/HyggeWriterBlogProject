@@ -16,7 +16,11 @@ public class Group {
     /**
      * 组唯一标识
      */
-    private String gid;
+    private Integer gid;
+    /**
+     * 组编号
+     */
+    private String gno;
     /**
      * 群主
      */
@@ -34,18 +38,26 @@ public class Group {
      */
     private Long createTs;
 
-    public void validate(){
-       PropertiesHelper propertiesHelper= UtilsCreator.getDefaultPropertiesHelperInstance();
-       propertiesHelper.stringNotNull(groupOwner,9,10,"[groupOwner] can't be null,and its length should within 9~10.");
-       propertiesHelper.stringNotNull(groupName, 1, 32, "[uName] can't be null,and its length should within 32.");
+    public void validate() {
+        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
+        propertiesHelper.stringNotNull(groupOwner, 9, 10, "[groupOwner] can't be null,and its length should within 9~10.");
+        propertiesHelper.stringNotNull(groupName, 1, 32, "[uName] can't be null,and its length should within 32.");
     }
 
-    public String getGid() {
+    public Integer getGid() {
         return gid;
     }
 
-    public void setGid(String gid) {
+    public void setGid(Integer gid) {
         this.gid = gid;
+    }
+
+    public String getGno() {
+        return gno;
+    }
+
+    public void setGno(String gno) {
+        this.gno = gno;
     }
 
     public String getGroupOwner() {

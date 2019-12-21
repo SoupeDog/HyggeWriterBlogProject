@@ -29,44 +29,44 @@ public interface GroupMapper {
     /**
      * 根据 gId List 批量删除组
      *
-     * @param gidList gId List
+     * @param gnoList gId List
      * @return 受影响行
      */
-    Integer removeGroupByGidMultiple(@Param("gidList") ArrayList<String> gidList, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer removeGroupByGnoMultiple(@Param("gnoList") ArrayList<String> gnoList, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
-     * 根据 gid 更新组信息
+     * 根据 gno 更新组信息
      *
-     * @param gid          组唯一标识
+     * @param gno          组唯一标识
      * @param data         修改数据
      * @param lastUpdateTs CAS 用字段
      * @return 受影响行
      */
-    Integer updateByGid(@Param("gid") String gid, @Param("data") Map data, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer updateByGno(@Param("gno") String gno, @Param("data") Map data, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据 UId 查询用户信息
      *
-     * @param gid 组唯一标识
+     * @param gno 组唯一标识
      * @return 查询结果
      */
-    @Select("select * from group where gid=#{gid} limit 1")
-    Group queryGroupByGid(@Param("gid") String gid);
+    @Select("select * from `group` where gno=#{gno} limit 1")
+    Group queryGroupByGno(@Param("gno") String gno);
 
     /**
      * 根据 gId List 批量查询用户信息
      *
-     * @param gidList gId List
+     * @param gnoList gId List
      * @return 查询结果
      */
-    ArrayList<Group> queryGroupListByGid(@Param("gidList") ArrayList<String> gidList);
+    ArrayList<Group> queryGroupListByGno(@Param("gnoList") ArrayList<String> gnoList);
 
     /**
      * 根据 gId List 批量查询组信息
      *
-     * @param gidList gId List
+     * @param gnoList gId List
      * @return 查询结果
      */
     @MapKey("gId")
-    HashMap<String, Group> queryGroupMapByGid(@Param("gidList") ArrayList<String> gidList);
+    HashMap<String, Group> queryGroupMapByGno(@Param("gnoList") ArrayList<String> gnoList);
 }

@@ -3,15 +3,16 @@
 <mapper namespace="org.xavier.blog.user.dao.GroupMapper">
 
     <sql id="BaseColumnList">
-        groupName,groupOwner,createTs,lastUpdateTs
+        gno,groupName,groupOwner,createTs,lastUpdateTs
     </sql>
 
     <sql id="AllColumnList">
-        gid,groupName,groupOwner,createTs,lastUpdateTs
+        gid,gno,groupName,groupOwner,createTs,lastUpdateTs
     </sql>
 
     <insert id="saveGroup" parameterType="Group" useGeneratedKeys="true" keyProperty="gid">
         INSERT INTO `group`(<include refid="BaseColumnList"/>)VALUES (
+        #{Group.gno},
         #{Group.groupName},
         #{Group.groupOwner},
         #{Group.createTs},
@@ -19,36 +20,36 @@
         )
     </insert>
 
-    <delete id="removeGroupByGidMultiple">
+    <delete id="removeGroupByGnoMultiple">
         DELETE FROM `group`
         WHERE lastUpdateTs &lt; #{lastUpdateTs}
-        AND gid IN
+        AND gno IN
         <foreach collection="gidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </delete>
 
-    <update id="updateByGid">
+    <update id="updateByGno">
         UPDATE `group`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}
         </foreach>
-        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND gid=#{gid}
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND gno=#{gno}
     </update>
 
-    <select id="queryGroupListByGid" resultType="Group">
+    <select id="queryGroupListByGno" resultType="Group">
         SELECT
         <include refid="AllColumnList"/>
-        FROM `group` WHERE gid IN
+        FROM `group` WHERE gno IN
         <foreach collection="gidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
 
-    <select id="queryGroupMapByGid" resultType="Group">
+    <select id="queryGroupMapByGno" resultType="Group">
         SELECT
         <include refid="AllColumnList"/>
-        FROM `group` WHERE gid IN
+        FROM `group` WHERE gno IN
         <foreach collection="gidList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
