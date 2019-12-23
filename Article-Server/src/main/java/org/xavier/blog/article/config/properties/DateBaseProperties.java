@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @date 2018/2/8
  * @since Jdk 1.8
  */
-@ConfigurationProperties(prefix = "blog.db")
+@ConfigurationProperties(prefix = "db")
 public class DateBaseProperties {
     private String ac;
     private String pw;
