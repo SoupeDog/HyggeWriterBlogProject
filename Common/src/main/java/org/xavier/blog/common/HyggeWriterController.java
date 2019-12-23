@@ -61,7 +61,7 @@ public class HyggeWriterController extends DefaultController {
 
     @Override
     protected Object successHook(Object object) {
-        GatewayResponse result = GatewayResponse.GatewayResponseBuilder.buildSuccessGatewayResponse(object);
+        GatewayResponse result = GatewayResponseBuilder.buildSuccessGatewayResponse(object);
         return result;
     }
 
@@ -72,7 +72,7 @@ public class HyggeWriterController extends DefaultController {
 
     @Override
     protected Object failHook(ErrorResult errorResult) {
-        GatewayResponse result = GatewayResponse.GatewayResponseBuilder.buildFailGatewayResponse(2, errorResult.getErrorCode(), errorResult.getMsg());
+        GatewayResponse result = GatewayResponseBuilder.buildFailGatewayResponse(2, errorResult.getErrorCode(), errorResult.getMsg());
         return result;
     }
 }

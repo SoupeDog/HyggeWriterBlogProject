@@ -70,24 +70,4 @@ public class GatewayResponse<T> {
     public void setTs(Long ts) {
         this.ts = ts;
     }
-
-    public static class GatewayResponseBuilder {
-        public static GatewayResponse buildSuccessGatewayResponse(Object data) {
-            GatewayResponse result = new GatewayResponse();
-            result.setCode(200);
-            result.setState(1);
-            result.setData(data);
-            result.setTs(System.currentTimeMillis());
-            return result;
-        }
-
-        public static GatewayResponse buildFailGatewayResponse(Integer state, Number code, String msg) {
-            GatewayResponse result = new GatewayResponse();
-            result.setCode(code.intValue());
-            result.setState(state);
-            result.setMsg(msg);
-            result.setTs(System.currentTimeMillis());
-            return result;
-        }
-    }
 }

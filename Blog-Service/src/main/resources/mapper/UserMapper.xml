@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.dao.UserMapper">
+
+    <sql id="BaseColumnList">
+       uid, userType, pw, userName, userAvatar, sex, biography, birthday, phone, email, userState, createTs, lastUpdateTs
+    </sql>
+
+    <sql id="AllColumnList">
+       userId, uid, userType, pw, userName, userAvatar, sex, biography, birthday, phone, email, userState, createTs, lastUpdateTs
+    </sql>
+
+    <insert id="saveUser" parameterType="User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO `user`(<include refid="BaseColumnList"/>)VALUES (
+        #{user.uid},
+        #{user.userType},
+        #{user.pw},
+        #{user.userName},
+        #{user.userAvatar},
+        #{user.sex},
+        #{user.biography},
+        #{user.birthday},
+        #{user.phone},
+        #{user.email},
+        #{user.userState},
+        #{user.createTs},
+        #{user.lastUpdateTs}
+        )
+    </insert>
+
+    <update id="removeUserLogicallyByUidMultiple">
+        UPDATE `user`
+        SET userState = 0, lastUpdateTs = #{lastUpdateTs}
+        WHERE uid IN
+        <foreach collection="uidList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateByUid">
+        UPDATE `user`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND uid=#{uid}
+    </update>
+
+    <update id="updateByUserId">
+        UPDATE `user`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND userId=#{userId}
+    </update>
+
+    <select id="queryUserByUid" resultType="User">
+        SELECT
+        <include refid="AllColumnList"/>
+        FROM `user` WHERE uid=#{uid} LIMIT 1
+    </select>
+
+    <select id="queryUserListByUid" resultType="User">
+        SELECT
+        <include refid="AllColumnList"/>
+        FROM `user` WHERE uid IN
+        <foreach collection="uidList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryUserMapByUid" resultType="User">
+        SELECT
+        <include refid="AllColumnList"/>
+        FROM `user` WHERE uid IN
+        <foreach collection="uIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>
