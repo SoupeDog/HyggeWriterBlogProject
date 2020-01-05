@@ -162,7 +162,7 @@ public class ArticleServiceImpl extends DefaultUtils {
     }
 
     private boolean checkAccessRuleOfOneArticleCategoryNo(String secretKey, User loginUser, List<AccessRule> accessRuleList, HashMap<String, Object> allJoinedGroup) {
-        boolean pass = true;
+        boolean pass = false;
         for (AccessRule accessRule : accessRuleList) {
             if (accessRule.getRequirement()) {
                 pass = pass && checkAccessRule(loginUser, accessRule, allJoinedGroup, secretKey);
@@ -170,7 +170,7 @@ public class ArticleServiceImpl extends DefaultUtils {
                     break;
                 }
             } else {
-                pass = pass || checkAccessRule(loginUser, accessRule, allJoinedGroup, secretKey);
+                pass = checkAccessRule(loginUser, accessRule, allJoinedGroup, secretKey) || pass;
             }
         }
         return pass;

@@ -72,7 +72,7 @@ public class ArticleController extends HyggeWriterController {
     @GetMapping(value = "/main/article/{articleNo}")
     public ResponseEntity<?> queryArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleNo") String articleNo) {
         String loginUid = propertiesHelper.string(headers.getFirst("uid"));
-        String secretKey = propertiesHelper.stringNotNull(headers.getFirst("secretKey"), "[secretKey] can't be null.");
+        String secretKey = propertiesHelper.string(headers.getFirst("secretKey"));
         try {
             Article result = articleService.querySingleArticleByArticleNoForUser(loginUid, articleNo, secretKey);
             return success(result);

@@ -64,7 +64,7 @@ public interface ArticleMapper {
      * @param articleNo 文章唯一标识
      * @return 查询结果
      */
-    @Select("select articleId,articleNo,boardNo,title,uid,summary,wordCount,pageViews,content,properties,state,createTs,lastUpdateTs from `article` where articleNo=#{articleNo} and state=1 limit 1")
+    @Select("select articleId,articleNo,boardNo,articleCategoryNo,title,uid,summary,wordCount,pageViews,content,properties,state,createTs,lastUpdateTs from `article` where articleNo=#{articleNo} and state=1 limit 1")
     Article queryArticleByArticleNo(@Param("articleNo") String articleNo);
 
     /**
