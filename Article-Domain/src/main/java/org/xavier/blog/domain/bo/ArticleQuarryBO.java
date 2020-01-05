@@ -1,7 +1,7 @@
-package org.xavier.blog.article.domain.bo;
+package org.xavier.blog.domain.bo;
 
-import org.xavier.blog.article.domain.po.article.ArticleCategoryInfoPO;
-import org.xavier.blog.article.domain.po.article.ArticleQuarryPO;
+import org.xavier.blog.domain.po.article.ArticleCategoryInfoPO;
+import org.xavier.blog.domain.po.article.ArticleQuarryPO;
 
 import java.util.ArrayList;
 

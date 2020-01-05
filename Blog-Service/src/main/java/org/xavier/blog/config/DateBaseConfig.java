@@ -12,10 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.xavier.blog.common.enums.UserSexHandler;
-import org.xavier.blog.common.enums.UserStateHandler;
-import org.xavier.blog.common.enums.UserTokenScopeHandler;
-import org.xavier.blog.common.enums.UserTypeHandler;
+import org.xavier.blog.common.enums.*;
 import org.xavier.blog.config.properties.DateBaseProperties;
 import org.xavier.common.logging.core.HyggeLogger;
 
@@ -69,6 +66,8 @@ public class DateBaseConfig {
             TypeHandlerRegistry registry = bean.getObject().getConfiguration().getTypeHandlerRegistry();
             registry.register(new UserTypeHandler());
             registry.register(new UserSexHandler());
+            registry.register(new ArticleAccessPermitHandler());
+            registry.register(new DefaultStateTypeHandler());
             registry.register(new UserTokenScopeHandler());
             registry.register(new UserStateHandler());
             SqlSessionFactory sqlSessionFactory = bean.getObject();

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.dao.ArticleMapper">
+
+    <sql id="BaseColumnList">
+        articleNo,boardNo,articleCategoryNo,title,uid,summary,wordCount,pageViews,content,properties,state,createTs,lastUpdateTs
+    </sql>
+
+    <sql id="AllColumnList">
+        articleId,articleNo,boardNo,articleCategoryNo,title,uid,summary,wordCount,pageViews,content,properties,state,createTs,lastUpdateTs
+    </sql>
+
+    <sql id="SummaryColumnList">
+        articleId,articleNo,boardNo,articleCategoryNo,title,uid,summary,wordCount,pageViews,properties,state,createTs,lastUpdateTs
+    </sql>
+
+    <sql id="ArticleSummaryQueryPOColumnList">
+        articleId,uid,articleCategoryNo,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,createTs,lastUpdateTs
+    </sql>
+
+    <insert id="saveArticle" parameterType="Article">
+        INSERT INTO `article`(<include refid="BaseColumnList"/>)VALUES (
+        #{Article.articleNo},
+        #{Article.boardNo},
+        #{Article.articleCategoryNo},
+        #{Article.title},
+        #{Article.uid},
+        #{Article.summary},
+        #{Article.wordCount},
+        #{Article.pageViews},
+        #{Article.content},
+        #{Article.properties},
+        #{Article.state},
+        #{Article.createTs},
+        #{Article.lastUpdateTs}
+        )
+    </insert>
+
+    <update id="removeArticleMultipleByArticleNoLogically">
+        UPDATE `article`
+        SET state = 0, lastUpdateTs = #{lastUpdateTs}
+        WHERE articleNo IN
+        <foreach collection="articleNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateArticleByArticleNo">
+        UPDATE `article`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND articleNo=#{articleNo}
+    </update>
+
+    <select id="queryArticleByArticleNoList" resultType="Article">
+        SELECT
+        <include refid="AllColumnList"/>
+        FROM `article`
+        WHERE state=1
+        AND articleNo IN
+        <foreach collection="articleNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryArticleSummaryByArticleCategoryNo" resultType="Article">
+        SELECT
+        <include refid="SummaryColumnList"/>
+        FROM
+        `article`
+        WHERE state=1 AND boardNo=#{boardNo} AND articleCategoryNo IN
+        <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY ${orderKey} ${order}
+        Limit #{startPoint},#{size}
+    </select>
+
+    <select id="queryArticleSummaryByArticleCategoryNoTotalCount" resultType="integer">
+        SELECT
+        count(*)
+        FROM
+        `article`
+        WHERE state=1 AND boardNo=#{boardNo} AND articleCategoryNo IN
+        <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

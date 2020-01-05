@@ -55,18 +55,18 @@ public class GroupServiceImpl extends DefaultUtils {
     public Boolean removeGroup(String loginUid, String gno, Long upTs) throws Universal403Exception, Universal404Exception {
         Group targetGroup = queryGroupByGidNotNull(gno);
         checkRight(loginUid, targetGroup);
-        Integer removeGroup_affectedLine = groupMapper.removeGroupByGnoMultiple(new ArrayList<String>() {{
+        Integer removeGroupAffectedRow = groupMapper.removeGroupByGnoMultiple(new ArrayList<String>() {{
             add(gno);
         }}, upTs);
-        Boolean removeGroup_Flag = removeGroup_affectedLine == 1;
-        if (!removeGroup_Flag) {
-            logger.warn(HyggeLoggerMsgBuilder.assertFail("removeGroup_affectedLine", "1", removeGroup_affectedLine, new LinkedHashMap() {{
+        Boolean removeGroupFlag = removeGroupAffectedRow == 1;
+        if (!removeGroupFlag) {
+            logger.warn(HyggeLoggerMsgBuilder.assertFail("removeGroupAffectedRow", "1", removeGroupAffectedRow, new LinkedHashMap() {{
                 put("loginUid", loginUid);
                 put("gno", gno);
                 put("upTs", upTs);
             }}));
         }
-        return removeGroup_Flag;
+        return removeGroupFlag;
     }
 
     public Boolean updateGroup(String loginUid, String gno, Map rowData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
@@ -80,7 +80,7 @@ public class GroupServiceImpl extends DefaultUtils {
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }
-        Integer updateGroupAffectedRow = groupMapper.updateByGno(gno, data, upTs);
+        Integer updateGroupAffectedRow = groupMapper.updateGroupByGno(gno, data, upTs);
         Boolean updateGroupFlag = updateGroupAffectedRow == 1;
         if (!updateGroupFlag) {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("updateGroupAffectedRow", "1", updateGroupAffectedRow, new LinkedHashMap() {{

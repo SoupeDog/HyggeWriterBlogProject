@@ -1,9 +1,4 @@
-package org.xavier.blog.article.domain.bo;
-
-import org.xavier.blog.article.domain.po.article.ArticleCategoryInfoPO;
-import org.xavier.blog.article.domain.po.article.ArticleSummaryQueryPO;
-
-import java.util.ArrayList;
+package org.xavier.blog.domain.po.article;
 
 /**
  * 描述信息：<br/>
@@ -14,7 +9,7 @@ import java.util.ArrayList;
  * @date 2019/5/26
  * @since Jdk 1.8
  */
-public class ArticleSummaryQueryBO {
+public class ArticleSummaryQueryPO {
     /**
      * 唯一标示
      */
@@ -39,7 +34,7 @@ public class ArticleSummaryQueryBO {
     /**
      * 文章类别节点路径
      */
-    private ArrayList<ArticleCategoryInfoPO> articleCategoryPath;
+    private String articleCategoryPathStringVal;
     /**
      * 摘要内容
      */
@@ -65,28 +60,6 @@ public class ArticleSummaryQueryBO {
      * 创建时间 utc 毫秒级时间戳
      */
     private Long ts;
-
-    public ArticleSummaryQueryBO(ArticleSummaryQueryPO articleSummaryQueryPO) {
-        this.articleId = articleSummaryQueryPO.getArticleId();
-        this.uId = articleSummaryQueryPO.getuId();
-        this.articleCategoryId = articleSummaryQueryPO.getArticleCategoryId();
-        this.title = articleSummaryQueryPO.getTitle();
-        this.boardName = articleSummaryQueryPO.getBoardName();
-        ArrayList<ArticleCategoryInfoPO> articleCategoryPathTemp = new ArrayList();
-        if (articleSummaryQueryPO.getArticleCategoryPathStringVal() != null && !articleSummaryQueryPO.getArticleCategoryPathStringVal().trim().equals("")) {
-            String[] array = articleSummaryQueryPO.getArticleCategoryPathStringVal().split("/");
-            for (String temp : array) {
-                articleCategoryPathTemp.add(new ArticleCategoryInfoPO(temp));
-            }
-        }
-        this.articleCategoryPath = articleCategoryPathTemp;
-        this.summary = articleSummaryQueryPO.getSummary();
-        this.wordCount = articleSummaryQueryPO.getWordCount();
-        this.pageViews = articleSummaryQueryPO.getPageViews();
-        this.properties = articleSummaryQueryPO.getProperties();
-        this.lastUpdateTs = articleSummaryQueryPO.getLastUpdateTs();
-        this.ts = articleSummaryQueryPO.getTs();
-    }
 
     public String getArticleId() {
         return articleId;
@@ -128,12 +101,12 @@ public class ArticleSummaryQueryBO {
         this.boardName = boardName;
     }
 
-    public ArrayList<ArticleCategoryInfoPO> getArticleCategoryPath() {
-        return articleCategoryPath;
+    public String getArticleCategoryPathStringVal() {
+        return articleCategoryPathStringVal;
     }
 
-    public void setArticleCategoryPath(ArrayList<ArticleCategoryInfoPO> articleCategoryPath) {
-        this.articleCategoryPath = articleCategoryPath;
+    public void setArticleCategoryPathStringVal(String articleCategoryPathStringVal) {
+        this.articleCategoryPathStringVal = articleCategoryPathStringVal;
     }
 
     public String getSummary() {

@@ -29,7 +29,7 @@
         </foreach>
     </delete>
 
-    <update id="updateByGno">
+    <update id="updateGroupByGno">
         UPDATE `group`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}

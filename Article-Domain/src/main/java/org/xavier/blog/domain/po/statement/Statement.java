@@ -1,4 +1,4 @@
-package org.xavier.blog.article.domain.po.statement;
+package org.xavier.blog.domain.po.statement;
 
 
 import org.xavier.common.util.PropertiesHelper;

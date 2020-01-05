@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.dao.BoardMapper">
+
+    <sql id="BaseColumnList">
+        boardNo,boardName,uid,state,createTs,lastUpdateTs
+    </sql>
+
+    <sql id="AllColumnList">
+        boardId, boardNo,boardName,uid,state,createTs,lastUpdateTs
+    </sql>
+
+
+    <insert id="saveBoard" parameterType="Board">
+        INSERT INTO `board`(<include refid="BaseColumnList"/>)VALUES (
+        #{board.boardNo},
+        #{board.boardName},
+        #{board.uid},
+        #{board.state},
+        #{board.createTs},
+        #{board.lastUpdateTs}
+        )
+    </insert>
+
+    <update id="removeBoardMultipleByBoardNoLogically">
+        UPDATE `board`
+        SET state = 0,
+        lastUpdateTs = #{lastUpdateTs}
+        WHERE boardNo IN
+        <foreach collection="boardNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND state = 1
+    </update>
+
+    <update id="updateBoard">
+        UPDATE `board`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE boardNo=#{boardNo} AND lastUpdateTs &lt; #{lastUpdateTs}
+    </update>
+
+    <select id="queryBoardListByBoardNo" resultType="Board">
+        SELECT
+        <include refid="AllColumnList"/>
+        FROM `board` WHERE state=1 AND boardNo IN
+        <foreach collection="boardNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryAllBoardList" resultType="Board">
+        SELECT
+        <include refid="AllColumnList"/>
+        FROM `board` WHERE state=1 ORDER BY #{orderKey} ${order}
+        Limit #{startPoint},#{size}
+    </select>
+</mapper>

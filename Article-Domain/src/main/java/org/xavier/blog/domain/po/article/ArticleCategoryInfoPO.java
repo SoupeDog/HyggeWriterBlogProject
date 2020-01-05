@@ -1,4 +1,4 @@
-package org.xavier.blog.article.domain.po.article;
+package org.xavier.blog.domain.po.article;
 
 /**
  * 描述信息：<br/>

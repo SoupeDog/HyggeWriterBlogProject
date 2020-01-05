@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xavier.blog.dao.ArticleCategoryMapper">
+
+    <sql id="Base_Column_List">
+        articleCategoryNo,articleCategoryName,uid,description,state,createTs,lastUpdateTs
+    </sql>
+
+    <sql id="All_Column_List">
+        articleCategoryId,articleCategoryNo,articleCategoryName,uid,description,state,createTs,lastUpdateTs
+    </sql>
+
+    <insert id="saveArticleCategory" parameterType="ArticleCategory" useGeneratedKeys="true"
+            keyProperty="ArticleCategory.articleCategoryId">
+        INSERT INTO `articleCategory`(<include refid="Base_Column_List"/>)VALUES (
+        #{ArticleCategory.articleCategoryNo},
+        #{ArticleCategory.articleCategoryName},
+        #{ArticleCategory.uid},
+        #{ArticleCategory.description},
+        #{ArticleCategory.accessPermit},
+        #{ArticleCategory.extendProperties},
+        #{ArticleCategory.state},
+        #{ArticleCategory.createTs},
+        #{ArticleCategory.lastUpdateTs}
+        )
+    </insert>
+
+    <update id="removeArticleMultipleByArticleCategoryNoLogically">
+        UPDATE `articleCategory`
+        SET state = 0,
+        lastUpdateTs = #{lastUpdateTs}
+        WHERE articleCategoryNo IN
+        <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateArticleCategoryByArticleCategoryNo">
+        UPDATE `articleCategory`
+        <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
+            ${key}=#{val}
+        </foreach>
+        WHERE lastUpdateTs &lt; #{lastUpdateTs} AND articleCategoryNo=#{articleCategoryNo}
+    </update>
+
+    <select id="queryAllArticleCategory" resultType="ArticleCategory">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM `articleCategory` WHERE state=1
+        <if test="accessPermitRangeList != null">
+            AND accessPermit IN
+            <foreach collection="accessPermitRangeList" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+</mapper>

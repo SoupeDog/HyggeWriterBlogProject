@@ -42,7 +42,7 @@ public interface GroupMapper {
      * @param lastUpdateTs CAS 用字段
      * @return 受影响行
      */
-    Integer updateByGno(@Param("gno") String gno, @Param("data") Map data, @Param("lastUpdateTs") Long lastUpdateTs);
+    Integer updateGroupByGno(@Param("gno") String gno, @Param("data") Map data, @Param("lastUpdateTs") Long lastUpdateTs);
 
     /**
      * 根据 UId 查询用户信息
@@ -67,6 +67,6 @@ public interface GroupMapper {
      * @param gnoList gId List
      * @return 查询结果
      */
-    @MapKey("gId")
+    @MapKey("gno")
     HashMap<String, Group> queryGroupMapByGno(@Param("gnoList") ArrayList<String> gnoList);
 }
