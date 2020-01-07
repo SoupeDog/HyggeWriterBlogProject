@@ -2,12 +2,10 @@ package org.xavier.blog.domain.po;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.xavier.blog.common.enums.DefaultStateEnum;
 import org.xavier.blog.domain.bo.ArticleJsonProperties;
 import org.xavier.blog.domain.bo.RequestBOSaveArticle;
-import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.util.JsonHelper;
 import org.xavier.common.util.PropertiesHelper;
 import org.xavier.common.util.UtilsCreator;

@@ -1,7 +1,8 @@
-package org.xavier.blog.domain.bo;
+package org.xavier.blog.domain.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.xavier.blog.common.enums.DefaultStateEnum;
+import org.xavier.blog.domain.bo.ArticleJsonProperties;
 import org.xavier.blog.domain.po.Article;
 import org.xavier.blog.domain.po.ArticleCategory;
 import org.xavier.blog.domain.po.Board;
@@ -13,14 +14,13 @@ import java.util.ArrayList;
 
 /**
  * 描述信息：<br/>
- * 文章简介查询 BO
  *
  * @author Xavier
  * @version 1.0
- * @date 2019/5/26
+ * @date 20-1-7
  * @since Jdk 1.8
  */
-public class ArticleSummaryQueryBO {
+public class ArticleDTO {
     /**
      * 文章显示标示
      */
@@ -67,6 +67,10 @@ public class ArticleSummaryQueryBO {
      */
     private Integer pageViews;
     /**
+     * 文章内容
+     */
+    private String content;
+    /**
      * 文章额外参数
      */
     private ArticleJsonProperties properties;
@@ -85,10 +89,7 @@ public class ArticleSummaryQueryBO {
      */
     private Long lastUpdateTs;
 
-    public ArticleSummaryQueryBO() {
-    }
-
-    public ArticleSummaryQueryBO( Article article, Board board, ArticleCategory articleCategory, ArrayList<ArticleCategoryInfoPO> parentArticleCategoryList) {
+    public ArticleDTO(Article article, Board board, ArticleCategory articleCategory, ArrayList<ArticleCategoryInfoPO> parentArticleCategoryList) {
         this.articleNo = article.getArticleNo();
         this.boardNo = board.getBoardNo();
         this.boardName = board.getBoardName();
@@ -100,6 +101,7 @@ public class ArticleSummaryQueryBO {
         this.summary = article.getSummary();
         this.wordCount = article.getWordCount();
         this.pageViews = article.getPageViews();
+        this.content = article.getContent();
         try {
             this.properties = UtilsCreator.getDefaultJsonHelperInstance(false).getMapper().readValue(article.getProperties(), ArticleJsonProperties.class);
         } catch (JsonProcessingException e) {
@@ -196,6 +198,14 @@ public class ArticleSummaryQueryBO {
 
     public void setPageViews(Integer pageViews) {
         this.pageViews = pageViews;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public ArticleJsonProperties getProperties() {

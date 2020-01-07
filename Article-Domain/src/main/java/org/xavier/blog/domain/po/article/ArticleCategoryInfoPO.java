@@ -13,27 +13,31 @@ public class ArticleCategoryInfoPO {
     /**
      * 文章类别唯一标识
      */
-    private String articleCategoryId;
+    private String articleCategoryNo;
     /**
      * 文章类别名称
      */
     private String articleCategoryName;
+
+
+    public ArticleCategoryInfoPO() {
+    }
 
     /**
      * @param data 形如 {文章类别唯一标识}-{文章类别名称}
      */
     public ArticleCategoryInfoPO(String data) {
         String[] array = data.split("-");
-        this.articleCategoryId = array[0];
+        this.articleCategoryNo = array[0];
         this.articleCategoryName = array[1];
     }
 
-    public String getArticleCategoryId() {
-        return articleCategoryId;
+    public String getArticleCategoryNo() {
+        return articleCategoryNo;
     }
 
-    public void setArticleCategoryId(String articleCategoryId) {
-        this.articleCategoryId = articleCategoryId;
+    public void setArticleCategoryNo(String articleCategoryNo) {
+        this.articleCategoryNo = articleCategoryNo;
     }
 
     public String getArticleCategoryName() {

@@ -7,6 +7,7 @@ import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.dao.ArticleCategoryMapper;
 import org.xavier.blog.domain.po.ArticleCategory;
 import org.xavier.blog.domain.po.User;
+import org.xavier.blog.domain.po.article.ArticleCategoryInfoPO;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.exception.Universal400Exception;
 import org.xavier.common.exception.Universal403Exception;
@@ -17,6 +18,7 @@ import org.xavier.common.util.bo.ColumnInfo;
 import org.xavier.webtoolkit.base.DefaultUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 描述信息：<br/>
@@ -32,6 +34,8 @@ public class ArticleCategoryServiceImpl extends DefaultUtils {
     ArticleCategoryMapper articleCategoryMapper;
     @Autowired
     UserServiceImpl userService;
+
+    public static ConcurrentHashMap<String, ArrayList<ArticleCategoryInfoPO>> articleCategoryTreeInfo = new ConcurrentHashMap<>();
 
     private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
         add(new ColumnInfo("articleCategoryName", "articleCategoryName", ColumnType.STRING, false, 1, 32));

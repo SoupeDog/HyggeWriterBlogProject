@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
+import org.xavier.blog.domain.dto.ArticleDTO;
 import org.xavier.blog.domain.po.Article;
 import org.xavier.blog.service.ArticleServiceImpl;
 import org.xavier.common.exception.PropertiesRuntimeException;
@@ -74,7 +75,7 @@ public class ArticleController extends HyggeWriterController {
         String loginUid = propertiesHelper.string(headers.getFirst("uid"));
         String secretKey = propertiesHelper.string(headers.getFirst("secretKey"));
         try {
-            Article result = articleService.querySingleArticleByArticleNoForUser(loginUid, articleNo, secretKey);
+            ArticleDTO result = articleService.querySingleArticleByArticleNoForUser(loginUid, articleNo, secretKey);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

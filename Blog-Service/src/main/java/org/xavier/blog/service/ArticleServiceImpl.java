@@ -11,10 +11,8 @@ import org.xavier.blog.dao.ArticleCategoryMapper;
 import org.xavier.blog.dao.ArticleMapper;
 import org.xavier.blog.dao.GroupRelationshipMapper;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
-import org.xavier.blog.domain.po.AccessRule;
-import org.xavier.blog.domain.po.Article;
-import org.xavier.blog.domain.po.ArticleCategory;
-import org.xavier.blog.domain.po.User;
+import org.xavier.blog.domain.dto.ArticleDTO;
+import org.xavier.blog.domain.po.*;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;
@@ -146,7 +144,7 @@ public class ArticleServiceImpl extends DefaultUtils {
      * @param articleNo 文章唯一标识
      * @return 文章对象
      */
-    public Article querySingleArticleByArticleNoForUser(String loginUid, String articleNo, String secretKey) throws Universal404Exception {
+    public ArticleDTO querySingleArticleByArticleNoForUser(String loginUid, String articleNo, String secretKey) throws Universal404Exception {
         User loginUser = userService.queryUserNotNull(loginUid);
         Article article = querySingleArticleByArticleNoNotNull(articleNo);
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNo(article.getArticleCategoryNo());
@@ -157,8 +155,11 @@ public class ArticleServiceImpl extends DefaultUtils {
         if (!checkAccessRuleOfOneArticleCategoryNo(secretKey, loginUser, accessRuleList, allJoinedGroup)) {
             throw new Universal404Exception(ErrorCode.ARTICLE_NOTFOUND.getErrorCod(), "Article(" + articleNo + ") was not found.");
         }
+        ArticleCategory articleCategory = articleCategoryService.queryArticleCategoryNoByArticleCategoryNoNotNull(article.getArticleCategoryNo());
+        Board board = boardService.queryBoardByBoardNoNotNull(article.getBoardNo());
+        ArticleDTO result = new ArticleDTO(article, board, articleCategory, ArticleCategoryServiceImpl.articleCategoryTreeInfo.get(article.getArticleCategoryNo()));
         increasePageViewsAsynchronous(articleNo);
-        return article;
+        return result;
     }
 
     private boolean checkAccessRuleOfOneArticleCategoryNo(String secretKey, User loginUser, List<AccessRule> accessRuleList, HashMap<String, Object> allJoinedGroup) {
@@ -226,6 +227,10 @@ public class ArticleServiceImpl extends DefaultUtils {
                 (gno) -> gno,
                 (gno) -> gno);
         ArrayList<ArticleCategory> totalArticleCategoryList = articleCategoryService.queryAllArticleCategory(null);
+        // key-value articleCategoryNo-ArticleCategory
+        HashMap<String, ArticleCategory> totalArticleCategoryMap = collectionHelper.filterCollectionNotEmptyAsHashMap(totalArticleCategoryList, "", ArticleCategory.class, String.class, ArticleCategory.class,
+                (articleCategory) -> articleCategory.getArticleCategoryNo(),
+                (articleCategory) -> articleCategory);
         ArrayList<String> needCheckArticleCategoryNoList = collectionHelper.filterCollectionNotEmptyAsArrayList(true, totalArticleCategoryList, "[totalArticleCategoryList] for query can't be empty.", ArticleCategory.class, String.class,
                 (articleCategory) -> articleCategory.getArticleCategoryNo()
         );
@@ -261,8 +266,13 @@ public class ArticleServiceImpl extends DefaultUtils {
                 default:
                     orderKey = "createTs";
             }
+            Board board = boardService.queryBoardByBoardNo(boardNo);
             ArrayList<Article> resultSetTemp = articleMapper.queryArticleSummaryByArticleCategoryNo(allowableArticleCategoryNoList, boardNo, (currentPage - 1) * pageSize, pageSize, orderKey, isDESC ? "DESC" : "ASC");
-            ArrayList<ArticleSummaryQueryBO> resultSet = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultSetTemp, "", Article.class, ArticleSummaryQueryBO.class, (article) -> new ArticleSummaryQueryBO(article));
+            ArrayList<ArticleSummaryQueryBO> resultSet = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultSetTemp, "", Article.class, ArticleSummaryQueryBO.class,
+                    (article) -> new ArticleSummaryQueryBO(article,
+                            board,
+                            totalArticleCategoryMap.get(article.getArticleCategoryNo()),
+                            articleCategoryService.articleCategoryTreeInfo.get(article.getArticleCategoryNo())));
             result.setResultSet(resultSet);
         } else {
             result.setResultSet(new ArrayList<>(0));
