@@ -131,9 +131,10 @@ public class Article {
         propertiesHelper.stringNotNull(articleCategoryNo, "[articleCategoryNo] can't be null.");
         propertiesHelper.stringNotNull(uid, 0, 32, "[uid] can't be null,and its length should be between 9~10.");
         propertiesHelper.stringNotNull(content, 1, 100000, "[content] can't be null,and its length should within 100000.");
+        propertiesHelper.stringNotNull(summary, 1, 500, "[summary] can't be null,and its length should within 500.");
         JsonHelper<ObjectMapper> jsonHelper = UtilsCreator.getDefaultJsonHelperInstance(false);
         ArticleJsonProperties articleJsonProperties = new ArticleJsonProperties();
-        articleJsonProperties.setDefaultConfigIfabsent();
+        articleJsonProperties.setDefaultConfigIfAbsent();
         this.properties = jsonHelper.format(articleJsonProperties);
         initWordCount();
     }

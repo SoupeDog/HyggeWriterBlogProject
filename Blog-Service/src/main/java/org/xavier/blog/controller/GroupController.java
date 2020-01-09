@@ -68,11 +68,11 @@ public class GroupController extends HyggeWriterController {
     }
 
     @PutMapping(value = "/main/group/{gId}")
-    public ResponseEntity<?> updateGroup(@RequestHeader HttpHeaders headers, @PathVariable("gId") String gId, @RequestBody Map rowData) {
+    public ResponseEntity<?> updateGroup(@RequestHeader HttpHeaders headers, @PathVariable("gId") String gId, @RequestBody Map rawData) {
         try {
             Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
             String loginUid = propertiesHelper.string(headers.getFirst("uid"));
-            if (!groupService.updateGroup(loginUid, gId, rowData, upTs)) {
+            if (!groupService.updateGroup(loginUid, gId, rawData, upTs)) {
                 throw new Universal409Exception(ErrorCode.GROUP_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();

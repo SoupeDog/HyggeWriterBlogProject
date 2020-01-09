@@ -134,34 +134,34 @@ public class ArticleServiceImpl extends DefaultUtils {
      * 修改文章信息
      *
      * @param articleId 文章唯一标识
-     * @param rowData   修改原数据
+     * @param rawData   修改原数据
      */
-    public Boolean updateArticle(String operatorUId, String articleId, Map rowData) throws Universal404Exception, Universal403Exception {
+    public Boolean updateArticle(String operatorUId, String articleId, Map rawData) throws Universal404Exception, Universal403Exception {
         Article targetArticle = querySingleArticleByArticleId_WithExistValidate(articleId);
         userService.checkRight(operatorUId, UserTypeEnum.ROOT, targetArticle.getuId());
-        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
+        Long upTs = propertiesHelper.longRangeNotNull(rawData.get("ts"), "[ts] can't be null,and it should be a number.");
 
-        if (rowData.containsKey("statementId")) {
-            String statementId = propertiesHelper.string(rowData.get("statementId"), 32, 32, "[statementId] can't be null and its length should be 32.");
+        if (rawData.containsKey("statementId")) {
+            String statementId = propertiesHelper.string(rawData.get("statementId"), 32, 32, "[statementId] can't be null and its length should be 32.");
             if (statementId != null) {
                 statementService.queryStatementByStatementId_WithExistValidate(statementId);
             } else {
-                rowData.remove("statementId");
+                rawData.remove("statementId");
             }
         }
-        if (rowData.containsKey("articleCategoryId")) {
-            String articleCategoryId = propertiesHelper.string(rowData.get("articleCategoryId"), 32, 32, "[articleCategoryId] can't be null and its length should be 32.");
+        if (rawData.containsKey("articleCategoryId")) {
+            String articleCategoryId = propertiesHelper.string(rawData.get("articleCategoryId"), 32, 32, "[articleCategoryId] can't be null and its length should be 32.");
             if (articleCategoryId != null) {
                 articleCategoryService.queryArticleCategoryById_WithExistValidate(articleCategoryId);
             } else {
-                rowData.remove("articleCategoryId");
+                rawData.remove("articleCategoryId");
             }
         }
-        if (rowData.containsKey("content")) {
-            Integer wordCount = rowData.get("content").toString().trim().length();
-            rowData.put("wordCount", wordCount);
+        if (rawData.containsKey("content")) {
+            Integer wordCount = rawData.get("content").toString().trim().length();
+            rawData.put("wordCount", wordCount);
         }
-        HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
+        HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, checkInfo);
         Integer updateArticle_affectedLine = articleMapper.updateArticle(articleId, data, upTs);
         Boolean updateArticle_Flag = updateArticle_affectedLine == 1;
         if (!updateArticle_Flag) {

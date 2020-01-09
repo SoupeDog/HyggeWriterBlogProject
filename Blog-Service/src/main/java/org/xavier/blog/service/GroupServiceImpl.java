@@ -69,11 +69,11 @@ public class GroupServiceImpl extends DefaultUtils {
         return removeGroupFlag;
     }
 
-    public Boolean updateGroup(String loginUid, String gno, Map rowData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
+    public Boolean updateGroup(String loginUid, String gno, Map rawData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
         propertiesHelper.stringNotNull(gno, 32, 32, "[gno] can't be null,and its length should be 32.");
         Group targetGroup = queryGroupByGidNotNull(gno);
         checkRight(loginUid, targetGroup);
-        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, checkInfo);
         if (data.containsKey("groupOwner")) {
             userService.queryUserNotNull(propertiesHelper.string(data.get("groupOwner")));
         }
@@ -86,7 +86,7 @@ public class GroupServiceImpl extends DefaultUtils {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("updateGroupAffectedRow", "1", updateGroupAffectedRow, new LinkedHashMap() {{
                 put("loginUid", loginUid);
                 put("gno", gno);
-                put("rowData", rowData);
+                put("rawData", rawData);
             }}));
         }
         return updateGroupFlag;

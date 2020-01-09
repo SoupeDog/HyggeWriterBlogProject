@@ -96,15 +96,15 @@ public class BoardServiceImpl extends DefaultUtils {
     /**
      * 修改版权声明
      */
-    public Boolean updateBoard(String currentUserUId, String boardId, Map rowData) throws Universal404Exception, Universal403Exception, Universal400Exception {
+    public Boolean updateBoard(String currentUserUId, String boardId, Map rawData) throws Universal404Exception, Universal403Exception, Universal400Exception {
         propertiesHelper.stringNotNull(boardId, 32, 32, "[boardId] can't be null,and its length should be 32.");
         Board board = quarryBoardByBoardId(boardId);
         if (board == null) {
             throw new Universal404Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Board(" + boardId + ") was not found.");
         }
         userService.checkRight(currentUserUId, UserTypeEnum.ROOT, board.getuId());
-        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
-        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs,rowData, checkInfo);
+        Long upTs = propertiesHelper.longRangeNotNull(rawData.get("ts"), "[ts] can't be null,and it should be a number.");
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs,rawData, checkInfo);
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }

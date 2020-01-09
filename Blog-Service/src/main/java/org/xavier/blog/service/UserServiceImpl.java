@@ -92,10 +92,10 @@ public class UserServiceImpl extends DefaultUtils {
     /**
      * 更新用户对象
      */
-    public Boolean updateUser(String targetUid, String loginUid, Map rowData, Long currentTs) throws Universal400Exception, Universal403Exception, Universal404Exception {
+    public Boolean updateUser(String targetUid, String loginUid, Map rawData, Long currentTs) throws Universal400Exception, Universal403Exception, Universal404Exception {
         User loginUser = queryUserNotNull(loginUid);
         checkRight(loginUser, UserTypeEnum.ROOT, targetUid);
-        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(currentTs, rowData, checkInfo);
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(currentTs, rawData, checkInfo);
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }

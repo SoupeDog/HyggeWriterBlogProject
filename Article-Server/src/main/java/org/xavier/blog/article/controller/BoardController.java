@@ -61,9 +61,9 @@ public class BoardController extends HyggeWriterController {
     }
 
     @PutMapping(value = "/board/{boardId}")
-    public ResponseEntity<?> updateBoard(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId, @RequestBody Map rowData) {
+    public ResponseEntity<?> updateBoard(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId, @RequestBody Map rawData) {
         try {
-            boardService.updateBoard(headers.getFirst("uId"), boardId, rowData);
+            boardService.updateBoard(headers.getFirst("uId"), boardId, rawData);
             return success();
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

@@ -89,24 +89,24 @@ public class StatementServiceImpl extends DefaultUtils {
     /**
      * 修改版权声明
      */
-    public Boolean updateStatement(String operatorUId, String statementId, Map rowData) throws Universal404Exception, Universal403Exception, Universal400Exception {
+    public Boolean updateStatement(String operatorUId, String statementId, Map rawData) throws Universal404Exception, Universal403Exception, Universal400Exception {
         propertiesHelper.stringNotNull(statementId, 32, 32, "[statementId] can't be null,and its length should be 32.");
         Statement statement = quarryStatementByStatementId(statementId);
         if (statement == null) {
             throw new Universal404Exception(ErrorCode.STATEMENT_NOTFOUND.getErrorCod(), "Statement(" + statementId + ") was not found.");
         }
         userService.checkRight(operatorUId, UserTypeEnum.ROOT, statement.getuId());
-        if (rowData.containsKey("properties")) {
+        if (rawData.containsKey("properties")) {
             try {
-                Object propertiesObj = rowData.get("properties");
+                Object propertiesObj = rawData.get("properties");
                 String properties = jsonHelper.format(propertiesObj);
-                rowData.put("properties", properties);
+                rawData.put("properties", properties);
             } catch (Universal400RuntimeException e) {
                 throw new Universal400RuntimeException("[properties] should be json string.");
             }
         }
-        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a long number.");
-        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
+        Long upTs = propertiesHelper.longRangeNotNull(rawData.get("ts"), "[ts] can't be null,and it should be a long number.");
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, checkInfo);
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }

@@ -55,11 +55,11 @@ public class ArticleCategoryServiceImpl extends DefaultUtils {
         return articleCategoryFlag;
     }
 
-    public Boolean updateArticleCategory(String loginUid, String articleCategoryNo, Map rowData, Long upTs) throws Universal404Exception, Universal400Exception, Universal403Exception {
+    public Boolean updateArticleCategory(String loginUid, String articleCategoryNo, Map rawData, Long upTs) throws Universal404Exception, Universal400Exception, Universal403Exception {
         ArticleCategory targetArticleCategory = queryArticleCategoryNoByArticleCategoryNoNotNull(articleCategoryNo);
         User loginUser = userService.queryUserNotNull(loginUid);
         userService.checkRight(loginUser, UserTypeEnum.ROOT, targetArticleCategory.getUid());
-        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, checkInfo);
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }
@@ -69,7 +69,7 @@ public class ArticleCategoryServiceImpl extends DefaultUtils {
             logger.warn(HyggeLoggerMsgBuilder.assertFail("updateArticleCategoryRow", "1", updateArticleCategoryRow, new LinkedHashMap() {{
                 put("loginUid", loginUid);
                 put("articleCategoryNo", articleCategoryNo);
-                put("rowData", rowData);
+                put("rawData", rawData);
             }}));
         }
         return updateArticleCategoryFlag;

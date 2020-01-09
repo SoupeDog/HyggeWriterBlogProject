@@ -22,7 +22,7 @@ public class ArticleJsonProperties {
      */
     private BgmConfig bgmConfig;
 
-    public void setDefaultConfigIfabsent() {
+    public void setDefaultConfigIfAbsent() {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
         this.bgi = propertiesHelper.stringOfNullable(bgi, "https://s1.ax2x.com/2018/10/24/5XWiJq.jpg");
         if (bgmConfig != null) {

@@ -1,5 +1,7 @@
 package org.xavier.blog.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -10,13 +12,16 @@ import org.xavier.blog.dao.AccessRuleMapper;
 import org.xavier.blog.dao.ArticleCategoryMapper;
 import org.xavier.blog.dao.ArticleMapper;
 import org.xavier.blog.dao.GroupRelationshipMapper;
+import org.xavier.blog.domain.bo.ArticleJsonProperties;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.domain.dto.ArticleDTO;
 import org.xavier.blog.domain.po.*;
 import org.xavier.common.enums.ColumnType;
+import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
+import org.xavier.common.util.JsonHelper;
 import org.xavier.common.util.UtilsCreator;
 import org.xavier.common.util.bo.ColumnInfo;
 import org.xavier.webtoolkit.base.DefaultUtils;
@@ -55,8 +60,9 @@ public class ArticleServiceImpl extends DefaultUtils {
     private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
         add(new ColumnInfo("boardNo", "boardNo", ColumnType.STRING, false, 1, 32));
         add(new ColumnInfo("title", "title", ColumnType.STRING, false, 1, 32));
-        add(new ColumnInfo("summary", "summary", ColumnType.STRING, true, 0, 500));
-        add(new ColumnInfo("content", "content", ColumnType.STRING, false, 0, 100000));
+        add(new ColumnInfo("summary", "summary", ColumnType.STRING, false, 1, 500));
+        add(new ColumnInfo("content", "content", ColumnType.STRING, false, 1, 100000));
+        add(new ColumnInfo("properties", "properties", ColumnType.STRING, true, 0, 100000));
     }};
 
     public Boolean saveArticle(Article article, Long currentTs) throws Universal404Exception {
@@ -80,34 +86,50 @@ public class ArticleServiceImpl extends DefaultUtils {
      * 修改文章信息
      *
      * @param articleNo 文章唯一标识
-     * @param rowData   修改原数据
+     * @param rawData   修改原数据
      */
-    public Boolean updateArticle(String operatorUId, String articleNo, Map rowData) throws Universal404Exception, Universal403Exception {
-        Article targetArticle = querySingleArticleByArticleNo(articleNo);
+    public Boolean updateArticle(String operatorUId, String articleNo, Map rawData) throws Universal404Exception, Universal403Exception {
+        Article targetArticle = querySingleArticleByArticleNoNotNull(articleNo);
         User operatorUser = userService.queryUserNotNull(operatorUId);
         userService.checkRight(operatorUser, UserTypeEnum.ROOT, targetArticle.getUid());
-        Long upTs = propertiesHelper.longRangeNotNull(rowData.get("ts"), "[ts] can't be null,and it should be a number.");
-        if (rowData.containsKey("boardNo")) {
-            String boardNo = propertiesHelper.string(rowData.get("boardNo"), 0, 32, "[boardNo] can't be null and its length should be [0,32].");
+        Long upTs = propertiesHelper.longRangeNotNull(rawData.get("ts"), "[ts] can't be null,and it should be a number.");
+        if (rawData.containsKey("boardNo")) {
+            String boardNo = propertiesHelper.string(rawData.get("boardNo"), 0, 32, "[boardNo] can't be null and its length should be [0,32].");
             if (boardNo != null) {
                 boardService.queryBoardByBoardNoNotNull(boardNo);
             } else {
-                rowData.remove("boardNo");
+                rawData.remove("boardNo");
             }
         }
-        if (rowData.containsKey("articleCategoryNo")) {
-            String articleCategoryNo = propertiesHelper.string(rowData.get("articleCategoryNo"), 0, 32, "[articleCategoryNo] can't be null and its length should be [0,32].");
+        if (rawData.containsKey("properties")) {
+            String properties = jsonHelper.format(rawData.get("properties"));
+            if (properties != null) {
+                JsonHelper<ObjectMapper> jsonHelper = UtilsCreator.getDefaultJsonHelperInstance(false);
+                ArticleJsonProperties articleJsonProperties = null;
+                try {
+                    articleJsonProperties = jsonHelper.getDependence().readValue(properties, ArticleJsonProperties.class);
+                } catch (JsonProcessingException e) {
+                    throw new PropertiesRuntimeException("Fail to read [properties]:" + properties);
+                }
+                properties = jsonHelper.format(articleJsonProperties);
+                rawData.put("properties", properties);
+            } else {
+                rawData.remove("properties");
+            }
+        }
+        if (rawData.containsKey("articleCategoryNo")) {
+            String articleCategoryNo = propertiesHelper.string(rawData.get("articleCategoryNo"), 0, 32, "[articleCategoryNo] can't be null and its length should be [0,32].");
             if (articleCategoryNo != null) {
                 articleCategoryService.queryArticleCategoryNoByArticleCategoryNoNotNull(articleCategoryNo);
             } else {
-                rowData.remove("articleCategoryNo");
+                rawData.remove("articleCategoryNo");
             }
         }
-        if (rowData.containsKey("content")) {
-            Integer wordCount = rowData.get("content").toString().trim().length();
-            rowData.put("wordCount", wordCount);
+        if (rawData.containsKey("content")) {
+            Integer wordCount = rawData.get("content").toString().trim().length();
+            rawData.put("wordCount", wordCount);
         }
-        HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
+        HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, checkInfo);
         Integer updateArticleAffectedRow = articleMapper.updateArticleByArticleNo(articleNo, data, upTs);
         Boolean updateArticleFlag = updateArticleAffectedRow == 1;
         if (!updateArticleFlag) {

@@ -117,16 +117,16 @@ public class ArticleCategoryServiceImpl extends DefaultUtils {
      * 根据 类别唯一标识 更新类别
      *
      * @param articleCategoryId 类别唯一表示
-     * @param rowData           更新数据
+     * @param rawData           更新数据
      */
-    public Boolean updateArticleCategory(String operatorUId, String articleCategoryId, Map rowData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
-        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rowData, checkInfo);
+    public Boolean updateArticleCategory(String operatorUId, String articleCategoryId, Map rawData, Long upTs) throws Universal403Exception, Universal404Exception, Universal400Exception {
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, checkInfo);
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }
         ArticleCategory articleCategory = queryArticleCategoryById_WithExistValidate(articleCategoryId);
         userService.checkRight(operatorUId, UserTypeEnum.ROOT, articleCategory.getuId());
-        if (rowData.containsKey("boardId")) {
+        if (rawData.containsKey("boardId")) {
             String boardId = propertiesHelper.string(data.get("boardId"));
             boardService.quarryBoardByBoardId__WithExistValidate(boardId);
         }

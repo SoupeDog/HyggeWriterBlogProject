@@ -64,11 +64,11 @@ public class UserController extends HyggeWriterController {
     }
 
     @PutMapping(value = "/main/user/{uid}")
-    public ResponseEntity<?> updateUser(@RequestHeader HttpHeaders headers, @PathVariable("uid") String uid, @RequestBody Map rowData) {
+    public ResponseEntity<?> updateUser(@RequestHeader HttpHeaders headers, @PathVariable("uid") String uid, @RequestBody Map rawData) {
         try {
             Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
             String loginUid = propertiesHelper.string(headers.getFirst("uid"));
-            if (!userService.updateUser(loginUid, uid, rowData, upTs)) {
+            if (!userService.updateUser(loginUid, uid, rawData, upTs)) {
                 throw new Universal409Exception(ErrorCode.USER_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();
