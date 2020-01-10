@@ -7,6 +7,10 @@
     <groupId>org.xavier.blog</groupId>
     <artifactId>Domain-File</artifactId>
     <version>1.0-SNAPSHOT</version>
-
+    <parent>
+        <groupId>org.xavier.blog</groupId>
+        <artifactId>dependency</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
 </project>
