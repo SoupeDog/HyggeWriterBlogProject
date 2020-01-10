@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>common</module>
+        <module>Common</module>
         <module>Domain-Article</module>
         <module>Domain-File</module>
         <module>Domain-Group</module>
