@@ -11,7 +11,10 @@ import APICaller from "./utils/APICaller.jsx";
 //     currentPage: 1,
 //     pageSize: 10,
 //     successCallback: function (response) {
-//         console.log(response);
+//         alert(1)
+//     },
+//     errorCallback:function (response) {
+//         alert(response)
 //     }
 // });
 

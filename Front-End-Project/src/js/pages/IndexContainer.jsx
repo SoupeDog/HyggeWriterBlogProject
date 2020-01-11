@@ -78,6 +78,9 @@ class IndexContainer extends React.Component {
                         pageSize: this.state.notTechnologyPageSize,
                         successCallback: function (response) {
                             _react.refreshSummary(activeKey, actualCurrentPage, response.data.totalCount, response.data.resultSet);
+                        },
+                        errorCallback:function (response) {
+                            console.log(response);
                         }
                     });
                     break;
@@ -289,81 +292,6 @@ class IndexContainer extends React.Component {
     componentDidMount() {
         let _react = this;
         LogHelper.info({className: "IndexContainer", msg: "componentDidMount----------"});
-        // const listData = [];
-        // for (let i = 0; i < 23; i++) {
-        //     listData.push({
-        //         href: 'http://ant.design',
-        //         title: `ant design part ${i}`,
-        //         avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-        //         description:
-        //             'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-        //         content:
-        //             'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-        //     });
-        // }
-        // this.refreshSummary("1", [
-        //     {
-        //         "articleNo": "b6482323dcd74708a1b06f5e50e43321",
-        //         "boardNo": "b9cc9df574b448b088303f8056198d91",
-        //         "boardName": "非技术",
-        //         "articleCategoryNo": "5635bc7cb8fc4611bb1c4dcaf1e509c0",
-        //         "articleCategoryName": "随笔",
-        //         "parentArticleCategoryList": null,
-        //         "title": "测试标题2",
-        //         "uid": "U00000003",
-        //         "summary": "摘要",
-        //         "wordCount": 2,
-        //         "pageViews": 2,
-        //         "properties": {
-        //             "bgi": "https://s1.ax2x.com/2018/10/24/5XWiJq.jpg",
-        //             "bgmConfig": {
-        //                 "bgmType": null,
-        //                 "src": null
-        //             }
-        //         },
-        //         "state": "ACTIVE",
-        //         "createTs": 1578234180391,
-        //         "lastUpdateTs": 1578234180391
-        //     },
-        //     {
-        //         "articleNo": "b6bc50d6a0114e8c8e98f2922a0b5402",
-        //         "boardNo": "b9cc9df574b448b088303f8056198d91",
-        //         "boardName": "非技术",
-        //         "articleCategoryNo": "99ec540b01914a70a2be3f400bc9197a",
-        //         "articleCategoryName": "Beholder",
-        //         "parentArticleCategoryList": [
-        //             {
-        //                 "articleCategoryNo": "123456",
-        //                 "articleCategoryName": "305那帮缩男"
-        //             }
-        //         ],
-        //         "title": "测试标题改",
-        //         "uid": "U00000003",
-        //         "summary": "摘要改",
-        //         "wordCount": 2,
-        //         "pageViews": 59,
-        //         "properties": {
-        //             "bgi": "123",
-        //             "bgmConfig": {
-        //                 "bgmType": 1,
-        //                 "src": "456"
-        //             }
-        //         },
-        //         "state": "ACTIVE",
-        //         "createTs": 1578234099601,
-        //         "lastUpdateTs": 1578572855006
-        //     }
-        // ]);
-        // WindowsEventHelper.addCallback_Scroll({
-        //     name: "APPBar 透明判定", delta: 50, callbackFunction: function ({currentScrollY}) {
-        //         if (currentScrollY > 270) {
-        //             _react.setState({headerTransparent: false});
-        //         } else {
-        //             _react.setState({headerTransparent: true});
-        //         }
-        //     }
-        // });
-        // WindowsEventHelper.start_OnScroll();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

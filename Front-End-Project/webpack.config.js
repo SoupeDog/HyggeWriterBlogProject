@@ -7,6 +7,7 @@ const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 module.exports = {
     entry: {
         index: "./src/js/index.jsx",
+        browse: "./src/js/browse.jsx",
     },
     output: {
         publicPath: "",
@@ -18,7 +19,7 @@ module.exports = {
         open: true,
         compress: true,
         port: 9000,
-        // host: "192.168.1.105"
+        host: "192.168.1.103"
     },
     module: {
         rules: [
@@ -91,10 +92,22 @@ module.exports = {
         ),
         new HtmlWebpackPlugin({
             filename: "index.html",
-            title: "我的小宅子",
+            title: "主页-我的小宅子",
             favicon: "./src/img/favicon.ico",
             template: "./src/html/template.html",
             chunks: ["index", "commons"],
+            inject: "body",
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: "browse.html",
+            title: "浏览页-我的小宅子",
+            favicon: "./src/img/favicon.ico",
+            template: "./src/html/template.html",
+            chunks: ["browse", "commons"],
             inject: "body",
             minify: {
                 removeComments: true,

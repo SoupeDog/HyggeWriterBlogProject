@@ -6,7 +6,7 @@ import URLHelper from "./URLHelper.jsx";
 export default class APICaller {
     // 获取 headers
     static getCurrentHeaders() {
-        let currentSecretKey = URLHelper.getQueryString("secretKey");
+        let currentSecretKey = URLHelper.getQueryString("secretKey").substring(0,32);
         let currentHeaders = null;
         if (currentSecretKey != null) {
             currentHeaders = {
@@ -15,6 +15,7 @@ export default class APICaller {
         }
         let currentUId = localStorage.getItem("uid");
         let currentToken = localStorage.getItem("token");
+        let currentRefreshKey=localStorage.getItem("refreshKey");;
         if (currentUId == null || currentToken == null || currentRefreshKey == null) {
             localStorage.removeItem('uid');
             localStorage.removeItem('token');
@@ -36,6 +37,19 @@ export default class APICaller {
         HttpHelper.httpGet({
             headers: APICaller.getCurrentHeaders(),
             path: "blog-service/main/article/summary/" + boardNo + "?currentPage=" + currentPage + "&pageSize=" + pageSize,
+            successCallback: function (response) {
+                successCallback(response);
+            },
+            errorCallback: errorCallback,
+            timeOutCallback: timeOutCallback,
+            finallyCallback: finallyCallback
+        });
+    }
+
+    static queryArticle({articleNo, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
+        HttpHelper.httpGet({
+            headers: APICaller.getCurrentHeaders(),
+            path: "blog-service/main/article/" + articleNo,
             successCallback: function (response) {
                 successCallback(response);
             },

@@ -55,7 +55,7 @@ class NotTechnologyBoardView extends React.Component {
                                 ]}
                                 extra={
                                     <img
-                                        width={300}
+                                        width={220}
                                         alt="logo"
                                         src={summaryItem.properties.bgi}
                                     />
