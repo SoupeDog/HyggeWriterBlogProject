@@ -11,6 +11,8 @@ import URLHelper from "../utils/URLHelper.jsx";
 import IconText from "../component/IconText.jsx";
 import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
 import APICaller from "../utils/APICaller.jsx";
+import NotTechnologyBoardView from "../component/NotTechnologyBoardView.jsx";
+import TechnologyBoardView from "../component/TechnologyBoardView.jsx";
 
 const {Header, Sider, Content, Footer} = Layout;
 const {TabPane} = Tabs;
@@ -32,9 +34,12 @@ class IndexContainer extends React.Component {
         this.state = {
             headerTransparent: false,
             mainMenuCollapsed: true,
-            currentPage: 1,
-            pageSize: 2,
-            totalCount: 0,
+            technologyCurrentPage: 1,
+            technologyPageSize: 2,
+            technologyTotalCount: 0,
+            notTechnologyCurrentPage: 1,
+            notTechnologyPageSize: 2,
+            notTechnologyTotalCount: 0,
             technologySummaryList: [],
             notTechnologySummaryList: []
         };
@@ -49,28 +54,30 @@ class IndexContainer extends React.Component {
 
         // 标签页变更
         this.onTabChange = function ({activeKey, currentPage}) {
-           let actualCurrentPage= currentPage == null ? this.state.currentPage : currentPage;
+            let actualCurrentPage;
             let _react = this;
             switch (activeKey) {
                 case "1":
-                    alert("技术板块" + this.props.technologyBoardNo);
+                    // alert("技术板块" + this.props.technologyBoardNo);
+                    actualCurrentPage = currentPage == null ? this.state.technologyCurrentPage : currentPage;
                     APICaller.querySummaryByPage({
                         boardNo: this.props.technologyBoardNo,
                         currentPage: actualCurrentPage,
-                        pageSize: this.state.pageSize,
+                        pageSize: this.state.technologyPageSize,
                         successCallback: function (response) {
-                            _react.refreshSummary(activeKey, response.data.totalCount, response.data.resultSet);
+                            _react.refreshSummary(activeKey, actualCurrentPage, response.data.totalCount, response.data.resultSet);
                         }
                     });
                     break;
                 case "2":
-                    alert("非技术板块" + this.props.notTechnologyBoardNo);
+                    // alert("非技术板块" + this.props.notTechnologyBoardNo);
+                    actualCurrentPage = currentPage == null ? this.state.notTechnologyCurrentPage : currentPage;
                     APICaller.querySummaryByPage({
                         boardNo: this.props.notTechnologyBoardNo,
                         currentPage: actualCurrentPage,
-                        pageSize: this.state.pageSize,
+                        pageSize: this.state.notTechnologyPageSize,
                         successCallback: function (response) {
-                            _react.refreshSummary(activeKey, response.data.totalCount, response.data.resultSet);
+                            _react.refreshSummary(activeKey, actualCurrentPage, response.data.totalCount, response.data.resultSet);
                         }
                     });
                     break;
@@ -81,26 +88,33 @@ class IndexContainer extends React.Component {
             }
         }.bind(this);
 
-        this.refreshSummary = function (activeKey, totalCount, summaryList) {
+        this.refreshSummary = function (activeKey, actualCurrentPage, totalCount, summaryList) {
             let finalSummaryList;
             if (summaryList == null) {
                 finalSummaryList = new Array(0);
             } else {
                 finalSummaryList = summaryList;
             }
+            console.log({
+                activeKey: activeKey,
+                actualCurrentPage: actualCurrentPage,
+                totalCount: totalCount,
+                summaryList: summaryList
+            })
             switch (activeKey) {
                 case "1":
                     this.setState({
-                        totalCount: totalCount,
+                        technologyCurrentPage: actualCurrentPage,
+                        technologyTotalCount: totalCount,
                         technologySummaryList: finalSummaryList
                     });
                     break;
                 case "2":
                     this.setState({
-                        totalCount: totalCount,
+                        notTechnologyCurrentPage: actualCurrentPage,
+                        notTechnologyTotalCount: totalCount,
                         notTechnologySummaryList: finalSummaryList
                     });
-                    console.log(finalSummaryList)
                     break;
                 case "3":
                     break
@@ -210,47 +224,11 @@ class IndexContainer extends React.Component {
                                 }
                                 key="1"
                             >
-                                <List
-                                    itemLayout="vertical"
-                                    size="large"
-                                    pagination={{
-                                        onChange: page => {
-                                            this.setState({
-                                                currentPage: page
-                                            });
-                                        },
-                                        current: this.state.currentPage,
-                                        pageSize: this.state.pageSize,
-                                        total: this.state.totalCount
-                                    }}
-                                    dataSource={this.state.technologySummaryList}
-                                    renderItem={summaryItem => (
-                                        <List.Item
-                                            key={summaryItem.articleNo}
-                                            actions={[
-                                                <IconText type="&#xe640;" tip={"浏览量"} text={summaryItem.pageViews}
-                                                          key="view"/>,
-                                                <IconText type="&#xe61b;" tip={"字数统计"} text={summaryItem.wordCount}
-                                                          key="wordCount"/>,
-                                                <IconText type="&#xe638;" tip={"创建时间"} text={summaryItem.createTs}
-                                                          key="createTs" isTimeStamp={true}/>,
-                                            ]}
-                                            extra={
-                                                <img
-                                                    width={300}
-                                                    alt="logo"
-                                                    src={summaryItem.properties.bgi}
-                                                />
-                                            }
-                                        >
-                                            <List.Item.Meta
-                                                title={<a href={summaryItem.articleCategoryNo}>{summaryItem.title}</a>}
-                                                description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
-                                            />
-                                            {summaryItem.summary}
-                                        </List.Item>
-                                    )}
-                                />
+                                <TechnologyBoardView technologySummaryList={this.state.technologySummaryList}
+                                                     technologyCurrentPage={this.state.technologyCurrentPage}
+                                                     technologyPageSize={this.state.technologyPageSize}
+                                                     technologyTotalCount={this.state.technologyTotalCount}
+                                                     onTabChange={this.onTabChange}/>
                             </TabPane>
                             <TabPane
                                 tab={
@@ -260,48 +238,11 @@ class IndexContainer extends React.Component {
                                 }
                                 key="2"
                             >
-                                <List
-                                    itemLayout="vertical"
-                                    size="large"
-                                    pagination={{
-                                        onChange: page => {
-                                            this.setState({
-                                                currentPage: page
-                                            });
-                                            this.onTabChange({activeKey: "2", currentPage: page});
-                                        },
-                                        current: this.state.currentPage,
-                                        pageSize: this.state.pageSize,
-                                        total: this.state.totalCount
-                                    }}
-                                    dataSource={this.state.notTechnologySummaryList}
-                                    renderItem={summaryItem => (
-                                        <List.Item
-                                            key={summaryItem.articleNo}
-                                            actions={summaryItem == null ? [] : [
-                                                <IconText type="&#xe640;" tip={"浏览量"} text={summaryItem.pageViews}
-                                                          key="view"/>,
-                                                <IconText type="&#xe61b;" tip={"字数统计"} text={summaryItem.wordCount}
-                                                          key="wordCount"/>,
-                                                <IconText type="&#xe638;" tip={"创建时间"} text={summaryItem.createTs}
-                                                          key="createTs" isTimeStamp={true}/>,
-                                            ]}
-                                            extra={
-                                                <img
-                                                    width={300}
-                                                    alt="logo"
-                                                    src={summaryItem.properties.bgi}
-                                                />
-                                            }
-                                        >
-                                            <List.Item.Meta
-                                                title={<a href={summaryItem.articleCategoryNo}>{summaryItem.title}</a>}
-                                                description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
-                                            />
-                                            {summaryItem.summary}
-                                        </List.Item>
-                                    )}
-                                />
+                                <NotTechnologyBoardView notTechnologySummaryList={this.state.notTechnologySummaryList}
+                                                        notTechnologyCurrentPage={this.state.notTechnologyCurrentPage}
+                                                        notTechnologyPageSize={this.state.notTechnologyPageSize}
+                                                        notTechnologyTotalCount={this.state.notTechnologyTotalCount}
+                                                        onTabChange={this.onTabChange}/>
                             </TabPane>
                             <TabPane
                                 tab={

@@ -23,16 +23,19 @@ class IconText extends React.Component {
 
     render() {
         if (this.state.hasError) {
-            return <h1>Something went wrong.</h1>;
-        } else {
-            console.log(this.props);
             return (
-                <Tooltip title={this.props.tip}>
+                <h1>Something went wrong.</h1>
+            );
+        } else {
+            return (
+                <div>
+                    <Tooltip title={this.props.tip}>
                     <span>
                         <i className="iconfont" style={{marginRight: 8}}>{this.props.type}</i>
                         {this.props.isTimeStamp ? TimeHelper.formatTimeStampToString({target: this.props.text}) : this.props.text}
                     </span>
-                </Tooltip>
+                    </Tooltip>
+                </div>
             );
         }
     }
