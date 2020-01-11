@@ -1,7 +1,12 @@
 export default class URLHelper {
     // url 默认前缀
-    static getPrefix() {
+    static getJumpPrefix() {
         return "http://localhost:9000/";
+    }
+
+    // url 默认前缀
+    static getStaticPrefix() {
+        return "https://www.xavierwang.cn/images/";
     }
 
     static getQueryString(key) {

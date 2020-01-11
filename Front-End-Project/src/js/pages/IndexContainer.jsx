@@ -6,9 +6,11 @@ import '../../css/index.less';
 
 import csdnLogo from '../../img/csdnLogo.png';
 
-import {Layout, Menu, Icon, Avatar, BackTop, Tabs, Empty, message, notification} from 'antd';
+import {Avatar, BackTop, Empty, Icon, Layout, List, Menu, message, notification, Tabs} from 'antd';
 import URLHelper from "../utils/URLHelper.jsx";
-import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
+import IconText from "../component/IconText.jsx";
+import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
+import APICaller from "../utils/APICaller.jsx";
 
 const {Header, Sider, Content, Footer} = Layout;
 const {TabPane} = Tabs;
@@ -29,15 +31,84 @@ class IndexContainer extends React.Component {
         super(props);
         this.state = {
             headerTransparent: false,
-            mainMenuCollapsed: true
+            mainMenuCollapsed: true,
+            currentPage: 1,
+            pageSize: 2,
+            totalCount: 0,
+            technologySummaryList: [],
+            notTechnologySummaryList: []
         };
         LogHelper.info({className: "IndexContainer", msg: "constructor----------"});
 
+        // 左侧菜单缩进
         this.mainMenuToggle = function () {
             this.setState({
                 mainMenuCollapsed: !this.state.mainMenuCollapsed
             });
         }.bind(this);
+
+        // 标签页变更
+        this.onTabChange = function ({activeKey, currentPage}) {
+           let actualCurrentPage= currentPage == null ? this.state.currentPage : currentPage;
+            let _react = this;
+            switch (activeKey) {
+                case "1":
+                    alert("技术板块" + this.props.technologyBoardNo);
+                    APICaller.querySummaryByPage({
+                        boardNo: this.props.technologyBoardNo,
+                        currentPage: actualCurrentPage,
+                        pageSize: this.state.pageSize,
+                        successCallback: function (response) {
+                            _react.refreshSummary(activeKey, response.data.totalCount, response.data.resultSet);
+                        }
+                    });
+                    break;
+                case "2":
+                    alert("非技术板块" + this.props.notTechnologyBoardNo);
+                    APICaller.querySummaryByPage({
+                        boardNo: this.props.notTechnologyBoardNo,
+                        currentPage: actualCurrentPage,
+                        pageSize: this.state.pageSize,
+                        successCallback: function (response) {
+                            _react.refreshSummary(activeKey, response.data.totalCount, response.data.resultSet);
+                        }
+                    });
+                    break;
+                case "3":
+                    break
+                default:
+                    console.log("非预期的 Tabs [activeKey]");
+            }
+        }.bind(this);
+
+        this.refreshSummary = function (activeKey, totalCount, summaryList) {
+            let finalSummaryList;
+            if (summaryList == null) {
+                finalSummaryList = new Array(0);
+            } else {
+                finalSummaryList = summaryList;
+            }
+            switch (activeKey) {
+                case "1":
+                    this.setState({
+                        totalCount: totalCount,
+                        technologySummaryList: finalSummaryList
+                    });
+                    break;
+                case "2":
+                    this.setState({
+                        totalCount: totalCount,
+                        notTechnologySummaryList: finalSummaryList
+                    });
+                    console.log(finalSummaryList)
+                    break;
+                case "3":
+                    break
+                default:
+                    console.log("非预期的 Tabs [activeKey]");
+            }
+        }.bind(this);
+
     }
 
     static getDerivedStateFromProps(nextProps, nextContext) {
@@ -128,7 +199,9 @@ class IndexContainer extends React.Component {
                         "myContentCollapsed": this.state.mainMenuCollapsed,
                         "myContent": !this.state.mainMenuCollapsed
                     })}>
-                        <Tabs defaultActiveKey="2">
+                        <Tabs defaultActiveKey="1" onChange={(activeKey) => {
+                            this.onTabChange({activeKey: activeKey});
+                        }}>
                             <TabPane
                                 tab={
                                     <span>
@@ -137,17 +210,98 @@ class IndexContainer extends React.Component {
                                 }
                                 key="1"
                             >
-                                Tab 1
+                                <List
+                                    itemLayout="vertical"
+                                    size="large"
+                                    pagination={{
+                                        onChange: page => {
+                                            this.setState({
+                                                currentPage: page
+                                            });
+                                        },
+                                        current: this.state.currentPage,
+                                        pageSize: this.state.pageSize,
+                                        total: this.state.totalCount
+                                    }}
+                                    dataSource={this.state.technologySummaryList}
+                                    renderItem={summaryItem => (
+                                        <List.Item
+                                            key={summaryItem.articleNo}
+                                            actions={[
+                                                <IconText type="&#xe640;" tip={"浏览量"} text={summaryItem.pageViews}
+                                                          key="view"/>,
+                                                <IconText type="&#xe61b;" tip={"字数统计"} text={summaryItem.wordCount}
+                                                          key="wordCount"/>,
+                                                <IconText type="&#xe638;" tip={"创建时间"} text={summaryItem.createTs}
+                                                          key="createTs" isTimeStamp={true}/>,
+                                            ]}
+                                            extra={
+                                                <img
+                                                    width={300}
+                                                    alt="logo"
+                                                    src={summaryItem.properties.bgi}
+                                                />
+                                            }
+                                        >
+                                            <List.Item.Meta
+                                                title={<a href={summaryItem.articleCategoryNo}>{summaryItem.title}</a>}
+                                                description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
+                                            />
+                                            {summaryItem.summary}
+                                        </List.Item>
+                                    )}
+                                />
                             </TabPane>
                             <TabPane
                                 tab={
                                     <span>
-                                      杂谈
+                                      非技术
                                     </span>
                                 }
                                 key="2"
                             >
-                                Tab 2
+                                <List
+                                    itemLayout="vertical"
+                                    size="large"
+                                    pagination={{
+                                        onChange: page => {
+                                            this.setState({
+                                                currentPage: page
+                                            });
+                                            this.onTabChange({activeKey: "2", currentPage: page});
+                                        },
+                                        current: this.state.currentPage,
+                                        pageSize: this.state.pageSize,
+                                        total: this.state.totalCount
+                                    }}
+                                    dataSource={this.state.notTechnologySummaryList}
+                                    renderItem={summaryItem => (
+                                        <List.Item
+                                            key={summaryItem.articleNo}
+                                            actions={summaryItem == null ? [] : [
+                                                <IconText type="&#xe640;" tip={"浏览量"} text={summaryItem.pageViews}
+                                                          key="view"/>,
+                                                <IconText type="&#xe61b;" tip={"字数统计"} text={summaryItem.wordCount}
+                                                          key="wordCount"/>,
+                                                <IconText type="&#xe638;" tip={"创建时间"} text={summaryItem.createTs}
+                                                          key="createTs" isTimeStamp={true}/>,
+                                            ]}
+                                            extra={
+                                                <img
+                                                    width={300}
+                                                    alt="logo"
+                                                    src={summaryItem.properties.bgi}
+                                                />
+                                            }
+                                        >
+                                            <List.Item.Meta
+                                                title={<a href={summaryItem.articleCategoryNo}>{summaryItem.title}</a>}
+                                                description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
+                                            />
+                                            {summaryItem.summary}
+                                        </List.Item>
+                                    )}
+                                />
                             </TabPane>
                             <TabPane
                                 tab={
@@ -164,8 +318,9 @@ class IndexContainer extends React.Component {
                     <Footer className={clsx('myFooter')}>
                         <div>
                             <div>
-                                <span>©2019 Xavier </span><span>Power by</span> <a className="dependentLink" target="_blank"
-                                                         href="https://react.docschina.org">React</a>
+                                <span>©2019 Xavier </span><span>Power by</span> <a className="dependentLink"
+                                                                                   target="_blank"
+                                                                                   href="https://react.docschina.org">React</a>
                                 <span>&nbsp;&amp;&nbsp;</span> <a className="dependentLink" target="_blank"
                                                                   href="https://ant.design/index-cn">Ant Design</a>
                             </div>
@@ -193,6 +348,71 @@ class IndexContainer extends React.Component {
     componentDidMount() {
         let _react = this;
         LogHelper.info({className: "IndexContainer", msg: "componentDidMount----------"});
+        // const listData = [];
+        // for (let i = 0; i < 23; i++) {
+        //     listData.push({
+        //         href: 'http://ant.design',
+        //         title: `ant design part ${i}`,
+        //         avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+        //         description:
+        //             'Ant Design, a design language for background applications, is refined by Ant UED Team.',
+        //         content:
+        //             'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
+        //     });
+        // }
+        // this.refreshSummary("1", [
+        //     {
+        //         "articleNo": "b6482323dcd74708a1b06f5e50e43321",
+        //         "boardNo": "b9cc9df574b448b088303f8056198d91",
+        //         "boardName": "非技术",
+        //         "articleCategoryNo": "5635bc7cb8fc4611bb1c4dcaf1e509c0",
+        //         "articleCategoryName": "随笔",
+        //         "parentArticleCategoryList": null,
+        //         "title": "测试标题2",
+        //         "uid": "U00000003",
+        //         "summary": "摘要",
+        //         "wordCount": 2,
+        //         "pageViews": 2,
+        //         "properties": {
+        //             "bgi": "https://s1.ax2x.com/2018/10/24/5XWiJq.jpg",
+        //             "bgmConfig": {
+        //                 "bgmType": null,
+        //                 "src": null
+        //             }
+        //         },
+        //         "state": "ACTIVE",
+        //         "createTs": 1578234180391,
+        //         "lastUpdateTs": 1578234180391
+        //     },
+        //     {
+        //         "articleNo": "b6bc50d6a0114e8c8e98f2922a0b5402",
+        //         "boardNo": "b9cc9df574b448b088303f8056198d91",
+        //         "boardName": "非技术",
+        //         "articleCategoryNo": "99ec540b01914a70a2be3f400bc9197a",
+        //         "articleCategoryName": "Beholder",
+        //         "parentArticleCategoryList": [
+        //             {
+        //                 "articleCategoryNo": "123456",
+        //                 "articleCategoryName": "305那帮缩男"
+        //             }
+        //         ],
+        //         "title": "测试标题改",
+        //         "uid": "U00000003",
+        //         "summary": "摘要改",
+        //         "wordCount": 2,
+        //         "pageViews": 59,
+        //         "properties": {
+        //             "bgi": "123",
+        //             "bgmConfig": {
+        //                 "bgmType": 1,
+        //                 "src": "456"
+        //             }
+        //         },
+        //         "state": "ACTIVE",
+        //         "createTs": 1578234099601,
+        //         "lastUpdateTs": 1578572855006
+        //     }
+        // ]);
         // WindowsEventHelper.addCallback_Scroll({
         //     name: "APPBar 透明判定", delta: 50, callbackFunction: function ({currentScrollY}) {
         //         if (currentScrollY > 270) {
