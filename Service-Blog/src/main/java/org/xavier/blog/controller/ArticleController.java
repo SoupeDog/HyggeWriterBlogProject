@@ -8,10 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
+import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.domain.dto.ArticleDTO;
 import org.xavier.blog.domain.po.Article;
+import org.xavier.blog.domain.po.User;
 import org.xavier.blog.service.ArticleServiceImpl;
+import org.xavier.blog.service.UserServiceImpl;
 import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;
@@ -33,11 +36,15 @@ import java.util.Map;
 public class ArticleController extends HyggeWriterController {
     @Autowired
     ArticleServiceImpl articleService;
+    @Autowired
+    UserServiceImpl userService;
 
     @PostMapping(value = "/main/article")
     public ResponseEntity<?> saveArticle(@RequestHeader HttpHeaders headers, @RequestBody Article article) {
         String loginUid = propertiesHelper.string(headers.getFirst("uid"));
         try {
+            User loginUser = userService.queryUserNotNull(loginUid);
+            userService.checkRight(loginUser, UserTypeEnum.ROOT);
             article.setUid(loginUid);
             Long serviceTs = System.currentTimeMillis();
             articleService.saveArticle(article, serviceTs);
@@ -46,6 +53,8 @@ public class ArticleController extends HyggeWriterController {
             return fail(HttpStatus.CONFLICT, ErrorCode.ARTICLE_EXISTS.getErrorCod(), "Article(" + article.getTitle() + ") dose exist.");
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        } catch (Universal403Exception e) {
+            return fail(HttpStatus.FORBIDDEN, e.getStateCode(), e.getMessage());
         } catch (Universal404Exception e) {
             return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
         }
