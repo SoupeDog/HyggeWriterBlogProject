@@ -8,6 +8,8 @@ module.exports = {
     entry: {
         index: "./src/js/index.jsx",
         browse: "./src/js/browse.jsx",
+        editor: "./src/js/editor.jsx",
+        login: "./src/js/login.jsx",
     },
     output: {
         publicPath: "",
@@ -108,6 +110,30 @@ module.exports = {
             favicon: "./src/img/favicon.ico",
             template: "./src/html/template.html",
             chunks: ["browse", "commons"],
+            inject: "body",
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: "editor.html",
+            title: "编辑页-我的小宅子",
+            favicon: "./src/img/favicon.ico",
+            template: "./src/html/template.html",
+            chunks: ["editor", "commons"],
+            inject: "body",
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: "login.html",
+            title: "登录页-我的小宅子",
+            favicon: "./src/img/favicon.ico",
+            template: "./src/html/template.html",
+            chunks: ["login", "commons"],
             inject: "body",
             minify: {
                 removeComments: true,
