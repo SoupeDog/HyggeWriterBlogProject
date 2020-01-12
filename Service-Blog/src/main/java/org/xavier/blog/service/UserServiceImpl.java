@@ -77,7 +77,7 @@ public class UserServiceImpl extends DefaultUtils {
     public Boolean removeUserByUidLogicallyMultiple(String loginUid, List<String> uidList, Long upTs) throws Universal403Exception, Universal404Exception {
         User loginUser = queryUserNotNull(loginUid);
         checkRight(loginUser, UserTypeEnum.ROOT);
-        ArrayList<String> uIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uidList, "[uidList] for remove can't be empty.", String.class, String.class, (uId) -> uId.trim());
+        ArrayList<String> uIdListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uidList, "[uidList] for remove can't be empty.", String.class, String.class, (uid) -> uid.trim());
         if (uIdListForQuery.size() < 1) {
             throw new PropertiesRuntimeException("[uidList] can't be empty.");
         }
@@ -135,7 +135,7 @@ public class UserServiceImpl extends DefaultUtils {
      * 根据 uId 批量查询用户
      */
     public ArrayList<User> queryUserListByUid(List<String> uidList,String loginUid) throws Universal404Exception, Universal403Exception {
-        ArrayList<String> uidListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uidList, "[uidList] for query can't be empty.", String.class, String.class, (uId) -> uId.trim());
+        ArrayList<String> uidListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, uidList, "[uidList] for query can't be empty.", String.class, String.class, (uid) -> uid.trim());
         User loginUser = queryUserNotNull(loginUid);
         checkRight(loginUser, UserTypeEnum.ROOT);
         if (uidListForQuery.size() < 1) {

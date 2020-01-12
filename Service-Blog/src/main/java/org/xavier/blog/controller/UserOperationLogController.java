@@ -35,7 +35,7 @@ public class UserOperationLogController extends HyggeWriterController {
     public ResponseEntity<?> addUserOperationLog(@RequestHeader HttpHeaders headers, @RequestBody UserOperationLog userOperationLog) {
         try {
             userOperationLog.validate();
-            String operatorUId = headers.getFirst("uId");
+            String operatorUId = headers.getFirst("uid");
             if (!userOperationLogService.saveUserOperationLog(operatorUId, userOperationLog)) {
                 throw new Universal409Exception("Fall to save UserOperationLog:" + jsonHelper.format(userOperationLogService));
             }
@@ -58,7 +58,7 @@ public class UserOperationLogController extends HyggeWriterController {
                                                            @RequestParam(value = "orderKey", required = false, defaultValue = "ts") String orderKey,
                                                            @RequestParam(value = "isDESC", required = false, defaultValue = "true") Boolean isDESC) {
         try {
-            String operatorUId = headers.getFirst("uId");
+            String operatorUId = headers.getFirst("uid");
             PageResult<UserOperationLog> result = userOperationLogService.quarryUserOperationLogByUidList(operatorUId, uIdList, currentPage, pageSize, orderKey, isDESC);
             return success(result);
         } catch (PropertiesRuntimeException e) {

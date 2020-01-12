@@ -59,6 +59,7 @@ public class ArticleServiceImpl extends DefaultUtils {
 
     private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
         add(new ColumnInfo("boardNo", "boardNo", ColumnType.STRING, false, 1, 32));
+        add(new ColumnInfo("articleCategoryNo", "articleCategoryNo", ColumnType.STRING, false, 1, 32));
         add(new ColumnInfo("title", "title", ColumnType.STRING, false, 1, 32));
         add(new ColumnInfo("summary", "summary", ColumnType.STRING, false, 1, 500));
         add(new ColumnInfo("content", "content", ColumnType.STRING, false, 1, 100000));
