@@ -54,7 +54,7 @@ class LoginContainer extends React.Component {
                             <a target="_blank"
                                href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
                                className="textItem policeLink">
-                                <img src="https://www.xavierwang.cn/images/icon-police.png"/>
+                                <img src="https://www.xavierwang.cn/static/icon-police.png"/>
                                 <span>&nbsp;津公网安备12010402000667号</span>
                             </a>
                         </div>

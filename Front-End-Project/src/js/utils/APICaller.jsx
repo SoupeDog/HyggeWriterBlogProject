@@ -184,7 +184,7 @@ export default class APICaller {
         }
         let propertiesConfig = {};
         if (bgi != null) {
-            propertiesConfig.bgi = bgi;
+            propertiesConfig.bgi = URLHelper.getStaticPrefix() + bgi;
         }
         let bgmConfig = {};
 

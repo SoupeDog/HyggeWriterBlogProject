@@ -159,7 +159,7 @@ class IndexContainer extends React.Component {
                         <Menu.Item key="1">
                             <i className="anticon anticon-link">
                                 <Avatar size={14}
-                                        src="https://www.xavierwang.cn/images/47454e58e7f249c3968524d25a6c9c7a_M.png"/>
+                                        src="https://www.xavierwang.cn/static/我的头像.png"/>
                             </i>
                             <span>Xavier</span>
                         </Menu.Item>
@@ -280,7 +280,7 @@ class IndexContainer extends React.Component {
                             <a target="_blank"
                                href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
                                className="textItem policeLink">
-                                <img src="https://www.xavierwang.cn/images/icon-police.png"/>
+                                <img src="https://www.xavierwang.cn/static/icon-police.png"/>
                                 <span>&nbsp;津公网安备12010402000667号</span>
                             </a>
                         </div>
