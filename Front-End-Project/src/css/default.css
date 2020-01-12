@@ -1,12 +1,12 @@
 @charset "utf-8";
 @font-face {
     font-family: 'iconfont';  /* project id 1608423 */
-    src: url('//at.alicdn.com/t/font_1608423_xrudlhr3ohf.eot');
-    src: url('//at.alicdn.com/t/font_1608423_xrudlhr3ohf.eot?#iefix') format('embedded-opentype'),
-    url('//at.alicdn.com/t/font_1608423_xrudlhr3ohf.woff2') format('woff2'),
-    url('//at.alicdn.com/t/font_1608423_xrudlhr3ohf.woff') format('woff'),
-    url('//at.alicdn.com/t/font_1608423_xrudlhr3ohf.ttf') format('truetype'),
-    url('//at.alicdn.com/t/font_1608423_xrudlhr3ohf.svg#iconfont') format('svg');
+    src: url('//at.alicdn.com/t/font_1608423_dc0dwisgza6.eot');
+    src: url('//at.alicdn.com/t/font_1608423_dc0dwisgza6.eot?#iefix') format('embedded-opentype'),
+    url('//at.alicdn.com/t/font_1608423_dc0dwisgza6.woff2') format('woff2'),
+    url('//at.alicdn.com/t/font_1608423_dc0dwisgza6.woff') format('woff'),
+    url('//at.alicdn.com/t/font_1608423_dc0dwisgza6.ttf') format('truetype'),
+    url('//at.alicdn.com/t/font_1608423_dc0dwisgza6.svg#iconfont') format('svg');
 }
 
 .iconfont{
@@ -42,38 +42,38 @@ address, caption, cite, code, dfn, p, em, i, th, var {
     font-weight: normal
 }
 
-body::-webkit-scrollbar {
-    height: 10px;
-    width: 7px;
-    background: rgba(0, 0, 0, 0.1);
-}
+/*body::-webkit-scrollbar {*/
+    /*height: 10px;*/
+    /*width: 7px;*/
+    /*background: rgba(0, 0, 0, 0.1);*/
+/*}*/
 
-body::-webkit-scrollbar:hover {
-    background: rgba(0, 0, 0, 0.2);
-}
+/*body::-webkit-scrollbar:hover {*/
+    /*background: rgba(0, 0, 0, 0.2);*/
+/*}*/
 
-body::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    -ms-border-radius: 6px;
-    -o-border-radius: 6px;
-    border-radius: 6px;
-}
+/*body::-webkit-scrollbar-thumb {*/
+    /*background: rgba(0, 0, 0, 0.3);*/
+    /*-webkit-border-radius: 6px;*/
+    /*-moz-border-radius: 6px;*/
+    /*-ms-border-radius: 6px;*/
+    /*-o-border-radius: 6px;*/
+    /*border-radius: 6px;*/
+/*}*/
 
-body::-webkit-scrollbar-thumb:hover {
-    -webkit-box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);
-    /* Webkit browsers */
-    -moz-box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);
-    /* Firefox */
-    -ms-box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);
-    /* IE9 */
-    -o-box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);
-    /* Opera(Old) */
-    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);
-    /* IE9+, News */
-    background-color: rgba(0, 0, 0, 0.4);
-}
+/*body::-webkit-scrollbar-thumb:hover {*/
+    /*-webkit-box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);*/
+    /*!* Webkit browsers *!*/
+    /*-moz-box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);*/
+    /*!* Firefox *!*/
+    /*-ms-box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);*/
+    /*!* IE9 *!*/
+    /*-o-box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);*/
+    /*!* Opera(Old) *!*/
+    /*box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.25);*/
+    /*!* IE9+, News *!*/
+    /*background-color: rgba(0, 0, 0, 0.4);*/
+/*}*/
 
 
 .pointer {
@@ -139,4 +139,13 @@ body .backgroundTransparent {
 
 .b_r:hover {
     color: #F35C8F
+}
+
+.myFooter{
+    text-align: center;
+    line-height: 20px;
+}
+
+.policeLink{
+    margin-right: 10px;
 }

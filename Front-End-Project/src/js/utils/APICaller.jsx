@@ -6,7 +6,10 @@ import URLHelper from "./URLHelper.jsx";
 export default class APICaller {
     // 获取 headers
     static getCurrentHeaders() {
-        let currentSecretKey = URLHelper.getQueryString("secretKey").substring(0,32);
+        let currentSecretKey = URLHelper.getQueryString("secretKey");
+        if (currentSecretKey != null) {
+            currentSecretKey = currentSecretKey.substring(0, 32);
+        }
         let currentHeaders = null;
         if (currentSecretKey != null) {
             currentHeaders = {
@@ -15,7 +18,8 @@ export default class APICaller {
         }
         let currentUId = localStorage.getItem("uid");
         let currentToken = localStorage.getItem("token");
-        let currentRefreshKey=localStorage.getItem("refreshKey");;
+        let currentRefreshKey = localStorage.getItem("refreshKey");
+        ;
         if (currentUId == null || currentToken == null || currentRefreshKey == null) {
             localStorage.removeItem('uid');
             localStorage.removeItem('token');

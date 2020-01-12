@@ -44,10 +44,10 @@ class TechnologyBoardView extends React.Component {
                         <List.Item
                             key={summaryItem.articleNo}
                             actions={[
-                                <IconText type="&#xe640;" tip={"浏览量"} text={summaryItem.pageViews}
-                                          key="view"/>,
                                 <IconText type="&#xe61b;" tip={"字数统计"} text={summaryItem.wordCount}
                                           key="wordCount"/>,
+                                <IconText type="&#xe640;" tip={"浏览量"} text={summaryItem.pageViews}
+                                          key="view"/>,
                                 <IconText type="&#xe638;" tip={"创建时间"} text={summaryItem.createTs}
                                           key="createTs" isTimeStamp={true}/>,
                             ]}

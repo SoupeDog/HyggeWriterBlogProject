@@ -3,6 +3,7 @@ import LogHelper from "../utils/LogHelper.jsx";
 import {List} from "antd";
 import IconText from "./IconText.jsx";
 import ArticleCategoryBreadcrumb from "./ArticleCategoryBreadcrumb.jsx";
+import URLHelper from "../utils/URLHelper.jsx";
 
 class NotTechnologyBoardView extends React.Component {
 
@@ -11,6 +12,15 @@ class NotTechnologyBoardView extends React.Component {
         this.state = {
             hasError: false
         };
+        this.getBrowseURL = function (articleNo) {
+            let finalURL = URLHelper.getJumpPrefix() + "browse.html?articleNo=" + articleNo;
+            let currentSecretKey = URLHelper.getQueryString("secretKey");
+            if (currentSecretKey != null) {
+                currentSecretKey = currentSecretKey.substring(0, 32);
+                finalURL = finalURL + "&secretKey=" + currentSecretKey;
+            }
+            return finalURL;
+        }.bind(this);
         LogHelper.info({className: "NotTechnologyBoardView", msg: "constructor----------"});
     }
 
@@ -29,47 +39,48 @@ class NotTechnologyBoardView extends React.Component {
             );
         } else {
             return (
-                    <List
-                        itemLayout="vertical"
-                        size="large"
-                        pagination={{
-                            onChange: page => {
-                                this.props.onTabChange({activeKey: "2", currentPage: page});
-                            },
-                            current: this.props.notTechnologyCurrentPage,
-                            pageSize: this.props.notTechnologyPageSize,
-                            total: this.props.notTechnologyTotalCount
-                        }}
-                        dataSource={this.props.notTechnologySummaryList}
-                        // 这个组件有此处 bug
-                        renderItem={summaryItem => (
-                            <List.Item
-                                key={summaryItem.articleNo}
-                                actions={[
-                                    <IconText type="&#xe640;" tip={"浏览量"} text={summaryItem.pageViews}
-                                              key="view"/>,
-                                    <IconText type="&#xe61b;" tip={"字数统计"} text={summaryItem.wordCount}
-                                              key="wordCount"/>,
-                                    <IconText type="&#xe638;" tip={"创建时间"} text={summaryItem.createTs}
-                                              key="createTs" isTimeStamp={true}/>,
-                                ]}
-                                extra={
-                                    <img
-                                        width={220}
-                                        alt="logo"
-                                        src={summaryItem.properties.bgi}
-                                    />
-                                }
-                            >
-                                <List.Item.Meta
-                                    title={<a href={summaryItem.articleCategoryNo}>{summaryItem.title}</a>}
-                                    // 这个组件有此处 bug
-                                    description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
+                <List
+                    itemLayout="vertical"
+                    size="large"
+                    pagination={{
+                        onChange: page => {
+                            this.props.onTabChange({activeKey: "2", currentPage: page});
+                        },
+                        current: this.props.notTechnologyCurrentPage,
+                        pageSize: this.props.notTechnologyPageSize,
+                        total: this.props.notTechnologyTotalCount
+                    }}
+                    dataSource={this.props.notTechnologySummaryList}
+                    // 这个组件有此处 bug
+                    renderItem={summaryItem => (
+                        <List.Item
+                            key={summaryItem.articleNo}
+                            actions={[
+                                <IconText type="&#xe61b;" tip={"字数统计"} text={summaryItem.wordCount}
+                                          key="wordCount"/>,
+                                <IconText type="&#xe640;" tip={"浏览量"} text={summaryItem.pageViews}
+                                          key="view"/>,
+                                <IconText type="&#xe638;" tip={"创建时间"} text={summaryItem.createTs}
+                                          key="createTs" isTimeStamp={true}/>,
+                            ]}
+                            extra={
+                                <img
+                                    width={220}
+                                    alt="logo"
+                                    src={summaryItem.properties.bgi}
                                 />
-                                {summaryItem.summary}
-                            </List.Item>
-                        )}
-                    />
+                            }
+                        >
+                            <List.Item.Meta
+                                title={<a
+                                    href={this.getBrowseURL(summaryItem.articleNo)}>{summaryItem.title}</a>}
+                                // 这个组件有此处 bug
+                                description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
+                            />
+                            {summaryItem.summary}
+                        </List.Item>
+                    )}
+                />
             );
         }
     }

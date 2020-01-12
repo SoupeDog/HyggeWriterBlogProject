@@ -28,14 +28,14 @@ class IconText extends React.Component {
             );
         } else {
             return (
-                <div>
+                <>
                     <Tooltip title={this.props.tip}>
-                    <span>
+                    <span className={"pointer"} style={{marginRight: 10}}>
                         <i className="iconfont" style={{marginRight: 8}}>{this.props.type}</i>
                         {this.props.isTimeStamp ? TimeHelper.formatTimeStampToString({target: this.props.text}) : this.props.text}
                     </span>
                     </Tooltip>
-                </div>
+                </>
             );
         }
     }
