@@ -60,6 +60,6 @@ public interface GroupRelationshipMapper {
      * @param uidList uId List
      * @return 查询结果
      */
-    @MapKey("uId")
+    @MapKey("uid")
     HashMap<String, GroupRelationship> queryGroupJoinRecordMapByGnoAndUIdList(@Param("gno") String gno, @Param("uidList") ArrayList<String> uidList);
 }

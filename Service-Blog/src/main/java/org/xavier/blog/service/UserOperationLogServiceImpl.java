@@ -48,8 +48,8 @@ public class UserOperationLogServiceImpl extends DefaultUtils {
         userService.checkRight(loginUser, UserTypeEnum.ROOT);
         String order = isDESC ? "DESC" : "ASC";
         switch (orderKey) {
-            case "uId":
-                orderKey = "uId";
+            case "uid":
+                orderKey = "uid";
                 break;
             default:
                 orderKey = "ts";

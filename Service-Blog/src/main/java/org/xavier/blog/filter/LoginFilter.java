@@ -38,7 +38,7 @@ public class LoginFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
-        String uId, token;
+        String uid, token;
         UserTokenScopeEnum scope;
         try {
             switch (request.getMethod().toUpperCase()) {
@@ -46,12 +46,12 @@ public class LoginFilter extends OncePerRequestFilter {
                 case "POST":
                 case "PUT":
                 case "DELETE":
-                    uId = propertiesHelper.stringOfNullable(request.getHeader("uId"), "U00000000");
+                    uid = propertiesHelper.stringOfNullable(request.getHeader("uid"), "U00000000");
                     token = propertiesHelper.stringOfNullable(request.getHeader("token"), "0000");
-                    FilterHelper.addValueToHeaders(request, "uId", uId);
+                    FilterHelper.addValueToHeaders(request, "uid", uid);
                     FilterHelper.addValueToHeaders(request, "token", token);
                     scope = UserTokenScopeEnum.getUserTypeEnum(propertiesHelper.stringOfNullable(request.getHeader("scope"), "web"));
-                    userTokenService.validateUserToken(uId, token, scope, System.currentTimeMillis());
+                    userTokenService.validateUserToken(uid, token, scope, System.currentTimeMillis());
                     filterChain.doFilter(request, response);
                     break;
                 default:

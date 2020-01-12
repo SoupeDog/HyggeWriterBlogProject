@@ -54,7 +54,7 @@ public class ArticleController extends HyggeWriterController {
     @PutMapping(value = "/main/article/{articleId}")
     public ResponseEntity<?> updateArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleId") String articleId, @RequestBody Map data) {
         try {
-            String operatorUId = headers.getFirst("uId");
+            String operatorUId = headers.getFirst("uid");
             if (!articleService.updateArticle(operatorUId, articleId, data)) {
                 throw new Universal409Exception(ErrorCode.ARTICLE_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
@@ -86,7 +86,6 @@ public class ArticleController extends HyggeWriterController {
 
     @GetMapping(value = "/main/article/summary/{boardId}")
     public ResponseEntity<?> queryArticleSummary(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId,
-                                                 @RequestParam(value = "uId", required = false, defaultValue = "U00000001") String uId,
                                                  @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                                  @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
                                                  @RequestParam(value = "orderKey", required = false, defaultValue = "ts") String orderKey,
