@@ -24,7 +24,7 @@ public class CrossOriginFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "OPTIONS,GET,POST, PUT, DELETE");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With,uid,token,scope,secretKey,ts");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With,uid,token,scope,secretKey,refreshKey,ts");
         response.setHeader("Access-Control-Max-Age", "2592000");
         // x-forwarded-for 为 HTTP 头字段标准化草案中正式提出。详见 https://baike.baidu.com/item/X-Forwarded-For
         //        String remoteIp = request.getRemoteAddr();
