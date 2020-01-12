@@ -3,6 +3,7 @@ import LogHelper from "../utils/LogHelper.jsx";
 import {List} from "antd";
 import IconText from "./IconText.jsx";
 import ArticleCategoryBreadcrumb from "./ArticleCategoryBreadcrumb.jsx";
+import URLHelper from "../utils/URLHelper.jsx";
 
 class TechnologyBoardView extends React.Component {
 
@@ -11,6 +12,15 @@ class TechnologyBoardView extends React.Component {
         this.state = {
             hasError: false
         };
+        this.getBrowseURL = function (articleNo) {
+            let finalURL = URLHelper.getJumpPrefix() + "browse.html?articleNo=" + articleNo;
+            let currentSecretKey = URLHelper.getQueryString("secretKey");
+            if (currentSecretKey != null) {
+                currentSecretKey = currentSecretKey.substring(0, 32);
+                finalURL = finalURL + "&secretKey=" + currentSecretKey;
+            }
+            return finalURL;
+        }.bind(this);
         LogHelper.info({className: "TechnologyBoardView", msg: "constructor----------"});
     }
 
@@ -53,14 +63,14 @@ class TechnologyBoardView extends React.Component {
                             ]}
                             extra={
                                 <img
-                                    width={300}
-                                    alt="logo"
-                                    src={summaryItem.properties.bgi}
+                                     width={300}
+                                     alt="logo"
+                                     src={summaryItem.properties.bgi}
                                 />
                             }
                         >
                             <List.Item.Meta
-                                title={<a href={summaryItem.articleCategoryNo}>{summaryItem.title}</a>}
+                                title={<a target="_blank" href={this.getBrowseURL(summaryItem.articleNo)}>{summaryItem.title}</a>}
                                 // 这个组件有此处 bug
                                 description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
                             />

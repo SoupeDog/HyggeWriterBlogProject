@@ -72,7 +72,7 @@ class NotTechnologyBoardView extends React.Component {
                             }
                         >
                             <List.Item.Meta
-                                title={<a
+                                title={<a target="_blank"
                                     href={this.getBrowseURL(summaryItem.articleNo)}>{summaryItem.title}</a>}
                                 // 这个组件有此处 bug
                                 description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
