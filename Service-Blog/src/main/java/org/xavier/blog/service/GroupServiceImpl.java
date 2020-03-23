@@ -106,7 +106,7 @@ public class GroupServiceImpl extends DefaultUtils {
     }
 
     public ArrayList<Group> queryGroupByGidList(List<String> gidList) {
-        ArrayList<String> gidListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, gidList, "Item of [gidList] can't be null.", String.class, String.class,
+        ArrayList<String> gidListForQuery = collectionHelper.filterCollectionNotEmptyAsArrayList(true, gidList, "Item of [gidList] can't be null.",
                 (item) -> propertiesHelper.stringNotNull(item, "[gid] can't be empty. "));
         if (gidListForQuery.size() < 1) {
             throw new PropertiesRuntimeException("[gidList] can't be empty.");

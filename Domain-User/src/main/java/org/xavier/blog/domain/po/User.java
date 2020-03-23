@@ -7,6 +7,8 @@ import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.common.util.PropertiesHelper;
 import org.xavier.common.util.UtilsCreator;
 
+import java.io.Serializable;
+
 /**
  * 描述信息：<br/>
  * 用户对象
@@ -17,7 +19,7 @@ import org.xavier.common.util.UtilsCreator;
  * @since Jdk 1.8
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class User {
+public class User implements Serializable {
     /**
      * 唯一标示
      */

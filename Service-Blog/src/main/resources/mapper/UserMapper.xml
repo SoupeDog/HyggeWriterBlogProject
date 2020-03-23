@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.xavier.blog.dao.UserMapper">
+    <!--清空逻辑非常简单粗暴，作用域下全部清除-->
+    <cache-ref namespace="org.xavier.blog.dao.UserMapper"/>
+    <!--此标签很重要必须使用-->
+    <cache eviction="FIFO"
+           flushInterval="60000"
+           size="512"
+           readOnly="true"/>
 
     <sql id="BaseColumnList">
        uid, userType, pw, userName, userAvatar, sex, biography, birthday, phone, email, userState, createTs, lastUpdateTs
@@ -45,7 +52,7 @@
         WHERE lastUpdateTs &lt; #{lastUpdateTs} AND uid=#{uid}
     </update>
 
-    <update id="updateByUserId">
+    <update id="updateByUserId" flushCache="true">
         UPDATE `user`
         <foreach collection="data" index="key" item="val" open="SET" separator="," close=" ">
             ${key}=#{val}
@@ -53,7 +60,7 @@
         WHERE lastUpdateTs &lt; #{lastUpdateTs} AND userId=#{userId}
     </update>
 
-    <select id="queryUserByUid" resultType="User">
+    <select id="queryUserByUid" resultType="User" flushCache="false" useCache="true" >
         SELECT
         <include refid="AllColumnList"/>
         FROM `user` WHERE uid=#{uid} LIMIT 1

@@ -172,7 +172,7 @@ public class ArticleServiceImpl extends DefaultUtils {
         Article article = querySingleArticleByArticleNoNotNull(articleNo);
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNo(article.getArticleCategoryNo());
         ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
-        HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.", String.class, String.class, Object.class,
+        HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.",
                 (gno) -> gno,
                 (gno) -> gno);
         if (!checkAccessRuleOfOneArticleCategoryNo(secretKey, loginUser, accessRuleList, allJoinedGroup)) {
@@ -246,15 +246,15 @@ public class ArticleServiceImpl extends DefaultUtils {
         PageResult<ArticleSummaryQueryBO> result = new PageResult<>();
         User loginUser = userService.queryUserNotNull(loginUid);
         ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
-        HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.", String.class, String.class, Object.class,
+        HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.",
                 (gno) -> gno,
                 (gno) -> gno);
         ArrayList<ArticleCategory> totalArticleCategoryList = articleCategoryService.queryAllArticleCategory(null);
         // key-value articleCategoryNo-ArticleCategory
-        HashMap<String, ArticleCategory> totalArticleCategoryMap = collectionHelper.filterCollectionNotEmptyAsHashMap(totalArticleCategoryList, "", ArticleCategory.class, String.class, ArticleCategory.class,
+        HashMap<String, ArticleCategory> totalArticleCategoryMap = collectionHelper.filterCollectionNotEmptyAsHashMap(totalArticleCategoryList, "",
                 (articleCategory) -> articleCategory.getArticleCategoryNo(),
                 (articleCategory) -> articleCategory);
-        ArrayList<String> needCheckArticleCategoryNoList = collectionHelper.filterCollectionNotEmptyAsArrayList(true, totalArticleCategoryList, "[totalArticleCategoryList] for query can't be empty.", ArticleCategory.class, String.class,
+        ArrayList<String> needCheckArticleCategoryNoList = collectionHelper.filterCollectionNotEmptyAsArrayList(true, totalArticleCategoryList, "[totalArticleCategoryList] for query can't be empty.",
                 (articleCategory) -> articleCategory.getArticleCategoryNo()
         );
         if (needCheckArticleCategoryNoList.size() < 1) {
@@ -291,7 +291,7 @@ public class ArticleServiceImpl extends DefaultUtils {
             }
             Board board = boardService.queryBoardByBoardNo(boardNo);
             ArrayList<Article> resultSetTemp = articleMapper.queryArticleSummaryByArticleCategoryNo(allowableArticleCategoryNoList, boardNo, (currentPage - 1) * pageSize, pageSize, orderKey, isDESC ? "DESC" : "ASC");
-            ArrayList<ArticleSummaryQueryBO> resultSet = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultSetTemp, "", Article.class, ArticleSummaryQueryBO.class,
+            ArrayList<ArticleSummaryQueryBO> resultSet = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultSetTemp, "",
                     (article) -> new ArticleSummaryQueryBO(article,
                             board,
                             totalArticleCategoryMap.get(article.getArticleCategoryNo()),
