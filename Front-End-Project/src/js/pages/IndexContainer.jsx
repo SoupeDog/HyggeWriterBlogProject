@@ -6,10 +6,8 @@ import '../../css/index.less';
 
 import csdnLogo from '../../img/csdnLogo.png';
 
-import {Avatar, BackTop, Empty, Icon, Layout, List, Menu, message, notification, Tabs} from 'antd';
+import {Avatar, BackTop, Empty, Icon, Layout, List, Menu, message, Modal, notification, Tabs} from 'antd';
 import URLHelper from "../utils/URLHelper.jsx";
-import IconText from "../component/IconText.jsx";
-import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
 import APICaller from "../utils/APICaller.jsx";
 import NotTechnologyBoardView from "../component/NotTechnologyBoardView.jsx";
 import TechnologyBoardView from "../component/TechnologyBoardView.jsx";
@@ -31,18 +29,24 @@ class IndexContainer extends React.Component {
 
     constructor(props) {
         super(props);
+        let initTechnologyCurrentPage = this.props.technologyCurrentPageInit;
+        let initTechnologyPageSize = this.props.technologyPageSizeInit;
+        let initTechnologyTotalCount = this.props.technologyTotalCountInit;
+        let initTechnologySummaryList = this.props.technologySummaryListInit;
+
         this.state = {
             headerTransparent: false,
             mainMenuCollapsed: true,
-            technologyCurrentPage: 1,
-            technologyPageSize: 2,
-            technologyTotalCount: 0,
+            technologyCurrentPage: initTechnologyCurrentPage,
+            technologyPageSize: initTechnologyPageSize,
+            technologyTotalCount: initTechnologyTotalCount,
             notTechnologyCurrentPage: 1,
-            notTechnologyPageSize: 2,
+            notTechnologyPageSize: 5,
             notTechnologyTotalCount: 0,
-            technologySummaryList: [],
+            technologySummaryList: initTechnologySummaryList,
             notTechnologySummaryList: []
         };
+
         LogHelper.info({className: "IndexContainer", msg: "constructor----------"});
 
         // 左侧菜单缩进
@@ -79,7 +83,7 @@ class IndexContainer extends React.Component {
                         successCallback: function (response) {
                             _react.refreshSummary(activeKey, actualCurrentPage, response.data.totalCount, response.data.resultSet);
                         },
-                        errorCallback:function (response) {
+                        errorCallback: function (response) {
                             console.log(response);
                         }
                     });
@@ -155,7 +159,7 @@ class IndexContainer extends React.Component {
                         <Menu.Item key="1">
                             <i className="anticon anticon-link">
                                 <Avatar size={14}
-                                        src="https://www.xavierwang.cn/images/47454e58e7f249c3968524d25a6c9c7a_M.png"/>
+                                        src="https://www.xavierwang.cn/static/我的头像.png"/>
                             </i>
                             <span>Xavier</span>
                         </Menu.Item>
@@ -276,7 +280,7 @@ class IndexContainer extends React.Component {
                             <a target="_blank"
                                href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
                                className="textItem policeLink">
-                                <img src="https://www.xavierwang.cn/images/icon-police.png"/>
+                                <img src="https://www.xavierwang.cn/static/icon-police.png"/>
                                 <span>&nbsp;津公网安备12010402000667号</span>
                             </a>
                         </div>
@@ -290,6 +294,13 @@ class IndexContainer extends React.Component {
     }
 
     componentDidMount() {
+        let isPC = !(navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i));
+        if (!isPC) {
+            Modal.warning({
+                title: '提示',
+                content: '检测到客户端为移动端，本站未对移动端做特殊适配、优化处理，推荐您使用 PC 访问，若执意使用移动端，产生的故障请见谅。',
+            });
+        }
         let _react = this;
         LogHelper.info({className: "IndexContainer", msg: "componentDidMount----------"});
     }

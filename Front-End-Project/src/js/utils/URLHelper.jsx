@@ -1,12 +1,12 @@
 export default class URLHelper {
     // url 默认前缀
     static getJumpPrefix() {
-        return "http://192.168.1.103:9000/";
+        return "https://www.xavierwang.cn/";
     }
 
     // url 默认前缀
     static getStaticPrefix() {
-        return "https://www.xavierwang.cn/images/";
+        return "https://www.xavierwang.cn/static/";
     }
 
     static getQueryString(key) {

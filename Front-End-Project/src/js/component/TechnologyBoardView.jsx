@@ -34,7 +34,9 @@ class TechnologyBoardView extends React.Component {
 
     render() {
         if (this.state.hasError) {
-            return <h1>Something went wrong.</h1>;
+            return (
+                <h1>Something went wrong.</h1>
+            );
         } else {
             return (
                 <List
@@ -63,14 +65,15 @@ class TechnologyBoardView extends React.Component {
                             ]}
                             extra={
                                 <img
-                                     width={300}
-                                     alt="logo"
-                                     src={summaryItem.properties.bgi}
+                                    width={300}
+                                    alt="logo"
+                                    src={summaryItem.properties.bgi}
                                 />
                             }
                         >
                             <List.Item.Meta
-                                title={<a target="_blank" href={this.getBrowseURL(summaryItem.articleNo)}>{summaryItem.title}</a>}
+                                title={<a target="_blank"
+                                          href={this.getBrowseURL(summaryItem.articleNo)}>{summaryItem.title}</a>}
                                 // 这个组件有此处 bug
                                 description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
                             />

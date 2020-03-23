@@ -90,7 +90,11 @@ class BrowseContainer extends React.Component {
                                 })}
                             </Menu>
                         </Header>
-                        <div id="mainImage" style={{width: "100%"}}></div>
+                        <div id="mainImage" style={{
+                            width: "100%",
+                            background: "url("+this.props.article.properties.bgi+") no-repeat center"
+                        }}>
+                        </div>
                         {this.props.article.properties.bgmConfig.src == null ? null :
                             <div id="bgmPlayer">
                                 {this.props.article.properties.bgmConfig.bgmType != 1 ? null :
@@ -103,8 +107,9 @@ class BrowseContainer extends React.Component {
                                     </div>}
                                 {this.props.article.properties.bgmConfig.bgmType != 2 ? null :
                                     // 音频直连播放
-                                    <div id={"txPlayer"} >
-                                        <audio id="h5audio_media" controls  style={{margin:"0 auto 0 auto", width:"100%"}} autoPlay={true}
+                                    <div id={"txPlayer"}>
+                                        <audio id="h5audio_media" controls
+                                               style={{margin: "0 auto 0 auto", width: "100%"}} autoPlay={true}
                                                src="http://220.194.121.152/amobile.music.tc.qq.com/C400003ktY2c1Qnkam.m4a?guid=8097394155&amp;vkey=D5F441BE795776E963E16389DFCF06A73BB61F5605737347050957FDBD2C5AAC9BA120EEF1741536E1B25788DAE3CA3AC9328206E741F8D8&amp;uin=0&amp;fromtag=66">
                                         </audio>
                                     </div>}
@@ -151,7 +156,7 @@ class BrowseContainer extends React.Component {
                                 <a target="_blank"
                                    href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
                                    className="textItem policeLink">
-                                    <img src="https://www.xavierwang.cn/images/icon-police.png"/>
+                                    <img src="https://www.xavierwang.cn/static/icon-police.png"/>
                                     <span>&nbsp;津公网安备12010402000667号</span>
                                 </a>
                             </div>

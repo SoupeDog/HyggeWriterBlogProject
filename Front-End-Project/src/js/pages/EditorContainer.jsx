@@ -1,9 +1,9 @@
 import React from 'react';
 import LogHelper from "../utils/LogHelper.jsx";
 import {Form, Layout, Menu} from 'antd';
-import Vditor from "vditor";
 import EditorForm from "../component/EditorForm.jsx";
-
+import "vditor/src/assets/scss/classic.scss"
+import clsx from "clsx";
 const {Header, Footer, Sider, Content} = Layout;
 
 const EditorArticleForm = Form.create({name: 'editorArticle'})(EditorForm);
@@ -30,26 +30,38 @@ class EditorContainer extends React.Component {
         } else {
             return (
                 <Layout>
-                    <Header style={{position: 'fixed', zIndex: 1, width: '100%'}}>
-                        <div className="logo"/>
-                        <Menu
-                            theme="dark"
-                            mode="horizontal"
-                            defaultSelectedKeys={['2']}
-                            style={{lineHeight: '64px'}}
-                        >
-                            <Menu.Item key="1">nav 1</Menu.Item>
-                            <Menu.Item key="2">nav 2</Menu.Item>
-                            <Menu.Item key="3">nav 3</Menu.Item>
-                        </Menu>
+                    <Header>
+                        <div className="logo">我的小宅子---编辑页面</div>
                     </Header>
                     <Content style={{padding: '0 50px', marginTop: 64}}>
                         <div style={{background: '#fff', padding: 24, minHeight: 380}}>
                             <EditorArticleForm />
-
+                            <div id="preview" style={{background: '#fff', padding: 24, minHeight: 300}}>
+                            </div>
                         </div>
                     </Content>
-                    <Footer style={{textAlign: 'center'}}>Ant Design ©2018 Created by Ant UED</Footer>
+                    <Footer className={clsx('myFooter')}>
+                        <div>
+                            <div>
+                                <span>©2019 Xavier </span><span>Power by</span> <a className="dependentLink"
+                                                                                   target="_blank"
+                                                                                   href="https://react.docschina.org">React</a>
+                                <span>&nbsp;&amp;&nbsp;</span> <a className="dependentLink" target="_blank"
+                                                                  href="https://ant.design/index-cn">Ant Design</a>
+                            </div>
+                        </div>
+
+                        <div><a
+                            className="textItem policeLink" target="_blank"
+                            href="http://www.beian.miit.gov.cn">津ICP备18004196号-1</a>
+                            <a target="_blank"
+                               href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
+                               className="textItem policeLink">
+                                <img src="https://www.xavierwang.cn/static/icon-police.png"/>
+                                <span>&nbsp;津公网安备12010402000667号</span>
+                            </a>
+                        </div>
+                    </Footer>
                 </Layout>
             );
         }
@@ -65,11 +77,6 @@ class EditorContainer extends React.Component {
     }
 
     componentDidMount() {
-        // Vditor.preview(document.getElementById('preview'),
-        //     this.props.article.content, {
-        //         className: 'preview vditor-reset vditor-reset--anchor',
-        //         anchor: false
-        //     });
         LogHelper.info({className: "EditorContainer", msg: "componentDidMount----------"});
         LogHelper.debug({msg: ""});
     }

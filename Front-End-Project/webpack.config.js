@@ -4,6 +4,7 @@ const path = require("path");
 // 外部插件
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = {
     entry: {
         index: "./src/js/index.jsx",
@@ -139,7 +140,8 @@ module.exports = {
                 removeComments: true,
                 collapseWhitespace: true
             }
-        })
+        }),
+        new BundleAnalyzerPlugin()
     ],
     optimization: {
         splitChunks: {

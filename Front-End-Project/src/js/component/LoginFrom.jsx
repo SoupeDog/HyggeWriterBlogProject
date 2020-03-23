@@ -1,6 +1,7 @@
 import React from 'react';
 import LogHelper from "../utils/LogHelper.jsx";
 import {Form, Icon, Input, Button, message} from 'antd';
+import APICaller from "../utils/APICaller.jsx";
 
 class LoginFrom extends React.Component {
 
@@ -11,18 +12,17 @@ class LoginFrom extends React.Component {
             e.preventDefault();
             this.props.form.validateFields((err, values) => {
                 if (!err) {
-                    alert("登录")
-                    // UserAPI.login({
-                    //     ac: values.ac,
-                    //     pw: values.pw,
-                    //     successCallback: function (response) {
-                    //         if (response != null && response.code == 200) {
-                    //             message.success(`登录成功即将进行跳转`);
-                    //         } else {
-                    //             message.error(response.msg);
-                    //         }
-                    //     }
-                    // });
+                    APICaller.login({
+                        ac: values.ac,
+                        pw: values.pw,
+                        successCallback: function (response) {
+                            if (response != null && response.code == 200) {
+                                message.success(`登录成功即将进行跳转`);
+                            } else {
+                                message.error(response.msg);
+                            }
+                        }
+                    });
                 }
             });
         };
@@ -49,7 +49,7 @@ class LoginFrom extends React.Component {
     render() {
         const {getFieldDecorator} = this.props.form;
         return (
-            <Form style={{margin:"40px auto 0 auto"}} onSubmit={this.handleSubmit} className="login-form">
+            <Form style={{margin: "40px auto 0 auto"}} onSubmit={this.handleSubmit} className="login-form">
                 <Form.Item>
                     {getFieldDecorator('ac', {
                         rules: [{required: true, message: '请输入账号!'}],
