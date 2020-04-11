@@ -4,8 +4,14 @@ import clsx from 'clsx';
 import '../../css/index.less';
 
 import csdnLogo from '../../img/csdnLogo.png';
-import {LinkOutlined, GithubOutlined, QuestionCircleOutlined, MenuUnfoldOutlined, MenuFoldOutlined} from '@ant-design/icons';
-import {Avatar, BackTop, Empty, Layout, Menu, message, Modal, notification, Tabs} from 'antd';
+import {
+    LinkOutlined,
+    GithubOutlined,
+    QuestionCircleOutlined,
+    MenuUnfoldOutlined,
+    MenuFoldOutlined
+} from '@ant-design/icons';
+import {Avatar, BackTop, Badge, Empty, Layout, Menu, message, Modal, notification, Tabs} from 'antd';
 
 import URLHelper from "../utils/URLHelper.jsx";
 import APICaller from "../utils/APICaller.jsx";
@@ -102,12 +108,12 @@ class IndexContainer extends React.Component {
             } else {
                 finalSummaryList = summaryList;
             }
-            console.log({
-                activeKey: activeKey,
-                actualCurrentPage: actualCurrentPage,
-                totalCount: totalCount,
-                summaryList: summaryList
-            })
+            // console.log({
+            //     activeKey: activeKey,
+            //     actualCurrentPage: actualCurrentPage,
+            //     totalCount: totalCount,
+            //     summaryList: summaryList
+            // })
             switch (activeKey) {
                 case "1":
                     this.setState({
@@ -153,7 +159,7 @@ class IndexContainer extends React.Component {
         return (
             <Layout id={"myPage"}>
                 <Sider theme="dark" className="leftMenu" trigger={null} collapsible
-                       collapsed={this.state.mainMenuCollapsed} style={{overflow:"hidden"}}>
+                       collapsed={this.state.mainMenuCollapsed} style={{overflow: "hidden"}}>
                     <div className="logo autoOmit_2">{this.state.mainMenuCollapsed ? "宅" : "我的小宅子"}</div>
                     <Menu theme="dark" mode="inline" selectable={false}>
                         <Menu.Item key="1">
@@ -212,8 +218,8 @@ class IndexContainer extends React.Component {
                     })}>
                         {this.state.mainMenuCollapsed ?
                             <MenuUnfoldOutlined style={{color: "#fff", fontSize: "20px", padding: "0 24px"}}
-                                          onClick={this.mainMenuToggle}/> :
-                            <MenuFoldOutlined  style={{color: "#fff", fontSize: "20px", padding: "0 24px"}}
+                                                onClick={this.mainMenuToggle}/> :
+                            <MenuFoldOutlined style={{color: "#fff", fontSize: "20px", padding: "0 24px"}}
                                               onClick={this.mainMenuToggle}/>
                         }
                     </Header>
@@ -221,14 +227,19 @@ class IndexContainer extends React.Component {
                         "myContentCollapsed": this.state.mainMenuCollapsed,
                         "myContent": !this.state.mainMenuCollapsed
                     })}>
-                        <Tabs defaultActiveKey="1" onChange={(activeKey) => {
+                        <Tabs tabBarGutter={50} defaultActiveKey="1" onChange={(activeKey) => {
                             this.onTabChange({activeKey: activeKey});
                         }}>
                             <TabPane
                                 tab={
+                                    <Badge
+                                        overflowCount={99}
+                                        offset={[20, -5]}
+                                        count={this.state.technologyTotalCount == null ? "?" : this.state.technologyTotalCount}>
                                     <span>
-                                      技术
+                                      技 术
                                     </span>
+                                    </Badge>
                                 }
                                 key="1"
                             >
@@ -240,9 +251,14 @@ class IndexContainer extends React.Component {
                             </TabPane>
                             <TabPane
                                 tab={
-                                    <span>
-                                      非技术
-                                    </span>
+                                    <Badge
+                                        overflowCount={99}
+                                        offset={[20, -5]}
+                                        count={this.state.notTechnologyTotalCount == null ? "?" : this.state.notTechnologyTotalCount}>
+                                        <span>
+                                          非技术
+                                        </span>
+                                    </Badge>
                                 }
                                 key="2"
                             >
