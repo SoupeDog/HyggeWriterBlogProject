@@ -68,7 +68,7 @@ class BrowseContainer extends React.Component {
                                 className={clsx({
                                     "backgroundTransparent": this.state.headerTransparent
                                 })}
-                                theme="dark"
+                                theme={this.state.headerTransparent ? "light" : "dark"}
                                 mode="horizontal"
                                 defaultSelectedKeys={['0']}
                                 style={{lineHeight: '64px'}}

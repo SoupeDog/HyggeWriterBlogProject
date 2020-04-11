@@ -153,7 +153,7 @@ class IndexContainer extends React.Component {
         return (
             <Layout id={"myPage"}>
                 <Sider theme="dark" className="leftMenu" trigger={null} collapsible
-                       collapsed={this.state.mainMenuCollapsed}>
+                       collapsed={this.state.mainMenuCollapsed} style={{overflow:"hidden"}}>
                     <div className="logo autoOmit_2">{this.state.mainMenuCollapsed ? "宅" : "我的小宅子"}</div>
                     <Menu theme="dark" mode="inline" selectable={false}>
                         <Menu.Item key="1">
