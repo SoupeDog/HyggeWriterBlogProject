@@ -74,6 +74,7 @@ class ArticleCategoryBreadcrumb extends React.Component {
         LogHelper.debug({className: "ArticleCategoryBreadcrumb", tag: "prevProps", msg: prevProps, isJson: true});
         LogHelper.debug({className: "ArticleCategoryBreadcrumb", tag: "prevState", msg: prevState, isJson: true});
         LogHelper.debug({msg: ""});
+        return null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

@@ -7,8 +7,8 @@ const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = {
     entry: {
-        index: "./src/js/index.jsx",
-        browse: "./src/js/browse.jsx",
+        // index: "./src/js/index.jsx",
+        // browse: "./src/js/browse.jsx",
         editor: "./src/js/editor.jsx",
         login: "./src/js/login.jsx",
     },
@@ -34,7 +34,11 @@ module.exports = {
                         options: {
                             presets: ["@babel/preset-env", "@babel/react"],
                             plugins: [
-                                [require("@babel/plugin-proposal-decorators"), {"legacy": true}]
+                                ["import", {
+                                    "libraryName": "antd",
+                                    "libraryDirectory": "es",
+                                    "style": true // `style: true` 会加载 less 文件
+                                }]
                             ]
                         }
                     }
@@ -93,30 +97,30 @@ module.exports = {
                 ]
             }
         ),
-        new HtmlWebpackPlugin({
-            filename: "index.html",
-            title: "主页-我的小宅子",
-            favicon: "./src/img/favicon.ico",
-            template: "./src/html/template.html",
-            chunks: ["index", "commons"],
-            inject: "body",
-            minify: {
-                removeComments: true,
-                collapseWhitespace: true
-            }
-        }),
-        new HtmlWebpackPlugin({
-            filename: "browse.html",
-            title: "浏览页-我的小宅子",
-            favicon: "./src/img/favicon.ico",
-            template: "./src/html/template.html",
-            chunks: ["browse", "commons"],
-            inject: "body",
-            minify: {
-                removeComments: true,
-                collapseWhitespace: true
-            }
-        }),
+        // new HtmlWebpackPlugin({
+        //     filename: "index.html",
+        //     title: "主页-我的小宅子",
+        //     favicon: "./src/img/favicon.ico",
+        //     template: "./src/html/template.html",
+        //     chunks: ["index", "commons"],
+        //     inject: "body",
+        //     minify: {
+        //         removeComments: true,
+        //         collapseWhitespace: true
+        //     }
+        // }),
+        // new HtmlWebpackPlugin({
+        //     filename: "browse.html",
+        //     title: "浏览页-我的小宅子",
+        //     favicon: "./src/img/favicon.ico",
+        //     template: "./src/html/template.html",
+        //     chunks: ["browse", "commons"],
+        //     inject: "body",
+        //     minify: {
+        //         removeComments: true,
+        //         collapseWhitespace: true
+        //     }
+        // }),
         new HtmlWebpackPlugin({
             filename: "editor.html",
             title: "编辑页-我的小宅子",

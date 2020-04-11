@@ -19,54 +19,54 @@ class EditorForm extends React.Component {
             articleCategoryInfo: []
         };
 
-        this.handleSubmit = e => {
-            e.preventDefault();
-            this.props.form.validateFields((err, values) => {
-                if (!err) {
-                    console.log(values)
-                    if (values.actionType == "修改文章") {
-                        APICaller.updateArticle({
-                            articleNo: URLHelper.getQueryString("articleNo"),
-                            boardNo: values.boardNo,
-                            articleCategoryNo: values.articleCategoryNo,
-                            title: values.title,
-                            summary: values.summary,
-                            content: values.content,
-                            bgi: values.bgi,
-                            bgmType: values.bgmType,
-                            bgmSrc: values.bgmSrc,
-                            ts: new Date().getTime(),
-                            successCallback: function (response) {
-                                if (response != null && response.code == 200) {
-                                    message.success(`修改成功`);
-                                } else {
-                                    message.error(response.msg);
-                                }
-                            }
-                        });
+        this.handleSubmit = values => {
+            if (values.actionType == "修改文章") {
+                APICaller.updateArticle({
+                    articleNo: URLHelper.getQueryString("articleNo"),
+                    boardNo: values.boardNo,
+                    articleCategoryNo: values.articleCategoryNo,
+                    title: values.title,
+                    summary: values.summary,
+                    content: values.content,
+                    bgi: values.bgi,
+                    bgmType: values.bgmType,
+                    bgmSrc: values.bgmSrc,
+                    ts: new Date().getTime(),
+                    successCallback: function (response) {
+                        if (response != null && response.code == 200) {
+                            message.success(`修改成功`);
+                        } else {
+                            message.error(response.msg);
+                        }
                     }
+                });
+            }
 
-                    if (values.actionType == "添加文章") {
-                        APICaller.addArticle({
-                            boardNo: values.boardNo,
-                            articleCategoryNo: values.articleCategoryNo,
-                            title: values.title,
-                            summary: values.summary,
-                            content: values.content,
-                            bgi: values.bgi,
-                            bgmType: values.bgmType,
-                            bgmSrc: values.bgmSrc,
-                            successCallback: function (response) {
-                                if (response != null && response.code == 200) {
-                                    message.success(`添加成功`);
-                                } else {
-                                    message.error(response.msg);
-                                }
-                            }
-                        });
+            if (values.actionType == "添加文章") {
+                APICaller.addArticle({
+                    boardNo: values.boardNo,
+                    articleCategoryNo: values.articleCategoryNo,
+                    title: values.title,
+                    summary: values.summary,
+                    content: values.content,
+                    bgi: values.bgi,
+                    bgmType: values.bgmType,
+                    bgmSrc: values.bgmSrc,
+                    successCallback: function (response) {
+                        if (response != null && response.code == 200) {
+                            message.success(`添加成功`);
+                        } else {
+                            message.error(response.msg);
+                        }
                     }
-                }
-            });
+                });
+            }
+        };
+
+        this.handleSubmitFailed = ({values, errorFields, outOfDate}) => {
+            console.log('Received values of form: ', values);
+            console.log('Received errorFields of form: ', errorFields);
+            console.log('Received outOfDate of form: ', outOfDate);
         };
 
         // 查询文章信息
@@ -77,17 +77,20 @@ class EditorForm extends React.Component {
                 APICaller.queryArticle({
                     articleNo: currentArticleNo,
                     successCallback: function (response) {
-                        console.log(response);
+                        // console.log(response);
                         if (response != null && response.code == 200) {
                             let article = response.data;
-
+                            let finalBgi = "";
+                            if (article.properties.bgi != null) {
+                                finalBgi = article.properties.bgi.substring(URLHelper.getStaticPrefix().length, article.properties.bgi.length);
+                            }
                             let finalValues = {
                                 boardNo: article.boardNo,
                                 articleCategoryNo: article.articleCategoryNo,
                                 title: article.title,
                                 summary: article.summary,
                                 content: article.content,
-                                bgi: article.properties.bgi
+                                bgi: finalBgi
                             };
 
                             if (article.properties.bgmConfig.src != null) {
@@ -98,7 +101,7 @@ class EditorForm extends React.Component {
                             if (article.properties.bgmConfig.bgmType != null) {
                                 finalValues.bgmType = article.properties.bgmConfig.bgmType + "";
                             }
-                            _react.props.form.setFieldsValue(finalValues);
+                            _react.state.form.setFieldsValue(finalValues);
                         } else {
                             message.error(response.msg);
                         }
@@ -147,155 +150,129 @@ class EditorForm extends React.Component {
     }
 
     render() {
-        const {getFieldDecorator} = this.props.form;
-        if (this.state.hasError) {
+        let _react = this;
+        if (_react.state.hasError) {
             return <h1>Something went wrong.</h1>;
         } else {
             return (
-                <Form style={{margin: "40px auto 0 auto"}} onSubmit={this.handleSubmit} className="login-form">
-                    <Form.Item label="板块类型">
-                        {getFieldDecorator('boardNo', {
-                            rules: [{required: true, message: '请选择板块类型'}],
-                        })(
-                            <Radio.Group>
-                                <Radio value="ae81801808f8485384b66da526169da2">技术板块</Radio>
-                                <Radio value="b9cc9df574b448b088303f8056198d91">非技术板块</Radio>
-                            </Radio.Group>,
-                        )}
+                <Form ref={(form) => {
+                    if (_react.state.form == null) {
+                        _react.setState({form: form})
+                    }
+                }}
+                      style={{margin: "40px auto 0 auto"}}
+                      className="login-form"
+                      initialValues={{remember: true}}
+                      onFinish={_react.handleSubmit}
+                      onFinishFailed={_react.handleSubmitFailed}
+                      form={_react.state.form}>
+                    <Form.Item label="板块类型" name="boardNo" rules={[{required: true, message: '请选择板块类型'}]}>
+                        <Radio.Group>
+                            <Radio value="ae81801808f8485384b66da526169da2">技术板块</Radio>
+                            <Radio value="b9cc9df574b448b088303f8056198d91">非技术板块</Radio>
+                        </Radio.Group>
                     </Form.Item>
-                    <Form.Item label="标题">
-                        {getFieldDecorator('title', {
-                            rules: [{required: true, message: '请选择标题'}],
-                        })(
-                            <Input placeholder="请输入标题"/>,
-                        )}
+                    <Form.Item label="标题" name="title" rules={[{required: true, message: '请选择标题'}]}>
+                        <Input placeholder="请输入标题"/>
                     </Form.Item>
-                    <Form.Item label="文章类别">
-                        {getFieldDecorator('articleCategoryNo', {
-                            rules: [{required: true, message: '请选择文章类别'}],
-                        })(
-                            <Select
-                                showSearch
-                                placeholder="请选择文章类别"
-                                optionFilterProp="children"
-                                filterOption={(input, option) => {
-                                    let currentItem = option.props.children;
-                                    if (currentItem != null) {
-                                        console.log(currentItem + "----" + PropertiesHelper.isStringNotNull(currentItem))
-                                        return currentItem.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                    } else {
-                                        return false;
-                                    }
+                    <Form.Item label="文章类别" name="articleCategoryNo"
+                               rules={[{required: true, message: '请选择文章类别'}]}>
+                        <Select
+                            showSearch
+                            placeholder="请选择文章类别"
+                            optionFilterProp="children"
+                            filterOption={(input, option) => {
+                                let currentItem = option.props.children;
+                                if (currentItem != null) {
+                                    console.log(currentItem + "----" + PropertiesHelper.isStringNotNull(currentItem))
+                                    return currentItem.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                } else {
+                                    return false;
                                 }
+                            }
+                            }
+                        >
+                            {
+                                _react.state.articleCategoryInfo.map((articleCategoryItem, index) => {
+                                    return (
+                                        <Select.Option key={index}
+                                                       value={articleCategoryItem.articleCategoryNo}>{articleCategoryItem.articleCategoryName + "-" + articleCategoryItem.description}</Select.Option>
+                                    )
+                                })
+                            }
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="背景图片" name="bgi" rules={[{required: true, message: '请选择背景图片'}]}>
+                        <Select
+                            showSearch
+                            placeholder="请选择背景图片"
+                            optionFilterProp="children"
+                            filterOption={(input, option) => {
+                                let currentItem = option.props.children;
+                                if (currentItem != null) {
+                                    console.log(currentItem + "----" + PropertiesHelper.isStringNotNull(currentItem))
+                                    return currentItem.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                } else {
+                                    return false;
                                 }
-                            >
-                                {
-                                    this.state.articleCategoryInfo.map((articleCategoryItem, index) => {
-                                        return (
-                                            <Select.Option key={index}
-                                                           value={articleCategoryItem.articleCategoryNo}>{articleCategoryItem.articleCategoryName + "-" + articleCategoryItem.description}</Select.Option>
-                                        )
-                                    })
-                                }
-                            </Select>,
-                        )}
+                            }
+                            }
+                        >
+                            {
+                                _react.state.fileInfo.map((fileItem, index) => {
+                                    return (
+                                        <Select.Option key={index}
+                                                       value={fileItem.fileName}>{fileItem.fileName}</Select.Option>
+                                    )
+                                })
+                            }
+                        </Select>
                     </Form.Item>
-                    <Form.Item label="背景图片">
-                        {getFieldDecorator('bgi', {
-                            rules: [{required: true, message: '请选择背景图片'}],
-                        })(
-                            <Select
-                                showSearch
-                                placeholder="请选择背景图片"
-                                optionFilterProp="children"
-                                filterOption={(input, option) => {
-                                    let currentItem = option.props.children;
-                                    if (currentItem != null) {
-                                        console.log(currentItem + "----" + PropertiesHelper.isStringNotNull(currentItem))
-                                        return currentItem.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                    } else {
-                                        return false;
-                                    }
-                                }
-                                }
-                            >
-                                {
-                                    this.state.fileInfo.map((fileItem, index) => {
-                                        return (
-                                            <Select.Option key={index}
-                                                           value={fileItem.fileName}>{fileItem.fileName}</Select.Option>
-                                        )
-                                    })
-                                }
-                            </Select>
-                        )}
+                    <Form.Item label="背景音乐类型" name="bgmType">
+                        <Radio.Group>
+                            <Radio value="0">无音乐</Radio>
+                            <Radio value="1">网易云音乐外链</Radio>
+                            <Radio value="2">音频文件直连</Radio>
+                        </Radio.Group>
                     </Form.Item>
-                    <Form.Item label="背景音乐类型">
-                        {getFieldDecorator('bgmType')(
-                            <Radio.Group>
-                                <Radio value="0">无音乐</Radio>
-                                <Radio value="1">网易云音乐外链</Radio>
-                                <Radio value="2">音频文件直连</Radio>
-                            </Radio.Group>,
-                        )}
+                    <Form.Item label="背景音乐资源路径" name="bgmSrc"
+                               rules={[{required: false, message: '请选择背景音乐资源路径'}]}>
+                        <Input placeholder="请输入音频资源路径"/>
                     </Form.Item>
-
-                    <Form.Item label="背景音乐资源路径">
-                        {getFieldDecorator('bgmSrc', {
-                            rules: [{required: false, message: '请选择背景音乐资源路径'}],
-                        })(
-                            <Input placeholder="请输入音频资源路径"/>
-                        )}
+                    <Form.Item label="摘要" name="summary" rules={[{required: false, message: '请输入摘要'}]}>
+                        <TextArea
+                            placeholder="摘要"
+                            autosize={{minRows: 2, maxRows: 200}}
+                        />
                     </Form.Item>
-
-                    <Form.Item label="摘要">
-                        {getFieldDecorator('summary', {
-                            rules: [{required: false, message: '请输入摘要'}],
-                        })(
-                            <TextArea
-                                placeholder="摘要"
-                                autosize={{minRows: 2, maxRows: 200}}
-                            />
-                        )}
+                    <Form.Item label="内容" name="content" rules={[{required: false, message: '请输入内容'}]}>
+                        <TextArea
+                            onBlur={() => {
+                                Vditor.preview(document.getElementById('preview'),
+                                    $("#content").text(), {
+                                        className: 'preview vditor-reset vditor-reset--anchor',
+                                        anchor: false
+                                    });
+                            }}
+                            placeholder="文章内容"
+                            autosize={{minRows: 4, maxRows: 400}}
+                        />
                     </Form.Item>
-
-                    <Form.Item label="内容">
-                        {getFieldDecorator('content', {
-                            rules: [{required: false, message: '请输入内容'}],
-                        })(
-                            <TextArea
-                                onBlur={()=>{
-                                    Vditor.preview(document.getElementById('preview'),
-                                        $("#editorArticle_content").text(), {
-                                            className: 'preview vditor-reset vditor-reset--anchor',
-                                            anchor: false
-                                        });
-                                }}
-                                placeholder="文章内容"
-                                autosize={{minRows: 4, maxRows: 400}}
-                            />
-                        )}
-                    </Form.Item>
-                    <Form.Item label="执行类型">
-                        {getFieldDecorator('actionType', {
-                            rules: [{required: true, message: '请选择执行类型'}],
-                        })(
-                            <Radio.Group>
-                                <Radio value="添加文章">添加文章</Radio>
-                                <Radio value="修改文章">修改文章</Radio>
-                            </Radio.Group>,
-                        )}
+                    <Form.Item label="执行类型" name="actionType" rules={[{required: true, message: '请选择执行类型'}]}>
+                        <Radio.Group>
+                            <Radio value="添加文章">添加文章</Radio>
+                            <Radio value="修改文章">修改文章</Radio>
+                        </Radio.Group>
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="button" className="editor-form-button"
-                                onClick={this.queryArticleForEditor}>
+                                onClick={_react.queryArticleForEditor}>
                             查询文章
                         </Button>
-
                         <Button type="primary" htmlType="button" className="editor-form-button"
                                 onClick={() => {
                                     Vditor.preview(document.getElementById('preview'),
-                                        $("#editorArticle_content").text(), {
+                                        $("#content").text(), {
                                             className: 'preview vditor-reset vditor-reset--anchor',
                                             anchor: false
                                         });
@@ -303,7 +280,7 @@ class EditorForm extends React.Component {
                             预览文章
                         </Button>
                         <Button type="primary" htmlType="button" className="editor-form-button"
-                                onClick={this.queryConfigPropertiesForEditor}>
+                                onClick={_react.queryConfigPropertiesForEditor}>
                             拉取配置信息
                         </Button>
                         <Button type="danger" htmlType="submit" className="editor-form-button">
@@ -334,6 +311,7 @@ class EditorForm extends React.Component {
         LogHelper.debug({className: "EditorForm", tag: "prevProps", msg: prevProps, isJson: true});
         LogHelper.debug({className: "EditorForm", tag: "prevState", msg: prevState, isJson: true});
         LogHelper.debug({msg: ""});
+        return null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

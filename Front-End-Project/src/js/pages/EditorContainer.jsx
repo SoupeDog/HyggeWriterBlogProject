@@ -1,12 +1,11 @@
 import React from 'react';
 import LogHelper from "../utils/LogHelper.jsx";
-import {Form, Layout, Menu} from 'antd';
+import {Layout} from 'antd';
+// import 'antd/dist/antd.css'
 import EditorForm from "../component/EditorForm.jsx";
-import "vditor/src/assets/scss/classic.scss"
 import clsx from "clsx";
-const {Header, Footer, Sider, Content} = Layout;
 
-const EditorArticleForm = Form.create({name: 'editorArticle'})(EditorForm);
+const {Header, Footer, Content} = Layout;
 
 class EditorContainer extends React.Component {
 
@@ -35,7 +34,7 @@ class EditorContainer extends React.Component {
                     </Header>
                     <Content style={{padding: '0 50px', marginTop: 64}}>
                         <div style={{background: '#fff', padding: 24, minHeight: 380}}>
-                            <EditorArticleForm />
+                            <EditorForm />
                             <div id="preview" style={{background: '#fff', padding: 24, minHeight: 300}}>
                             </div>
                         </div>
@@ -86,6 +85,7 @@ class EditorContainer extends React.Component {
         LogHelper.debug({className: "EditorContainer", tag: "prevProps", msg: prevProps, isJson: true});
         LogHelper.debug({className: "EditorContainer", tag: "prevState", msg: prevState, isJson: true});
         LogHelper.debug({msg: ""});
+        return null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

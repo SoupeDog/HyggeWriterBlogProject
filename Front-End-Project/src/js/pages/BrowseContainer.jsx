@@ -5,7 +5,6 @@ import Vditor from "vditor";
 import $ from 'jquery'
 import 'antd/dist/antd.less';
 import '../../css/browse.less';
-import "vditor/src/assets/scss/classic.scss"
 import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
 import clsx from "clsx";
 import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
@@ -110,7 +109,7 @@ class BrowseContainer extends React.Component {
                                     <div id={"txPlayer"}>
                                         <audio id="h5audio_media" controls
                                                style={{margin: "0 auto 0 auto", width: "100%"}} autoPlay={true}
-                                               src="http://220.194.121.152/amobile.music.tc.qq.com/C400003ktY2c1Qnkam.m4a?guid=8097394155&amp;vkey=D5F441BE795776E963E16389DFCF06A73BB61F5605737347050957FDBD2C5AAC9BA120EEF1741536E1B25788DAE3CA3AC9328206E741F8D8&amp;uin=0&amp;fromtag=66">
+                                               src={this.props.article.properties.bgmConfig.src}>
                                         </audio>
                                     </div>}
                             </div>
@@ -209,6 +208,7 @@ class BrowseContainer extends React.Component {
         LogHelper.debug({className: "BrowseContainer", tag: "prevProps", msg: prevProps, isJson: true});
         LogHelper.debug({className: "BrowseContainer", tag: "prevState", msg: prevState, isJson: true});
         LogHelper.debug({msg: ""});
+        return null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
