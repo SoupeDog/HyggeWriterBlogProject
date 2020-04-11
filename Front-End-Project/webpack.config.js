@@ -22,7 +22,7 @@ module.exports = {
         open: true,
         compress: true,
         port: 9000,
-        host: "192.168.1.103"
+        // host: "192.168.1.103"
     },
     module: {
         rules: [
