@@ -95,7 +95,7 @@ address, caption, cite, code, dfn, p, em, i, th, var {
     display: block;
     height: 0;
     overflow: hidden;
-    clear: both
+    clear: both;
 }
 
 .clearFix {

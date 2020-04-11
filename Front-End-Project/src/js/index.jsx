@@ -1,6 +1,4 @@
 import '../css/default.css';
-// import "vditor/src/assets/scss/classic.scss"// 或者使用 dark
-import { Modal } from 'antd';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import IndexContainer from "./pages/IndexContainer.jsx";

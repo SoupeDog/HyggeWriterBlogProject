@@ -1,7 +1,4 @@
 import '../css/default.css';
-
-// import "vditor/src/assets/scss/dark.scss"// 或者使用 dark
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import BrowseContainer from "./pages/BrowseContainer.jsx";

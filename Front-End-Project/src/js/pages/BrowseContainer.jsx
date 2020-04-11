@@ -3,13 +3,12 @@ import LogHelper from "../utils/LogHelper.jsx";
 import {Card, Layout, Menu, Sider} from "antd";
 import Vditor from "vditor";
 import $ from 'jquery'
-import 'antd/dist/antd.less';
 import '../../css/browse.less';
 import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
 import clsx from "clsx";
 import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
 import IconText from "../component/IconText.jsx";
-// 或者使用 dark
+
 const {Header, Content, Footer} = Layout;
 
 class BrowseContainer extends React.Component {
@@ -91,7 +90,7 @@ class BrowseContainer extends React.Component {
                         </Header>
                         <div id="mainImage" style={{
                             width: "100%",
-                            background: "url("+this.props.article.properties.bgi+") no-repeat center"
+                            background: "url(" + this.props.article.properties.bgi + ") no-repeat center"
                         }}>
                         </div>
                         {this.props.article.properties.bgmConfig.src == null ? null :
@@ -181,7 +180,14 @@ class BrowseContainer extends React.Component {
         Vditor.preview(document.getElementById('preview'),
             this.props.article.content, {
                 className: 'preview vditor-reset vditor-reset--anchor',
-                anchor: false
+                anchor: false,
+                hljs: {
+                    style: "native",
+                    lineNumber: true
+                },
+                markdown: {
+                    toc: true
+                }
             });
         let _react = this;
         // 生成目录
