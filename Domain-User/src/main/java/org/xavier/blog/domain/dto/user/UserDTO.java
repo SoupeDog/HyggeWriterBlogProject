@@ -17,10 +17,6 @@ import org.xavier.blog.domain.po.User;
  */
 public class UserDTO {
     /**
-     * 唯一标示
-     */
-    private Integer userId;
-    /**
      * 账号
      */
     private String uid;
@@ -28,10 +24,6 @@ public class UserDTO {
      * 用户类型
      */
     private UserTypeEnum userType;
-    /**
-     * 密码
-     */
-    private String pw;
     /**
      * 用户昵称
      */
@@ -86,14 +78,6 @@ public class UserDTO {
         this.lastUpdateTs = user.getLastUpdateTs();
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
     public String getUid() {
         return uid;
     }
@@ -108,14 +92,6 @@ public class UserDTO {
 
     public void setUserType(UserTypeEnum userType) {
         this.userType = userType;
-    }
-
-    public String getPw() {
-        return pw;
-    }
-
-    public void setPw(String pw) {
-        this.pw = pw;
     }
 
     public String getUserName() {

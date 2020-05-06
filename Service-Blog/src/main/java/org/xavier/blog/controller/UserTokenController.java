@@ -9,6 +9,7 @@ import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.domain.bo.UserLoginBO;
 import org.xavier.blog.domain.bo.UserTokenBO;
+import org.xavier.blog.domain.dto.user.UserDTO;
 import org.xavier.blog.domain.dto.user.UserTokenDTO;
 import org.xavier.blog.domain.po.User;
 import org.xavier.blog.domain.po.UserToken;
@@ -36,7 +37,8 @@ public class UserTokenController extends HyggeWriterController {
     @PostMapping("/extra/token/login")
     public ResponseEntity<?> login(@RequestBody UserLoginBO userLoginBO) {
         try {
-            UserTokenDTO result = new UserTokenDTO(userTokenService.login(userLoginBO, System.currentTimeMillis()));
+            UserTokenDTO result = userTokenService.login(userLoginBO, System.currentTimeMillis());
+
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
@@ -79,6 +81,8 @@ public class UserTokenController extends HyggeWriterController {
             userTokenBO.validate();
             UserToken resultTemp = userTokenService.keepAlive(userTokenBO.getUid(), userTokenBO.getToken(), userTokenBO.getRefreshKey(), userTokenBO.calculateScope(), System.currentTimeMillis());
             UserTokenDTO result = new UserTokenDTO(resultTemp);
+            User targetUser = userService.queryUserByUId(result.getUid());
+            result.setUserInfo(new UserDTO(targetUser));
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

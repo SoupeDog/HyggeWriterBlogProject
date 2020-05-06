@@ -14,6 +14,7 @@ import org.xavier.blog.dao.ArticleMapper;
 import org.xavier.blog.dao.GroupRelationshipMapper;
 import org.xavier.blog.domain.bo.ArticleJsonProperties;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
+import org.xavier.blog.domain.bo.BoardArticleCountInfo;
 import org.xavier.blog.domain.dto.ArticleDTO;
 import org.xavier.blog.domain.po.*;
 import org.xavier.common.enums.ColumnType;
@@ -263,17 +264,7 @@ public class ArticleServiceImpl extends DefaultUtils {
             return result;
         }
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
-        // key-value ArticleCategoryNo-AccessRule
-        LinkedMultiValueMap<String, AccessRule> accessRuleOrderMap = new LinkedMultiValueMap<>();
-        for (AccessRule accessRule : accessRuleList) {
-            accessRuleOrderMap.add(accessRule.getArticleCategoryNo(), accessRule);
-        }
-        ArrayList<String> allowableArticleCategoryNoList = new ArrayList<>();
-        for (Map.Entry<String, List<AccessRule>> entry : accessRuleOrderMap.entrySet()) {
-            if (checkAccessRuleOfOneArticleCategoryNo(secretKey, loginUser, entry.getValue(), allJoinedGroup)) {
-                allowableArticleCategoryNoList.add(entry.getKey());
-            }
-        }
+        ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
         Integer totalCount = articleMapper.queryArticleSummaryByArticleCategoryNoTotalCount(allowableArticleCategoryNoList, boardNo);
         if (totalCount != 0) {
             switch (orderKey) {
@@ -302,5 +293,58 @@ public class ArticleServiceImpl extends DefaultUtils {
         }
         result.setTotalCount(totalCount);
         return result;
+    }
+
+    /**
+     * 查询全部板块文章数量
+     *
+     * @return 全部板块文章数量信息 key-value BoardNo-BoardArticleCountInfo
+     */
+    public LinkedHashMap<String, BoardArticleCountInfo> queryAllArticleCountInfo(String loginUid, String secretKey) throws Universal404Exception {
+        ArrayList<Board> allBoardList = boardService.queryAllBoardList(1, 999, "ts", false);
+        LinkedHashMap<String, BoardArticleCountInfo> result = new LinkedHashMap(allBoardList.size());
+
+        User loginUser = userService.queryUserNotNull(loginUid);
+        ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
+        HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.",
+                (gno) -> gno,
+                (gno) -> gno);
+        ArrayList<ArticleCategory> totalArticleCategoryList = articleCategoryService.queryAllArticleCategory(null);
+        // key-value articleCategoryNo-ArticleCategory
+        HashMap<String, ArticleCategory> totalArticleCategoryMap = collectionHelper.filterCollectionNotEmptyAsHashMap(totalArticleCategoryList, "",
+                (articleCategory) -> articleCategory.getArticleCategoryNo(),
+                (articleCategory) -> articleCategory);
+        ArrayList<String> needCheckArticleCategoryNoList = collectionHelper.filterCollectionNotEmptyAsArrayList(true, totalArticleCategoryList, "[totalArticleCategoryList] for query can't be empty.",
+                (articleCategory) -> articleCategory.getArticleCategoryNo()
+        );
+        ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
+        ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
+
+        for (Board board : allBoardList) {
+            BoardArticleCountInfo boardArticleCountInfo = new BoardArticleCountInfo(board);
+            if (needCheckArticleCategoryNoList.size() < 1) {
+                boardArticleCountInfo.setTotalCount(0);
+            } else {
+                Integer totalCount = articleMapper.queryArticleSummaryByArticleCategoryNoTotalCount(allowableArticleCategoryNoList, board.getBoardNo());
+                boardArticleCountInfo.setTotalCount(totalCount);
+            }
+            result.put(board.getBoardNo(), boardArticleCountInfo);
+        }
+        return result;
+    }
+
+    private ArrayList<String> getAllowableArticleCategoryNoList(String secretKey, User loginUser, HashMap<String, Object> allJoinedGroup, ArrayList<AccessRule> accessRuleList) {
+        // key-value ArticleCategoryNo-AccessRule
+        LinkedMultiValueMap<String, AccessRule> accessRuleOrderMap = new LinkedMultiValueMap<>();
+        for (AccessRule accessRule : accessRuleList) {
+            accessRuleOrderMap.add(accessRule.getArticleCategoryNo(), accessRule);
+        }
+        ArrayList<String> allowableArticleCategoryNoList = new ArrayList<>();
+        for (Map.Entry<String, List<AccessRule>> entry : accessRuleOrderMap.entrySet()) {
+            if (checkAccessRuleOfOneArticleCategoryNo(secretKey, loginUser, entry.getValue(), allJoinedGroup)) {
+                allowableArticleCategoryNoList.add(entry.getKey());
+            }
+        }
+        return allowableArticleCategoryNoList;
     }
 }

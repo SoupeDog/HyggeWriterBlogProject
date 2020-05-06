@@ -48,11 +48,11 @@ public class ArticleCategoryController extends HyggeWriterController {
             try {
                 ConcurrentHashMap<String, ArrayList<ArticleCategoryInfoPO>> target = mapper.readValue(articleCategoryTreeInfo, new TypeReference<ConcurrentHashMap<String, ArrayList<ArticleCategoryInfoPO>>>() {
                 });
-                articleCategoryService.articleCategoryTreeInfo = target;
+                ArticleCategoryServiceImpl.articleCategoryTreeInfo = target;
             } catch (JsonProcessingException e) {
                 throw new PropertiesRuntimeException("Fail to read:" + articleCategoryTreeInfo);
             }
-            return success(articleCategoryService.articleCategoryTreeInfo);
+            return success(ArticleCategoryServiceImpl.articleCategoryTreeInfo);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
         } catch (Universal403Exception e) {

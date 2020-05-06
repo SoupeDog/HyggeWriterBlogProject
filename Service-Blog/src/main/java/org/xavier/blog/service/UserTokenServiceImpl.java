@@ -7,6 +7,8 @@ import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.enums.UserTokenScopeEnum;
 import org.xavier.blog.dao.UserTokenMapper;
 import org.xavier.blog.domain.bo.UserLoginBO;
+import org.xavier.blog.domain.dto.user.UserDTO;
+import org.xavier.blog.domain.dto.user.UserTokenDTO;
 import org.xavier.blog.domain.po.User;
 import org.xavier.blog.domain.po.UserToken;
 import org.xavier.common.exception.Universal400Exception;
@@ -35,7 +37,7 @@ public class UserTokenServiceImpl extends DefaultUtils {
     @Autowired
     UserServiceImpl userService;
 
-    public UserToken login(UserLoginBO loginBO, Long currentTs) throws Universal403Exception, Universal409Exception, Universal400Exception, Universal404Exception {
+    public UserTokenDTO login(UserLoginBO loginBO, Long currentTs) throws Universal403Exception, Universal409Exception, Universal400Exception, Universal404Exception {
         User targetUser = userService.queryUserNotNull(loginBO.getUid());
         UserTokenScopeEnum currentUserTokenScope = loginBO.calculateScope();
         if (!targetUser.getPw().equals(loginBO.getPw())) {
@@ -53,7 +55,9 @@ public class UserTokenServiceImpl extends DefaultUtils {
         } else {
             currentUserToken = refreshToken(currentTs, targetUser.getUid(), currentUserTokenScope, currentUserToken);
         }
-        return currentUserToken;
+        UserTokenDTO result = new UserTokenDTO(currentUserToken);
+        result.setUserInfo(new UserDTO(targetUser));
+        return result;
     }
 
     public UserToken keepAlive(String uid, String token, String refreshKey, UserTokenScopeEnum scope, Long currentTs) throws Universal404Exception, Universal409Exception, Universal403Exception {
