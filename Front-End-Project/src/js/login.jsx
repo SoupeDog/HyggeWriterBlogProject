@@ -3,7 +3,7 @@ import '../css/default.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'antd/dist/antd.less';
+// import 'antd/dist/antd.less';
 import LoginContainer from "./pages/LoginContainer.jsx";
 
 // APICaller.querySummaryByPage({

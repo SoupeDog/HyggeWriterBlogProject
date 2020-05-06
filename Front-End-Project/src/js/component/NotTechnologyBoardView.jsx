@@ -104,6 +104,7 @@ class NotTechnologyBoardView extends React.Component {
         LogHelper.debug({className: "NotTechnologyBoardView", tag: "prevProps", msg: prevProps, isJson: true});
         LogHelper.debug({className: "NotTechnologyBoardView", tag: "prevState", msg: prevState, isJson: true});
         LogHelper.debug({msg: ""});
+        return null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

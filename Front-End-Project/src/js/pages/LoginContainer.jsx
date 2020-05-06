@@ -3,12 +3,11 @@ import LogHelper from "../utils/LogHelper.jsx";
 
 import '../../css/login.less';
 import LoginFrom from "../component/LoginFrom.jsx";
-import {Layout, Form} from 'antd';
+import {Layout} from 'antd';
 import clsx from "clsx";
 
 const {Header, Content, Footer} = Layout;
 
-const WrappedNormalLoginForm = Form.create({name: 'normal_login'})(LoginFrom);
 class LoginContainer extends React.Component {
 
     constructor(props) {
@@ -35,7 +34,7 @@ class LoginContainer extends React.Component {
                         <div className="logo">我的小宅子---登录页面</div>
                     </Header>
                     <Content style={{padding: '0 50px'}}>
-                        <WrappedNormalLoginForm/>
+                        <LoginFrom/>
                     </Content>
                     <Footer className={clsx('myFooter')}>
                         <div>
@@ -83,6 +82,7 @@ class LoginContainer extends React.Component {
         LogHelper.debug({className: "loginContainer", tag: "prevProps", msg: prevProps, isJson: true});
         LogHelper.debug({className: "loginContainer", tag: "prevState", msg: prevState, isJson: true});
         LogHelper.debug({msg: ""});
+        return null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

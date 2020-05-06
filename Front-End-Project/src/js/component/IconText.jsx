@@ -59,6 +59,7 @@ class IconText extends React.Component {
         LogHelper.debug({className: "IconText", tag: "prevProps", msg: prevProps, isJson: true});
         LogHelper.debug({className: "IconText", tag: "prevState", msg: prevState, isJson: true});
         LogHelper.debug({msg: ""});
+        return null;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

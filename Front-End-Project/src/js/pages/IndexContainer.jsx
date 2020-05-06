@@ -1,12 +1,18 @@
 import React from 'react';
 import LogHelper from '../utils/LogHelper.jsx';
 import clsx from 'clsx';
-import 'antd/dist/antd.less';
 import '../../css/index.less';
 
 import csdnLogo from '../../img/csdnLogo.png';
+import {
+    LinkOutlined,
+    GithubOutlined,
+    QuestionCircleOutlined,
+    MenuUnfoldOutlined,
+    MenuFoldOutlined
+} from '@ant-design/icons';
+import {Avatar, BackTop, Badge, Empty, Layout, Menu, message, Modal, notification, Tabs} from 'antd';
 
-import {Avatar, BackTop, Empty, Icon, Layout, List, Menu, message, Modal, notification, Tabs} from 'antd';
 import URLHelper from "../utils/URLHelper.jsx";
 import APICaller from "../utils/APICaller.jsx";
 import NotTechnologyBoardView from "../component/NotTechnologyBoardView.jsx";
@@ -102,12 +108,12 @@ class IndexContainer extends React.Component {
             } else {
                 finalSummaryList = summaryList;
             }
-            console.log({
-                activeKey: activeKey,
-                actualCurrentPage: actualCurrentPage,
-                totalCount: totalCount,
-                summaryList: summaryList
-            })
+            // console.log({
+            //     activeKey: activeKey,
+            //     actualCurrentPage: actualCurrentPage,
+            //     totalCount: totalCount,
+            //     summaryList: summaryList
+            // })
             switch (activeKey) {
                 case "1":
                     this.setState({
@@ -153,7 +159,7 @@ class IndexContainer extends React.Component {
         return (
             <Layout id={"myPage"}>
                 <Sider theme="dark" className="leftMenu" trigger={null} collapsible
-                       collapsed={this.state.mainMenuCollapsed}>
+                       collapsed={this.state.mainMenuCollapsed} style={{overflow: "hidden"}}>
                     <div className="logo autoOmit_2">{this.state.mainMenuCollapsed ? "宅" : "我的小宅子"}</div>
                     <Menu theme="dark" mode="inline" selectable={false}>
                         <Menu.Item key="1">
@@ -183,13 +189,13 @@ class IndexContainer extends React.Component {
                                 inNewTab: true
                             });
                         }}>
-                            <Icon type="github" theme="filled"/>
+                            <GithubOutlined/>
                             <span>GitHub</span>
                         </Menu.Item>
                         <Menu.Item key="4" onClick={() => {
                             message.warn('暂时还没有，有人在期待着一场 PY 交易嘛~', 2);
                         }}>
-                            <Icon type="link"/>
+                            <LinkOutlined/>
                             <span>友链</span>
                         </Menu.Item>
                         <Menu.Item key="5" onClick={() => {
@@ -199,7 +205,7 @@ class IndexContainer extends React.Component {
                                     '本站前端基于 React 、Antd、Vditor 开发，后端基于 Spring Boot 全家桶开发，已在我的 Github 个人仓库开源。目标使用场景为 PC ，对手机端提供少数功能，平板将被视为手机端。本站全部音频、图片素材来源于网络，若侵犯了您的权益，请联系 xavierpe@qq.com 以便及时删除侵权素材。',
                             });
                         }}>
-                            <Icon type="question"/>
+                            <QuestionCircleOutlined/>
                             <span>关于</span>
                         </Menu.Item>
                     </Menu>
@@ -210,24 +216,30 @@ class IndexContainer extends React.Component {
                         "header": !this.state.mainMenuCollapsed,
                         "backgroundTransparent": this.state.headerTransparent
                     })}>
-                        <Icon
-                            className="trigger"
-                            type={this.state.mainMenuCollapsed ? 'menu-unfold' : 'menu-fold'}
-                            onClick={this.mainMenuToggle}
-                        />
+                        {this.state.mainMenuCollapsed ?
+                            <MenuUnfoldOutlined style={{color: "#fff", fontSize: "20px", padding: "0 24px"}}
+                                                onClick={this.mainMenuToggle}/> :
+                            <MenuFoldOutlined style={{color: "#fff", fontSize: "20px", padding: "0 24px"}}
+                                              onClick={this.mainMenuToggle}/>
+                        }
                     </Header>
                     <Content className={clsx({
                         "myContentCollapsed": this.state.mainMenuCollapsed,
                         "myContent": !this.state.mainMenuCollapsed
                     })}>
-                        <Tabs defaultActiveKey="1" onChange={(activeKey) => {
+                        <Tabs tabBarGutter={50} defaultActiveKey="1" onChange={(activeKey) => {
                             this.onTabChange({activeKey: activeKey});
                         }}>
                             <TabPane
                                 tab={
+                                    <Badge
+                                        overflowCount={99}
+                                        offset={[20, -5]}
+                                        count={this.state.technologyTotalCount == null ? "?" : this.state.technologyTotalCount}>
                                     <span>
-                                      技术
+                                      技 术
                                     </span>
+                                    </Badge>
                                 }
                                 key="1"
                             >
@@ -239,9 +251,14 @@ class IndexContainer extends React.Component {
                             </TabPane>
                             <TabPane
                                 tab={
-                                    <span>
-                                      非技术
-                                    </span>
+                                    <Badge
+                                        overflowCount={99}
+                                        offset={[20, -5]}
+                                        count={this.state.notTechnologyTotalCount == null ? "?" : this.state.notTechnologyTotalCount}>
+                                        <span>
+                                          非技术
+                                        </span>
+                                    </Badge>
                                 }
                                 key="2"
                             >
