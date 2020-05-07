@@ -76,15 +76,36 @@ public class IndexController extends HyggeWriterController {
         }
     }
 
-    @GetMapping(value = "/main/index/article")
+    @GetMapping(value = "/main/index/article", params = {"boardNo"})
     public ResponseEntity<?> queryArticleOfBoard(@RequestHeader HttpHeaders headers,
-                                           @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
-                                           @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
-                                           @RequestParam(value = "keyWord") String keyWord) {
+                                                 @RequestParam(value = "boardNo") String boardNo,
+                                                 @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
+                                                 @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                 @RequestParam(value = "orderKey", required = false, defaultValue = "ts") String orderKey,
+                                                 @RequestParam(value = "isDESC", required = false, defaultValue = "true") Boolean isDESC) {
         String loginUid = propertiesHelper.string(headers.getFirst("uid"));
         String secretKey = headers.getFirst("secretKey");
         try {
-            PageResult<ArticleSummaryQueryBO> result = articleService.articleSearch(loginUid, secretKey, keyWord, currentPage, pageSize);
+            PageResult<ArticleSummaryQueryBO> result = articleService.queryArticleSummaryOfBoard(loginUid, boardNo, secretKey, currentPage, pageSize, orderKey, isDESC);
+            return success(result);
+        } catch (PropertiesRuntimeException e) {
+            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
+        } catch (Universal404Exception e) {
+            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/main/index/article", params = {"articleCategoryNo"})
+    public ResponseEntity<?> queryArticleOfArticleCategory(@RequestHeader HttpHeaders headers,
+                                                           @RequestParam(value = "articleCategoryNo") String articleCategoryNo,
+                                                           @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
+                                                           @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                           @RequestParam(value = "orderKey", required = false, defaultValue = "ts") String orderKey,
+                                                           @RequestParam(value = "isDESC", required = false, defaultValue = "true") Boolean isDESC) {
+        String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+        String secretKey = headers.getFirst("secretKey");
+        try {
+            PageResult<ArticleSummaryQueryBO> result = articleService.queryArticleSummaryOfArticleCategory(loginUid, articleCategoryNo, secretKey, currentPage, pageSize, orderKey, isDESC);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

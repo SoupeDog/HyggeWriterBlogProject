@@ -244,7 +244,7 @@ public class ArticleServiceImpl extends DefaultUtils {
         return article;
     }
 
-    public PageResult<ArticleSummaryQueryBO> queryArticleSummary(String loginUid, String boardNo, String secretKey, Integer currentPage, Integer pageSize, String orderKey, Boolean isDESC) throws Universal404Exception {
+    public PageResult<ArticleSummaryQueryBO> queryArticleSummaryOfBoard(String loginUid, String boardNo, String secretKey, Integer currentPage, Integer pageSize, String orderKey, Boolean isDESC) throws Universal404Exception {
         PageResult<ArticleSummaryQueryBO> result = new PageResult<>();
         User loginUser = userService.queryUserNotNull(loginUid);
         ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
@@ -267,6 +267,56 @@ public class ArticleServiceImpl extends DefaultUtils {
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
         ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
         Integer totalCount = articleMapper.queryArticleSummaryByArticleCategoryNoTotalCount(allowableArticleCategoryNoList, boardNo);
+        if (totalCount != 0) {
+            switch (orderKey) {
+                case "wordCount":
+                    orderKey = "wordCount";
+                    break;
+                case "pageViews":
+                    orderKey = "pageViews";
+                    break;
+                case "lastUpdateTs":
+                    orderKey = "lastUpdateTs";
+                    break;
+                default:
+                    orderKey = "createTs";
+            }
+            Board board = boardService.queryBoardByBoardNo(boardNo);
+            ArrayList<Article> resultSetTemp = articleMapper.queryArticleSummaryByArticleCategoryNo(allowableArticleCategoryNoList, boardNo, (currentPage - 1) * pageSize, pageSize, orderKey, isDESC ? "DESC" : "ASC");
+            ArrayList<ArticleSummaryQueryBO> resultSet = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultSetTemp, "",
+                    (article) -> new ArticleSummaryQueryBO(article,
+                            board,
+                            totalArticleCategoryMap.get(article.getArticleCategoryNo()),
+                            ArticleCategoryServiceImpl.articleCategoryTreeInfo.get(article.getArticleCategoryNo())));
+            result.setResultSet(resultSet);
+        } else {
+            result.setResultSet(new ArrayList<>(0));
+        }
+        result.setTotalCount(totalCount);
+        return result;
+    }
+
+    public PageResult<ArticleSummaryQueryBO> queryArticleSummaryOfArticleCategory(String loginUid, String articleCategoryNo, String secretKey, Integer currentPage, Integer pageSize, String orderKey, Boolean isDESC) throws Universal404Exception {
+        ArticleCategory articleCategory = articleCategoryService.queryArticleCategoryNoByArticleCategoryNoNotNull(articleCategoryNo);
+        PageResult<ArticleSummaryQueryBO> result = new PageResult<>();
+        User loginUser = userService.queryUserNotNull(loginUid);
+        ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
+        HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.",
+                (gno) -> gno,
+                (gno) -> gno);
+        // key-value articleCategoryNo-ArticleCategory
+        HashMap<String, ArticleCategory> totalArticleCategoryMap = new HashMap() {{
+            put(articleCategory.getArticleCategoryNo(), articleCategory);
+        }};
+
+        ArrayList<String> needCheckArticleCategoryNoList = new ArrayList() {{
+            add(articleCategory.getArticleCategoryNo());
+        }};
+
+        String boardNo = articleCategory.getBoardNo();
+        ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
+        ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
+        Integer totalCount = allowableArticleCategoryNoList.size() < 1 ? 0 : articleMapper.queryArticleSummaryByArticleCategoryNoTotalCount(allowableArticleCategoryNoList, boardNo);
         if (totalCount != 0) {
             switch (orderKey) {
                 case "wordCount":
@@ -402,8 +452,8 @@ public class ArticleServiceImpl extends DefaultUtils {
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
         ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
 
-        for (Map.Entry<String,ArticleCategory> entry : totalArticleCategoryMap.entrySet()) {
-            if(allowableArticleCategoryNoList.contains(entry.getKey())){
+        for (Map.Entry<String, ArticleCategory> entry : totalArticleCategoryMap.entrySet()) {
+            if (allowableArticleCategoryNoList.contains(entry.getKey())) {
                 ArticleCategoryArticleCountInfo articleCategoryArticleCountInfo = new ArticleCategoryArticleCountInfo(entry.getValue());
                 if (needCheckArticleCategoryNoList.size() < 1) {
                     articleCategoryArticleCountInfo.setTotalCount(0);

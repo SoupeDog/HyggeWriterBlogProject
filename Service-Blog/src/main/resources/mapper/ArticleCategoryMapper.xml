@@ -3,11 +3,11 @@
 <mapper namespace="org.xavier.blog.dao.ArticleCategoryMapper">
 
     <sql id="Base_Column_List">
-        articleCategoryNo,articleCategoryName,uid,description,state,createTs,lastUpdateTs
+        articleCategoryNo,articleCategoryName,boardNo,uid,description,state,createTs,lastUpdateTs
     </sql>
 
     <sql id="All_Column_List">
-        articleCategoryId,articleCategoryNo,articleCategoryName,uid,description,state,createTs,lastUpdateTs
+        articleCategoryId,articleCategoryNo,articleCategoryName,boardNo,uid,description,state,createTs,lastUpdateTs
     </sql>
 
     <insert id="saveArticleCategory" parameterType="ArticleCategory" useGeneratedKeys="true"
@@ -15,6 +15,7 @@
         INSERT INTO `articleCategory`(<include refid="Base_Column_List"/>)VALUES (
         #{ArticleCategory.articleCategoryNo},
         #{ArticleCategory.articleCategoryName},
+        #{ArticleCategory.boardNo},
         #{ArticleCategory.uid},
         #{ArticleCategory.description},
         #{ArticleCategory.accessPermit},

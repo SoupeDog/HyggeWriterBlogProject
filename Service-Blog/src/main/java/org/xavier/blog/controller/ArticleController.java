@@ -102,7 +102,7 @@ public class ArticleController extends HyggeWriterController {
         String loginUid = propertiesHelper.string(headers.getFirst("uid"));
         String secretKey = headers.getFirst("secretKey");
         try {
-            PageResult<ArticleSummaryQueryBO> result = articleService.queryArticleSummary(loginUid, boardId, secretKey, currentPage, pageSize, orderKey, isDESC);
+            PageResult<ArticleSummaryQueryBO> result = articleService.queryArticleSummaryOfBoard(loginUid, boardId, secretKey, currentPage, pageSize, orderKey, isDESC);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
