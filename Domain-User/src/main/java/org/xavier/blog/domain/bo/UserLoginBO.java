@@ -36,7 +36,7 @@ public class UserLoginBO {
     private String refreshKey;
 
     public UserTokenScopeEnum calculateScope() throws Universal400Exception {
-        if (scope == null || scope.trim().equals("")) {
+        if (scope == null || "".equals(scope.trim())) {
             if (scopeByte == null) {
                 throw new Universal400Exception("[scope]、[scopeByte] can't be null at the same time.");
             } else {

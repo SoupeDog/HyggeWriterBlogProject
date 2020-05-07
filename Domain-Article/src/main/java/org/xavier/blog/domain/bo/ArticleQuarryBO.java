@@ -88,7 +88,7 @@ public class ArticleQuarryBO {
         this.title = articleQuarryPO.getTitle();
         this.boardName = articleQuarryPO.getBoardName();
         ArrayList<ArticleCategoryInfoPO> articleCategoryPathTemp = new ArrayList();
-        if (articleQuarryPO.getArticleCategoryPathStringVal() != null && !articleQuarryPO.getArticleCategoryPathStringVal().trim().equals("")) {
+        if (articleQuarryPO.getArticleCategoryPathStringVal() != null && !"".equals(articleQuarryPO.getArticleCategoryPathStringVal().trim())) {
             String[] array = articleQuarryPO.getArticleCategoryPathStringVal().split("/");
             for (String temp : array) {
                 articleCategoryPathTemp.add(new ArticleCategoryInfoPO(temp));

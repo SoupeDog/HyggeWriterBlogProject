@@ -37,7 +37,7 @@ public class ArticleCategoryServiceImpl extends DefaultUtils {
 
     public static ConcurrentHashMap<String, ArrayList<ArticleCategoryInfoPO>> articleCategoryTreeInfo = new ConcurrentHashMap<>();
 
-    private static final List<ColumnInfo> checkInfo = new ArrayList<ColumnInfo>() {{
+    private static final List<ColumnInfo> CHECK_INFO = new ArrayList<ColumnInfo>() {{
         add(new ColumnInfo("articleCategoryName", "articleCategoryName", ColumnType.STRING, false, 1, 32));
         add(new ColumnInfo("uid", "uid", ColumnType.STRING, false, 1, 32));
         add(new ColumnInfo("accessPermit", "accessPermit", ColumnType.BYTE, false, 0, Byte.MAX_VALUE));
@@ -59,7 +59,7 @@ public class ArticleCategoryServiceImpl extends DefaultUtils {
         ArticleCategory targetArticleCategory = queryArticleCategoryNoByArticleCategoryNoNotNull(articleCategoryNo);
         User loginUser = userService.queryUserNotNull(loginUid);
         userService.checkRight(loginUser, UserTypeEnum.ROOT, targetArticleCategory.getUid());
-        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, checkInfo);
+        HashMap data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, CHECK_INFO);
         if (data.size() < 2) {
             throw new Universal400Exception(ErrorCode.UPDATE_DATA_EMPTY.getErrorCod(), "Effective-Update-Properties can't be empty.");
         }

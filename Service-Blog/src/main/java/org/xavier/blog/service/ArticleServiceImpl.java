@@ -12,6 +12,7 @@ import org.xavier.blog.dao.AccessRuleMapper;
 import org.xavier.blog.dao.ArticleCategoryMapper;
 import org.xavier.blog.dao.ArticleMapper;
 import org.xavier.blog.dao.GroupRelationshipMapper;
+import org.xavier.blog.domain.bo.ArticleCategoryArticleCountInfo;
 import org.xavier.blog.domain.bo.ArticleJsonProperties;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.domain.bo.BoardArticleCountInfo;
@@ -146,7 +147,7 @@ public class ArticleServiceImpl extends DefaultUtils {
     }
 
     public void increasePageViewsAsynchronous(String articleNo) {
-        if (articleNo == null || articleNo.trim().equals("")) {
+        if (articleNo == null || "".equals(articleNo.trim())) {
             return;
         }
         CompletableFuture.runAsync(() -> {
@@ -286,7 +287,51 @@ public class ArticleServiceImpl extends DefaultUtils {
                     (article) -> new ArticleSummaryQueryBO(article,
                             board,
                             totalArticleCategoryMap.get(article.getArticleCategoryNo()),
-                            articleCategoryService.articleCategoryTreeInfo.get(article.getArticleCategoryNo())));
+                            ArticleCategoryServiceImpl.articleCategoryTreeInfo.get(article.getArticleCategoryNo())));
+            result.setResultSet(resultSet);
+        } else {
+            result.setResultSet(new ArrayList<>(0));
+        }
+        result.setTotalCount(totalCount);
+        return result;
+    }
+
+    /**
+     * 文章全文检索(从 title summary content 匹配)
+     */
+    public PageResult<ArticleSummaryQueryBO> articleSearch(String loginUid, String secretKey, String keyWord, Integer currentPage, Integer pageSize) throws Universal404Exception {
+        PageResult<ArticleSummaryQueryBO> result = new PageResult<>();
+        User loginUser = userService.queryUserNotNull(loginUid);
+        ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
+        HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.",
+                (gno) -> gno,
+                (gno) -> gno);
+        ArrayList<ArticleCategory> totalArticleCategoryList = articleCategoryService.queryAllArticleCategory(null);
+        // key-value articleCategoryNo-ArticleCategory
+        HashMap<String, ArticleCategory> totalArticleCategoryMap = collectionHelper.filterCollectionNotEmptyAsHashMap(totalArticleCategoryList, "",
+                (articleCategory) -> articleCategory.getArticleCategoryNo(),
+                (articleCategory) -> articleCategory);
+        ArrayList<String> needCheckArticleCategoryNoList = collectionHelper.filterCollectionNotEmptyAsArrayList(true, totalArticleCategoryList, "[totalArticleCategoryList] for query can't be empty.",
+                (articleCategory) -> articleCategory.getArticleCategoryNo()
+        );
+        if (needCheckArticleCategoryNoList.size() < 1) {
+            result.setTotalCount(0);
+            result.setResultSet(new ArrayList<>(0));
+            return result;
+        }
+        ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
+        ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
+        Integer totalCount = articleMapper.queryArticleNoCountForSearch(keyWord, allowableArticleCategoryNoList);
+        if (totalCount != 0) {
+            ArrayList<Board> allBoardList = boardService.queryAllBoardList(1, 999, "ts", false);
+            HashMap<String, Board> allBoardMap = collectionHelper.filterCollectionNotEmptyAsHashMap(allBoardList, "", (board) -> board.getBoardNo(), (board -> board));
+            ArrayList<String> finalArticleNoList = articleMapper.queryArticleNoForSearch(keyWord, allowableArticleCategoryNoList, (currentPage - 1) * pageSize, pageSize);
+            ArrayList<Article> resultSetTemp = articleMapper.queryArticleByArticleNoList(finalArticleNoList);
+            ArrayList<ArticleSummaryQueryBO> resultSet = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultSetTemp, "",
+                    (article) -> new ArticleSummaryQueryBO(article,
+                            allBoardMap.get(article.getBoardNo()),
+                            totalArticleCategoryMap.get(article.getArticleCategoryNo()),
+                            ArticleCategoryServiceImpl.articleCategoryTreeInfo.get(article.getArticleCategoryNo())));
             result.setResultSet(resultSet);
         } else {
             result.setResultSet(new ArrayList<>(0));
@@ -300,7 +345,7 @@ public class ArticleServiceImpl extends DefaultUtils {
      *
      * @return 全部板块文章数量信息 key-value BoardNo-BoardArticleCountInfo
      */
-    public LinkedHashMap<String, BoardArticleCountInfo> queryAllArticleCountInfo(String loginUid, String secretKey) throws Universal404Exception {
+    public LinkedHashMap<String, BoardArticleCountInfo> queryArticleCountInfoOfBoard(String loginUid, String secretKey) throws Universal404Exception {
         ArrayList<Board> allBoardList = boardService.queryAllBoardList(1, 999, "ts", false);
         LinkedHashMap<String, BoardArticleCountInfo> result = new LinkedHashMap(allBoardList.size());
 
@@ -332,6 +377,46 @@ public class ArticleServiceImpl extends DefaultUtils {
         }
         return result;
     }
+
+    /**
+     * 查询全部板块文章数量
+     *
+     * @return 全部板块文章数量信息 key-value BoardNo-BoardArticleCountInfo
+     */
+    public LinkedHashMap<String, ArticleCategoryArticleCountInfo> queryArticleCountInfoOfArticleCategory(String loginUid, String secretKey) throws Universal404Exception {
+        ArrayList<ArticleCategory> totalArticleCategoryList = articleCategoryService.queryAllArticleCategory(null);
+        LinkedHashMap<String, ArticleCategoryArticleCountInfo> result = new LinkedHashMap(totalArticleCategoryList.size());
+        User loginUser = userService.queryUserNotNull(loginUid);
+        ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
+        HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.",
+                (gno) -> gno,
+                (gno) -> gno);
+
+        // key-value articleCategoryNo-ArticleCategory
+        HashMap<String, ArticleCategory> totalArticleCategoryMap = collectionHelper.filterCollectionNotEmptyAsHashMap(totalArticleCategoryList, "",
+                (articleCategory) -> articleCategory.getArticleCategoryNo(),
+                (articleCategory) -> articleCategory);
+        ArrayList<String> needCheckArticleCategoryNoList = collectionHelper.filterCollectionNotEmptyAsArrayList(true, totalArticleCategoryList, "[totalArticleCategoryList] for query can't be empty.",
+                (articleCategory) -> articleCategory.getArticleCategoryNo()
+        );
+        ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
+        ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
+
+        for (Map.Entry<String,ArticleCategory> entry : totalArticleCategoryMap.entrySet()) {
+            if(allowableArticleCategoryNoList.contains(entry.getKey())){
+                ArticleCategoryArticleCountInfo articleCategoryArticleCountInfo = new ArticleCategoryArticleCountInfo(entry.getValue());
+                if (needCheckArticleCategoryNoList.size() < 1) {
+                    articleCategoryArticleCountInfo.setTotalCount(0);
+                } else {
+                    Integer totalCount = articleMapper.queryArticleCategoryArticleCount(entry.getKey());
+                    articleCategoryArticleCountInfo.setTotalCount(totalCount);
+                }
+                result.put(entry.getKey(), articleCategoryArticleCountInfo);
+            }
+        }
+        return result;
+    }
+
 
     private ArrayList<String> getAllowableArticleCategoryNoList(String secretKey, User loginUser, HashMap<String, Object> allJoinedGroup, ArrayList<AccessRule> accessRuleList) {
         // key-value ArticleCategoryNo-AccessRule

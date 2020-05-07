@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.xavier.blog.domain.po.Article;
-import org.xavier.blog.domain.po.Group;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -68,6 +67,15 @@ public interface ArticleMapper {
     Article queryArticleByArticleNo(@Param("articleNo") String articleNo);
 
     /**
+     * 查询特定文章类别下文章数量
+     *
+     * @param articleCategoryNo 文章类别编号
+     * @return 文章数量
+     */
+    @Select("select count(*) from article where articleCategoryNo=#{articleCategoryNo}")
+    Integer queryArticleCategoryArticleCount(@Param("articleCategoryNo") String articleCategoryNo);
+
+    /**
      * 根据 articleNo List 批量查询文章信息
      *
      * @param articleNoList articleNo List
@@ -90,4 +98,24 @@ public interface ArticleMapper {
      * @return 查询结果
      */
     Integer queryArticleSummaryByArticleCategoryNoTotalCount(@Param("articleCategoryNoList") ArrayList<String> articleCategoryNoList, @Param("boardNo") String boardNo);
+
+    /**
+     * 全文检索关键字返回匹配到的文章编号
+     *
+     * @param keyWord               关键字
+     * @param articleCategoryNoList 允许的文章类别
+     * @param startPoint            分页查询起点
+     * @param size                  页容量
+     * @return 匹配到的文章编号
+     */
+    ArrayList<String> queryArticleNoForSearch(@Param("keyWord") String keyWord, @Param("articleCategoryNoList") ArrayList<String> articleCategoryNoList, @Param("startPoint") Integer startPoint, @Param("size") Integer size);
+
+    /**
+     * 全文检索关键字返回匹配到的文章总数
+     *
+     * @param keyWord               关键字
+     * @param articleCategoryNoList 允许的文章类别
+     * @return 匹配到的文章总数
+     */
+    Integer queryArticleNoCountForSearch(@Param("keyWord") String keyWord, @Param("articleCategoryNoList") ArrayList<String> articleCategoryNoList);
 }
