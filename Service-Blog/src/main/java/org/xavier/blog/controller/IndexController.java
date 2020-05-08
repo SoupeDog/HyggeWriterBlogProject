@@ -6,14 +6,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.HyggeWriterController;
-import org.xavier.blog.domain.bo.ArticleCategoryArticleCountInfo;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
+import org.xavier.blog.domain.bo.BoardArticleCategoryArticleCountInfo;
 import org.xavier.blog.domain.bo.BoardArticleCountInfo;
 import org.xavier.blog.service.ArticleServiceImpl;
 import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal404Exception;
 import org.xavier.webtoolkit.domain.PageResult;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
@@ -50,7 +51,19 @@ public class IndexController extends HyggeWriterController {
         String loginUid = propertiesHelper.string(headers.getFirst("uid"));
         String secretKey = headers.getFirst("secretKey");
         try {
-            LinkedHashMap<String, ArticleCategoryArticleCountInfo> result = articleService.queryArticleCountInfoOfArticleCategory(loginUid, secretKey);
+            ArrayList<BoardArticleCategoryArticleCountInfo> result = articleService.queryArticleCountInfoOfArticleCategory(loginUid, secretKey);
+            // 根据板块编号从小到大排序
+            result.sort(((o1, o2) -> {
+                Integer boardId1 = o1.getBoard().getBoardId();
+                Integer boardId2 = o2.getBoard().getBoardId();
+                if (boardId1.equals(o2)) {
+                    return 0;
+                } else if (boardId1 > boardId2) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }));
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

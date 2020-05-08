@@ -12,10 +12,7 @@ import org.xavier.blog.dao.AccessRuleMapper;
 import org.xavier.blog.dao.ArticleCategoryMapper;
 import org.xavier.blog.dao.ArticleMapper;
 import org.xavier.blog.dao.GroupRelationshipMapper;
-import org.xavier.blog.domain.bo.ArticleCategoryArticleCountInfo;
-import org.xavier.blog.domain.bo.ArticleJsonProperties;
-import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
-import org.xavier.blog.domain.bo.BoardArticleCountInfo;
+import org.xavier.blog.domain.bo.*;
 import org.xavier.blog.domain.dto.ArticleDTO;
 import org.xavier.blog.domain.po.*;
 import org.xavier.common.enums.ColumnType;
@@ -431,11 +428,13 @@ public class ArticleServiceImpl extends DefaultUtils {
     /**
      * 查询全部板块文章数量
      *
-     * @return 全部板块文章数量信息 key-value BoardNo-BoardArticleCountInfo
+     * @return 全部板块文章数量信息
      */
-    public LinkedHashMap<String, ArticleCategoryArticleCountInfo> queryArticleCountInfoOfArticleCategory(String loginUid, String secretKey) throws Universal404Exception {
+    public ArrayList<BoardArticleCategoryArticleCountInfo> queryArticleCountInfoOfArticleCategory(String loginUid, String secretKey) throws Universal404Exception {
         ArrayList<ArticleCategory> totalArticleCategoryList = articleCategoryService.queryAllArticleCategory(null);
-        LinkedHashMap<String, ArticleCategoryArticleCountInfo> result = new LinkedHashMap(totalArticleCategoryList.size());
+        ArrayList<BoardArticleCategoryArticleCountInfo> result;
+
+
         User loginUser = userService.queryUserNotNull(loginUid);
         ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
         HashMap<String, Object> allJoinedGroup = collectionHelper.filterCollectionNotEmptyAsHashMap(allJoinedGroupTemp, "Item of [gno] can't be null.",
@@ -447,11 +446,17 @@ public class ArticleServiceImpl extends DefaultUtils {
                 (articleCategory) -> articleCategory.getArticleCategoryNo(),
                 (articleCategory) -> articleCategory);
         ArrayList<String> needCheckArticleCategoryNoList = collectionHelper.filterCollectionNotEmptyAsArrayList(true, totalArticleCategoryList, "[totalArticleCategoryList] for query can't be empty.",
-                (articleCategory) -> articleCategory.getArticleCategoryNo()
-        );
+                (articleCategory) -> articleCategory.getArticleCategoryNo());
+
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
         ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
 
+        ArrayList<Board> allBoardList = boardService.queryAllBoardList(1, 999, "ts", false);
+        // 全部板块信息 key-vale boardNo-Board
+        HashMap<String, Board> allBoardMap = collectionHelper.filterCollectionNotEmptyAsHashMap(allBoardList, "Board can't be null.", (board) -> board.getBoardNo(), board -> board);
+
+
+        LinkedHashMap<String, BoardArticleCategoryArticleCountInfo> resultTemp = new LinkedHashMap();
         for (Map.Entry<String, ArticleCategory> entry : totalArticleCategoryMap.entrySet()) {
             if (allowableArticleCategoryNoList.contains(entry.getKey())) {
                 ArticleCategoryArticleCountInfo articleCategoryArticleCountInfo = new ArticleCategoryArticleCountInfo(entry.getValue());
@@ -461,9 +466,22 @@ public class ArticleServiceImpl extends DefaultUtils {
                     Integer totalCount = articleMapper.queryArticleCategoryArticleCount(entry.getKey());
                     articleCategoryArticleCountInfo.setTotalCount(totalCount);
                 }
-                result.put(entry.getKey(), articleCategoryArticleCountInfo);
+                // 当前文章类别对应的板块
+                Board currentBoard = allBoardMap.get(entry.getValue().getBoardNo());
+                // 文章类别对应的板块信息存在
+                if (currentBoard != null) {
+                    if (resultTemp.containsKey(currentBoard.getBoardNo())) {
+                        resultTemp.get(currentBoard.getBoardNo()).getArticleCategoryCountInfoMap().put(entry.getKey(), articleCategoryArticleCountInfo);
+                    } else {
+                        BoardArticleCategoryArticleCountInfo boardArticleCategoryArticleCountInfo = new BoardArticleCategoryArticleCountInfo();
+                        boardArticleCategoryArticleCountInfo.setBoard(currentBoard);
+                        boardArticleCategoryArticleCountInfo.getArticleCategoryCountInfoMap().put(entry.getKey(), articleCategoryArticleCountInfo);
+                        resultTemp.put(currentBoard.getBoardNo(), boardArticleCategoryArticleCountInfo);
+                    }
+                }
             }
         }
+        result = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultTemp.values(), "Fail to get article count info of board.", (item) -> item);
         return result;
     }
 

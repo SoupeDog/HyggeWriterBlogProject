@@ -5,6 +5,8 @@ import org.xavier.blog.common.enums.DefaultStateEnum;
 import org.xavier.common.util.PropertiesHelper;
 import org.xavier.common.util.UtilsCreator;
 
+import java.util.Objects;
+
 /**
  * 描述信息：<br/>
  * 板块
@@ -108,5 +110,18 @@ public class Board {
 
     public void setLastUpdateTs(Long lastUpdateTs) {
         this.lastUpdateTs = lastUpdateTs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Board board = (Board) o;
+        return Objects.equals(boardNo, board.boardNo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(boardNo);
     }
 }
