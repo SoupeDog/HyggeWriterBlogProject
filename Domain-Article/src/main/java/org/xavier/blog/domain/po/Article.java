@@ -101,7 +101,7 @@ public class Article {
      */
     @JsonIgnore
     public void setWordCount(Article targetArticle) {
-        if (targetArticle == null || targetArticle.getContent() == null || targetArticle.getContent().trim().equals("")) {
+        if (targetArticle == null || targetArticle.getContent() == null || "".equals(targetArticle.getContent().trim())) {
             wordCount = 0;
         } else {
             wordCount = targetArticle.getContent().trim().length();
@@ -114,7 +114,7 @@ public class Article {
      */
     @JsonIgnore
     public void initWordCount() {
-        if (content == null || content.trim().equals("")) {
+        if (content == null || "".equals(content.trim())) {
             wordCount = 0;
         } else {
             wordCount = content.trim().length();

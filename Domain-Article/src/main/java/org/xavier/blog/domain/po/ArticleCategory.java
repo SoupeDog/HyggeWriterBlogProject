@@ -1,7 +1,6 @@
 package org.xavier.blog.domain.po;
 
 
-import org.xavier.blog.common.enums.ArticleAccessPermitEnum;
 import org.xavier.blog.common.enums.DefaultStateEnum;
 import org.xavier.common.util.PropertiesHelper;
 import org.xavier.common.util.UtilsCreator;
@@ -28,6 +27,10 @@ public class ArticleCategory {
      * 文章类别名称
      */
     private String articleCategoryName;
+    /**
+     * 板块显示编号
+     */
+    private String boardNo;
     /**
      * 作者唯一标识
      */
@@ -81,6 +84,14 @@ public class ArticleCategory {
 
     public void setArticleCategoryName(String articleCategoryName) {
         this.articleCategoryName = articleCategoryName;
+    }
+
+    public String getBoardNo() {
+        return boardNo;
+    }
+
+    public void setBoardNo(String boardNo) {
+        this.boardNo = boardNo;
     }
 
     public String getUid() {

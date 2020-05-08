@@ -57,11 +57,12 @@
         SELECT
         <include refid="AllColumnList"/>
         FROM `article`
-        WHERE state=1
+        WHERE state = 1
         AND articleNo IN
         <foreach collection="articleNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
+        ORDER BY articleId
     </select>
 
     <select id="queryArticleSummaryByArticleCategoryNo" resultType="Article">
@@ -74,10 +75,10 @@
             #{item}
         </foreach>
         ORDER BY ${orderKey} ${order}
-        Limit #{startPoint},#{size}
+        LIMIT #{startPoint},#{size}
     </select>
 
-    <select id="queryArticleSummaryByArticleCategoryNoTotalCount" resultType="integer">
+    <select id="queryArticleSummaryByArticleCategoryNoTotalCount" resultType="int">
         SELECT
         count(*)
         FROM
@@ -86,5 +87,31 @@
         <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+
+    <select id="queryArticleNoForSearch" resultType="string">
+        SELECT
+        articleNo
+        FROM
+        article
+        WHERE
+        articleCategoryNo IN
+        <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND MATCH ( title, summary, content ) AGAINST ( #{keyWord} )
+        ORDER BY articleId
+        LIMIT #{startPoint},#{size};
+    </select>
+
+    <select id="queryArticleNoCountForSearch" resultType="int">
+        SELECT
+        COUNT(IF(MATCH ( title, summary, content ) AGAINST ( #{keyWord} ), 1, NULL)) AS total
+        FROM
+        (SELECT * FROM article
+        WHERE articleCategoryNo IN
+        <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>) AS permit;
     </select>
 </mapper>

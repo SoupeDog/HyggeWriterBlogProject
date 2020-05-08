@@ -36,6 +36,11 @@ public class UserTokenDTO {
      */
     private UserTokenScopeEnum scope;
 
+    /**
+     * 用户信息
+     */
+    private UserDTO userInfo;
+
 
     public UserTokenDTO() {
     }
@@ -86,5 +91,13 @@ public class UserTokenDTO {
 
     public void setRefreshKey(String refreshKey) {
         this.refreshKey = refreshKey;
+    }
+
+    public UserDTO getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserDTO userInfo) {
+        this.userInfo = userInfo;
     }
 }
