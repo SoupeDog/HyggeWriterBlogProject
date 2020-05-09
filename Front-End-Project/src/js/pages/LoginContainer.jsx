@@ -1,12 +1,15 @@
 import React from 'react';
-import LogHelper from "../utils/LogHelper.jsx";
 
 import '../../css/login.less';
-import LoginFrom from "../component/LoginFrom.jsx";
+
 import {Layout} from 'antd';
+const {Header, Content} = Layout;
+
+import LogHelper from "../utils/LogHelper.jsx";
+
+import LoginFrom from "../component/LoginFrom.jsx";
 import MyFooter from "../component/public/MyFooter.jsx";
 
-const {Header, Content} = Layout;
 
 class LoginContainer extends React.Component {
 

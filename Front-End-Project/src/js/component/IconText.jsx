@@ -3,8 +3,6 @@ import LogHelper from "../utils/LogHelper.jsx";
 import {Tooltip} from "antd";
 import TimeHelper from "../utils/TimeHelper.jsx";
 
-
-
 class IconText extends React.Component {
 
     constructor(props) {

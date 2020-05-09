@@ -2,7 +2,6 @@ import React from 'react';
 import LogHelper from "../utils/LogHelper.jsx";
 import {Form, Input, Button, message} from 'antd';
 import {UserOutlined, LockOutlined} from '@ant-design/icons';
-import APICaller from "../utils/APICaller.jsx";
 import LoginAPICaller from "../utils/LoginAPICaller.jsx";
 import URLHelper from "../utils/URLHelper.jsx";
 

@@ -1,16 +1,21 @@
 import React from 'react';
+
+import '../../css/browse.less';
+
+import $ from 'jquery'
+import clsx from "clsx";
+import Vditor from "vditor";
 import LogHelper from "../utils/LogHelper.jsx";
 import {Card, Layout, Menu, Sider} from "antd";
-import Vditor from "vditor";
-import $ from 'jquery'
-import '../../css/browse.less';
+
+const {Header, Content} = Layout;
+
 import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
-import clsx from "clsx";
 import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
 import IconText from "../component/IconText.jsx";
 import MyFooter from "../component/public/MyFooter.jsx";
 
-const {Header, Content} = Layout;
+
 
 class BrowseContainer extends React.Component {
 

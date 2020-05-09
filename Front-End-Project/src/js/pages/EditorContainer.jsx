@@ -1,11 +1,15 @@
 import React from 'react';
-import LogHelper from "../utils/LogHelper.jsx";
+
 import {Layout} from 'antd';
+const {Header,  Content} = Layout;
+
+import LogHelper from "../utils/LogHelper.jsx";
+
 // import 'antd/dist/antd.css'
 import EditorForm from "../component/EditorForm.jsx";
 import MyFooter from "../component/public/MyFooter.jsx";
 
-const {Header,  Content} = Layout;
+
 
 class EditorContainer extends React.Component {
 
