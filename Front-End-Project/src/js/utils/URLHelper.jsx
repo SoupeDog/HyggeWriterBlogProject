@@ -1,7 +1,10 @@
+import PropertiesHelper from "./PropertiesHelper.jsx";
+
 export default class URLHelper {
     // url 默认前缀
     static getJumpPrefix() {
-        return "https://www.xavierwang.cn/";
+        // return "https://www.xavierwang.cn/";
+        return "http://192.168.18.12:9000/";
     }
 
     // url 默认前缀
@@ -26,11 +29,23 @@ export default class URLHelper {
         }
     }
 
-    static openNewPage({finalUrl, inNewTab}) {
+    static openNewPage({finalUrl, inNewTab, delayTime}) {
         if (inNewTab == null || inNewTab == false) {
-            window.location.href = finalUrl;
+            if (PropertiesHelper.isNumberNotNull(delayTime) && delayTime != null) {
+                window.setTimeout(function () {
+                    window.location.href = finalUrl;
+                }, delayTime);
+            } else {
+                window.location.href = finalUrl;
+            }
         } else {
-            window.open(finalUrl);
+            if (PropertiesHelper.isNumberNotNull(delayTime) && delayTime != null) {
+                window.setTimeout(function () {
+                    window.open(finalUrl);
+                }, delayTime);
+            } else {
+                window.open(finalUrl);
+            }
         }
     }
 }
