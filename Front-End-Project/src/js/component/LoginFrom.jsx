@@ -3,6 +3,8 @@ import LogHelper from "../utils/LogHelper.jsx";
 import {Form, Input, Button, message} from 'antd';
 import {UserOutlined, LockOutlined} from '@ant-design/icons';
 import APICaller from "../utils/APICaller.jsx";
+import LoginAPICaller from "../utils/LoginAPICaller.jsx";
+import URLHelper from "../utils/URLHelper.jsx";
 
 class LoginFrom extends React.Component {
 
@@ -10,12 +12,13 @@ class LoginFrom extends React.Component {
         super(props);
         this.state = {};
         this.handleSubmit = values => {
-            APICaller.login({
+            LoginAPICaller.login({
                 ac: values.ac,
                 pw: values.pw,
                 successCallback: function (response) {
                     if (response != null && response.code == 200) {
                         message.success(`登录成功即将进行跳转`);
+                        URLHelper.openNewPage({finalUrl: URLHelper.getJumpPrefix(), delayTime: 1000});
                     } else {
                         message.error(response.msg);
                     }
