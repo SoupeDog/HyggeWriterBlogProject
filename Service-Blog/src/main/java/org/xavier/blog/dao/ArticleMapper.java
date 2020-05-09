@@ -102,20 +102,20 @@ public interface ArticleMapper {
     /**
      * 全文检索关键字返回匹配到的文章编号
      *
-     * @param keyWord               关键字
+     * @param keyword               关键字
      * @param articleCategoryNoList 允许的文章类别
      * @param startPoint            分页查询起点
      * @param size                  页容量
      * @return 匹配到的文章编号
      */
-    ArrayList<String> queryArticleNoForSearch(@Param("keyWord") String keyWord, @Param("articleCategoryNoList") ArrayList<String> articleCategoryNoList, @Param("startPoint") Integer startPoint, @Param("size") Integer size);
+    ArrayList<String> queryArticleNoForSearch(@Param("keyword") String keyword, @Param("articleCategoryNoList") ArrayList<String> articleCategoryNoList, @Param("startPoint") Integer startPoint, @Param("size") Integer size);
 
     /**
      * 全文检索关键字返回匹配到的文章总数
      *
-     * @param keyWord               关键字
+     * @param keyword               关键字
      * @param articleCategoryNoList 允许的文章类别
      * @return 匹配到的文章总数
      */
-    Integer queryArticleNoCountForSearch(@Param("keyWord") String keyWord, @Param("articleCategoryNoList") ArrayList<String> articleCategoryNoList);
+    Integer queryArticleNoCountForSearch(@Param("keyword") String keyword, @Param("articleCategoryNoList") ArrayList<String> articleCategoryNoList);
 }

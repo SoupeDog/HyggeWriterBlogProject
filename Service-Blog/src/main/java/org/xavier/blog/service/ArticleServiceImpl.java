@@ -346,7 +346,7 @@ public class ArticleServiceImpl extends DefaultUtils {
     /**
      * 文章全文检索(从 title summary content 匹配)
      */
-    public PageResult<ArticleSummaryQueryBO> articleSearch(String loginUid, String secretKey, String keyWord, Integer currentPage, Integer pageSize) throws Universal404Exception {
+    public PageResult<ArticleSummaryQueryBO> articleSearch(String loginUid, String secretKey, String keyword, Integer currentPage, Integer pageSize) throws Universal404Exception {
         PageResult<ArticleSummaryQueryBO> result = new PageResult<>();
         User loginUser = userService.queryUserNotNull(loginUid);
         ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
@@ -368,11 +368,11 @@ public class ArticleServiceImpl extends DefaultUtils {
         }
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
         ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
-        Integer totalCount = articleMapper.queryArticleNoCountForSearch(keyWord, allowableArticleCategoryNoList);
+        Integer totalCount = articleMapper.queryArticleNoCountForSearch(keyword, allowableArticleCategoryNoList);
         if (totalCount != 0) {
             ArrayList<Board> allBoardList = boardService.queryAllBoardList(1, 999, "ts", false);
             HashMap<String, Board> allBoardMap = collectionHelper.filterCollectionNotEmptyAsHashMap(allBoardList, "", (board) -> board.getBoardNo(), (board -> board));
-            ArrayList<String> finalArticleNoList = articleMapper.queryArticleNoForSearch(keyWord, allowableArticleCategoryNoList, (currentPage - 1) * pageSize, pageSize);
+            ArrayList<String> finalArticleNoList = articleMapper.queryArticleNoForSearch(keyword, allowableArticleCategoryNoList, (currentPage - 1) * pageSize, pageSize);
             ArrayList<Article> resultSetTemp = articleMapper.queryArticleByArticleNoList(finalArticleNoList);
             ArrayList<ArticleSummaryQueryBO> resultSet = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultSetTemp, "",
                     (article) -> new ArticleSummaryQueryBO(article,
@@ -471,11 +471,11 @@ public class ArticleServiceImpl extends DefaultUtils {
                 // 文章类别对应的板块信息存在
                 if (currentBoard != null) {
                     if (resultTemp.containsKey(currentBoard.getBoardNo())) {
-                        resultTemp.get(currentBoard.getBoardNo()).getArticleCategoryCountInfoMap().put(entry.getKey(), articleCategoryArticleCountInfo);
+                        resultTemp.get(currentBoard.getBoardNo()).getArticleCategoryCountInfoList().add(articleCategoryArticleCountInfo);
                     } else {
                         BoardArticleCategoryArticleCountInfo boardArticleCategoryArticleCountInfo = new BoardArticleCategoryArticleCountInfo();
                         boardArticleCategoryArticleCountInfo.setBoardArticleCountInfo(new BoardArticleCountInfo(currentBoard));
-                        boardArticleCategoryArticleCountInfo.getArticleCategoryCountInfoMap().put(entry.getKey(), articleCategoryArticleCountInfo);
+                        boardArticleCategoryArticleCountInfo.getArticleCategoryCountInfoList().add(articleCategoryArticleCountInfo);
                         resultTemp.put(currentBoard.getBoardNo(), boardArticleCategoryArticleCountInfo);
                     }
                 }
@@ -485,8 +485,11 @@ public class ArticleServiceImpl extends DefaultUtils {
                 (item) -> {
                     // 额外初始化板块文章总量
                     item.initBoardTotalCount();
+                    // 按文章类别 id 从小到大排序
+                    item.initArticleCategorySort();
                     return item;
                 });
+
         return result;
     }
 

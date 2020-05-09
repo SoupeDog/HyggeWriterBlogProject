@@ -99,14 +99,14 @@
         <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
-        AND MATCH ( title, summary, content ) AGAINST ( #{keyWord} )
+        AND MATCH ( title, summary, content ) AGAINST ( #{keyword} )
         ORDER BY articleId
         LIMIT #{startPoint},#{size};
     </select>
 
     <select id="queryArticleNoCountForSearch" resultType="int">
         SELECT
-        COUNT(IF(MATCH ( title, summary, content ) AGAINST ( #{keyWord} ), 1, NULL)) AS total
+        COUNT(IF(MATCH ( title, summary, content ) AGAINST ( #{keyword} ), 1, NULL)) AS total
         FROM
         (SELECT * FROM article
         WHERE articleCategoryNo IN
