@@ -1,7 +1,5 @@
 package org.xavier.blog.domain.bo;
 
-import org.xavier.blog.domain.po.Board;
-
 import java.util.LinkedHashMap;
 
 /**
@@ -13,15 +11,23 @@ import java.util.LinkedHashMap;
  * @since Jdk 1.8
  */
 public class BoardArticleCategoryArticleCountInfo {
-    private Board board;
+    private BoardArticleCountInfo boardArticleCountInfo;
     private LinkedHashMap<String, ArticleCategoryArticleCountInfo> articleCategoryCountInfoMap = new LinkedHashMap();
 
-    public Board getBoard() {
-        return board;
+    public void initBoardTotalCount() {
+        Integer totalCount = 0;
+        for (ArticleCategoryArticleCountInfo item : articleCategoryCountInfoMap.values()) {
+            totalCount += item.getTotalCount();
+        }
+        boardArticleCountInfo.setTotalCount(totalCount);
     }
 
-    public void setBoard(Board board) {
-        this.board = board;
+    public BoardArticleCountInfo getBoardArticleCountInfo() {
+        return boardArticleCountInfo;
+    }
+
+    public void setBoardArticleCountInfo(BoardArticleCountInfo boardArticleCountInfo) {
+        this.boardArticleCountInfo = boardArticleCountInfo;
     }
 
     public LinkedHashMap<String, ArticleCategoryArticleCountInfo> getArticleCategoryCountInfoMap() {

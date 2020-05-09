@@ -54,8 +54,8 @@ public class IndexController extends HyggeWriterController {
             ArrayList<BoardArticleCategoryArticleCountInfo> result = articleService.queryArticleCountInfoOfArticleCategory(loginUid, secretKey);
             // 根据板块编号从小到大排序
             result.sort(((o1, o2) -> {
-                Integer boardId1 = o1.getBoard().getBoardId();
-                Integer boardId2 = o2.getBoard().getBoardId();
+                Integer boardId1 = o1.getBoardArticleCountInfo().getBoardId();
+                Integer boardId2 = o2.getBoardArticleCountInfo().getBoardId();
                 if (boardId1.equals(o2)) {
                     return 0;
                 } else if (boardId1 > boardId2) {

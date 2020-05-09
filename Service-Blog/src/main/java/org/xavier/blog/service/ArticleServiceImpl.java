@@ -474,14 +474,19 @@ public class ArticleServiceImpl extends DefaultUtils {
                         resultTemp.get(currentBoard.getBoardNo()).getArticleCategoryCountInfoMap().put(entry.getKey(), articleCategoryArticleCountInfo);
                     } else {
                         BoardArticleCategoryArticleCountInfo boardArticleCategoryArticleCountInfo = new BoardArticleCategoryArticleCountInfo();
-                        boardArticleCategoryArticleCountInfo.setBoard(currentBoard);
+                        boardArticleCategoryArticleCountInfo.setBoardArticleCountInfo(new BoardArticleCountInfo(currentBoard));
                         boardArticleCategoryArticleCountInfo.getArticleCategoryCountInfoMap().put(entry.getKey(), articleCategoryArticleCountInfo);
                         resultTemp.put(currentBoard.getBoardNo(), boardArticleCategoryArticleCountInfo);
                     }
                 }
             }
         }
-        result = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultTemp.values(), "Fail to get article count info of board.", (item) -> item);
+        result = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultTemp.values(), "Fail to get article count info of board.",
+                (item) -> {
+                    // 额外初始化板块文章总量
+                    item.initBoardTotalCount();
+                    return item;
+                });
         return result;
     }
 
