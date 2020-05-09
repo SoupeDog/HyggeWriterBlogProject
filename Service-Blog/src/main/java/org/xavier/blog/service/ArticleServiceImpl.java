@@ -471,11 +471,11 @@ public class ArticleServiceImpl extends DefaultUtils {
                 // 文章类别对应的板块信息存在
                 if (currentBoard != null) {
                     if (resultTemp.containsKey(currentBoard.getBoardNo())) {
-                        resultTemp.get(currentBoard.getBoardNo()).getArticleCategoryCountInfoMap().put(entry.getKey(), articleCategoryArticleCountInfo);
+                        resultTemp.get(currentBoard.getBoardNo()).getArticleCategoryCountInfoList().add(articleCategoryArticleCountInfo);
                     } else {
                         BoardArticleCategoryArticleCountInfo boardArticleCategoryArticleCountInfo = new BoardArticleCategoryArticleCountInfo();
                         boardArticleCategoryArticleCountInfo.setBoardArticleCountInfo(new BoardArticleCountInfo(currentBoard));
-                        boardArticleCategoryArticleCountInfo.getArticleCategoryCountInfoMap().put(entry.getKey(), articleCategoryArticleCountInfo);
+                        boardArticleCategoryArticleCountInfo.getArticleCategoryCountInfoList().add(articleCategoryArticleCountInfo);
                         resultTemp.put(currentBoard.getBoardNo(), boardArticleCategoryArticleCountInfo);
                     }
                 }
@@ -485,8 +485,11 @@ public class ArticleServiceImpl extends DefaultUtils {
                 (item) -> {
                     // 额外初始化板块文章总量
                     item.initBoardTotalCount();
+                    // 按文章类别 id 从小到大排序
+                    item.initArticleCategorySort();
                     return item;
                 });
+
         return result;
     }
 
