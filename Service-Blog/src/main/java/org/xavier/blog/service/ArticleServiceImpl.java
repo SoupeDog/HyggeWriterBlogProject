@@ -346,7 +346,7 @@ public class ArticleServiceImpl extends DefaultUtils {
     /**
      * 文章全文检索(从 title summary content 匹配)
      */
-    public PageResult<ArticleSummaryQueryBO> articleSearch(String loginUid, String secretKey, String keyWord, Integer currentPage, Integer pageSize) throws Universal404Exception {
+    public PageResult<ArticleSummaryQueryBO> articleSearch(String loginUid, String secretKey, String keyword, Integer currentPage, Integer pageSize) throws Universal404Exception {
         PageResult<ArticleSummaryQueryBO> result = new PageResult<>();
         User loginUser = userService.queryUserNotNull(loginUid);
         ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);
@@ -368,11 +368,11 @@ public class ArticleServiceImpl extends DefaultUtils {
         }
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNoMultiple(needCheckArticleCategoryNoList);
         ArrayList<String> allowableArticleCategoryNoList = getAllowableArticleCategoryNoList(secretKey, loginUser, allJoinedGroup, accessRuleList);
-        Integer totalCount = articleMapper.queryArticleNoCountForSearch(keyWord, allowableArticleCategoryNoList);
+        Integer totalCount = articleMapper.queryArticleNoCountForSearch(keyword, allowableArticleCategoryNoList);
         if (totalCount != 0) {
             ArrayList<Board> allBoardList = boardService.queryAllBoardList(1, 999, "ts", false);
             HashMap<String, Board> allBoardMap = collectionHelper.filterCollectionNotEmptyAsHashMap(allBoardList, "", (board) -> board.getBoardNo(), (board -> board));
-            ArrayList<String> finalArticleNoList = articleMapper.queryArticleNoForSearch(keyWord, allowableArticleCategoryNoList, (currentPage - 1) * pageSize, pageSize);
+            ArrayList<String> finalArticleNoList = articleMapper.queryArticleNoForSearch(keyword, allowableArticleCategoryNoList, (currentPage - 1) * pageSize, pageSize);
             ArrayList<Article> resultSetTemp = articleMapper.queryArticleByArticleNoList(finalArticleNoList);
             ArrayList<ArticleSummaryQueryBO> resultSet = collectionHelper.filterCollectionNotEmptyAsArrayList(true, resultSetTemp, "",
                     (article) -> new ArticleSummaryQueryBO(article,

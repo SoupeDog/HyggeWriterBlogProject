@@ -76,11 +76,11 @@ public class IndexController extends HyggeWriterController {
     public ResponseEntity<?> articleSearch(@RequestHeader HttpHeaders headers,
                                            @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
-                                           @RequestParam(value = "keyWord") String keyWord) {
+                                           @RequestParam(value = "keyword") String keyword) {
         String loginUid = propertiesHelper.string(headers.getFirst("uid"));
         String secretKey = headers.getFirst("secretKey");
         try {
-            PageResult<ArticleSummaryQueryBO> result = articleService.articleSearch(loginUid, secretKey, keyWord, currentPage, pageSize);
+            PageResult<ArticleSummaryQueryBO> result = articleService.articleSearch(loginUid, secretKey, keyword, currentPage, pageSize);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
