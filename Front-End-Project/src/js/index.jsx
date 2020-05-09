@@ -1,38 +1,52 @@
 import '../css/default.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import IndexContainer from "./pagesV2/IndexContainer.jsx";
-import APICaller from "./utils/APICaller.jsx";
+import IndexContainer from "./pages/IndexContainer.jsx";
+import ArticleAPICaller from "./utils/ArticleAPICaller.jsx";
+import {message} from 'antd';
 
-// APICaller.querySummaryByPage({
-//     boardNo: "ae81801808f8485384b66da526169da2",
-//     currentPage: 1,
-//     pageSize: 5,
-//     successCallback: function (response) {
-//         if (response.code == 200) {
-//             ReactDOM.render(<IndexContainer
-//                 technologyCurrentPageInit={1}
-//                 technologyPageSizeInit={5}
-//                 technologyTotalCountInit={response.data.totalCount}
-//                 technologySummaryListInit={response.data.resultSet}
-//                 // 技术板块
-//                 technologyBoardNo={"ae81801808f8485384b66da526169da2"}
-//                 // 非技术板块
-//                 notTechnologyBoardNo={"b9cc9df574b448b088303f8056198d91"}/>, document.getElementById('root'));
-//         } else {
-//             alert(JSON.stringify(response));
-//         }
-//     },
-//     errorCallback: function (response) {
-//         alert(JSON.stringify(response));
-//     }
-// });
-            ReactDOM.render(<IndexContainer
-                technologyCurrentPageInit={1}
-                technologyPageSizeInit={5}
-                technologyTotalCountInit={0}
-                technologySummaryListInit={[]}
-                // 技术板块
-                technologyBoardNo={"ae81801808f8485384b66da526169da2"}
-                // 非技术板块
-                notTechnologyBoardNo={"b9cc9df574b448b088303f8056198d91"}/>, document.getElementById('root'));
+message.config({
+    top: 80,
+    maxCount: 3
+});
+
+let currentPageInit = 1;
+let pageSizeInit = 5;
+// 技术板块
+let technologyBoardNo = "ae81801808f8485384b66da526169da2";
+// 非技术板块
+let notTechnologyBoardNo = "b9cc9df574b448b088303f8056198d91";
+// 全部板块数量信息
+let articleCountInfoOfBoardList = null;
+
+message.info('依赖加载完成',1);
+
+ArticleAPICaller.queryAllArticleCategoryArticleCount({
+    successCallback: function (response) {
+        articleCountInfoOfBoardList = response.data;
+        ArticleAPICaller.querySummaryByPageOfBoard({
+            boardNo: technologyBoardNo,
+            currentPage: currentPageInit,
+            pageSize: pageSizeInit,
+            successCallback: function (response2) {
+                ReactDOM.render(<IndexContainer
+                    currentPageInit={currentPageInit}
+                    pageSizeInit={pageSizeInit}
+                    technologyTotalCountInit={response2.data.totalCount}
+                    technologySummaryListInit={response2.data.resultSet}
+                    // 技术板块
+                    technologyBoardNo={technologyBoardNo}
+                    // 非技术板块
+                    notTechnologyBoardNo={notTechnologyBoardNo}
+                    articleCountInfoOfBoardList={articleCountInfoOfBoardList}/>, document.getElementById('root'));
+
+            },
+            errorCallback: function (response2) {
+                message.warn(response2.msg, 2)
+            }
+        });
+    },
+    errorCallback: function (response) {
+        message.warn(response.msg);
+    }
+});

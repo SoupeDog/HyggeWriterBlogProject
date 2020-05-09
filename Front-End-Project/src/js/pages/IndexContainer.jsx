@@ -1,26 +1,46 @@
 import React from 'react';
-import LogHelper from '../utils/LogHelper.jsx';
-import clsx from 'clsx';
-import '../../css/index.less';
 
+import '../../css/index.less';
 import csdnLogo from '../../img/csdnLogo.png';
+
+import clsx from 'clsx';
+import $ from 'jquery'
 import {
     LinkOutlined,
     GithubOutlined,
     QuestionCircleOutlined,
     MenuUnfoldOutlined,
-    MenuFoldOutlined
+    MenuFoldOutlined,
+    CloseCircleOutlined,
+    EditOutlined
 } from '@ant-design/icons';
-import {Avatar, BackTop, Badge, Empty, Layout, Menu, message, Modal, notification, Tabs} from 'antd';
 
-import URLHelper from "../utils/URLHelper.jsx";
-import APICaller from "../utils/APICaller.jsx";
-import NotTechnologyBoardView from "../component/NotTechnologyBoardView.jsx";
-import TechnologyBoardView from "../component/TechnologyBoardView.jsx";
+import {
+    Avatar,
+    BackTop,
+    Badge,
+    Empty,
+    Layout,
+    Menu,
+    message,
+    Modal,
+    notification,
+    Tabs,
+    Input,
+    Card,
+    Spin,
+    Typography,
+    Dropdown,
+    Button,
+    Collapse,
+    Divider,
+} from 'antd';
 
-const {Header, Sider, Content, Footer} = Layout;
+const {Header, Sider, Content} = Layout;
 const {TabPane} = Tabs;
-
+const {Search} = Input;
+const {Panel} = Collapse;
+const {Title} = Typography;
 
 message.config({
     top: 80,
@@ -31,29 +51,79 @@ notification.config({
     top: 80
 });
 
+import LogHelper from '../utils/LogHelper.jsx';
+import URLHelper from "../utils/URLHelper.jsx";
+import ArticleAPICaller from "../utils/ArticleAPICaller.jsx";
+
+
+import NotTechnologyBoardView from "../component/NotTechnologyBoardView.jsx";
+import TechnologyBoardView from "../component/TechnologyBoardView.jsx";
+import MyFooter from "../component/public/MyFooter.jsx";
+import SearchView from "../component/SearchView.jsx";
+
+const userMenu = (
+    <Menu onClick={(event) => {
+        message.info('Click on menu item —> ' + event.key);
+        switch (event.key) {
+            case "logout":
+                ArticleAPICaller.removeLoginInfo();
+                URLHelper.openNewPage({finalUrl: URLHelper.getJumpPrefix(), inNewTab: false})
+                break;
+            case "editor":
+                URLHelper.openNewPage({finalUrl: URLHelper.getJumpPrefix() + "editor.html", inNewTab: false})
+                break;
+        }
+    }}>
+        <Menu.Item key="editor" icon={<EditOutlined/>}>
+            编辑文章
+        </Menu.Item>
+        <Menu.Item key="logout" icon={<CloseCircleOutlined/>}>
+            登出
+        </Menu.Item>
+    </Menu>
+);
+
 class IndexContainer extends React.Component {
 
     constructor(props) {
         super(props);
-        let initTechnologyCurrentPage = this.props.technologyCurrentPageInit;
-        let initTechnologyPageSize = this.props.technologyPageSizeInit;
+        let currentPageInit = this.props.currentPageInit;
+        let pageSizeInit = this.props.pageSizeInit;
         let initTechnologyTotalCount = this.props.technologyTotalCountInit;
         let initTechnologySummaryList = this.props.technologySummaryListInit;
-
+        let articleCountInfoOfBoardList = this.props.articleCountInfoOfBoardList;
         this.state = {
+            loadingCountArray: new Array(0),
+            loginUserInfo: JSON.parse(localStorage.getItem('userInfo')),
             headerTransparent: false,
             mainMenuCollapsed: true,
-            technologyCurrentPage: initTechnologyCurrentPage,
-            technologyPageSize: initTechnologyPageSize,
+            articleCountInfoOfBoardList: articleCountInfoOfBoardList,
+            technologyCurrentPage: currentPageInit,
+            technologyPageSize: pageSizeInit,
             technologyTotalCount: initTechnologyTotalCount,
-            notTechnologyCurrentPage: 1,
-            notTechnologyPageSize: 5,
-            notTechnologyTotalCount: 0,
             technologySummaryList: initTechnologySummaryList,
-            notTechnologySummaryList: []
+            notTechnologyCurrentPage: currentPageInit,
+            notTechnologyPageSize: pageSizeInit,
+            notTechnologyTotalCount: articleCountInfoOfBoardList[1].boardArticleCountInfo.totalCount,
+            notTechnologySummaryList: [],
+            searchType: "keyword",
+            searchProperties: "",
+            searchCurrentPage: currentPageInit,
+            searchPageSize: pageSizeInit,
+            searchTotalCount: 0,
+            searchSummaryList: []
         };
+        // 添加一个加载事件
+        this.addLoadingEvent = function () {
+            this.state.loadingCountArray.push(0);
+            this.setState({loadingCountArray: this.state.loadingCountArray});
+        }.bind(this);
 
-        LogHelper.info({className: "IndexContainer", msg: "constructor----------"});
+        // 移除一个加载事件
+        this.removeLoadingEvent = function () {
+            this.state.loadingCountArray.pop();
+            this.setState({loadingCountArray: this.state.loadingCountArray});
+        }.bind(this);
 
         // 左侧菜单缩进
         this.mainMenuToggle = function () {
@@ -69,28 +139,43 @@ class IndexContainer extends React.Component {
             switch (activeKey) {
                 case "1":
                     // alert("技术板块" + this.props.technologyBoardNo);
-                    actualCurrentPage = currentPage == null ? this.state.technologyCurrentPage : currentPage;
-                    APICaller.querySummaryByPage({
-                        boardNo: this.props.technologyBoardNo,
+                    actualCurrentPage = currentPage == null ? _react.state.technologyCurrentPage : currentPage;
+                    ArticleAPICaller.querySummaryByPageOfBoard({
+                        boardNo: _react.props.technologyBoardNo,
                         currentPage: actualCurrentPage,
-                        pageSize: this.state.technologyPageSize,
+                        pageSize: _react.state.technologyPageSize,
+                        requestBefore: function () {
+                            _react.addLoadingEvent();
+                        },
                         successCallback: function (response) {
                             _react.refreshSummary(activeKey, actualCurrentPage, response.data.totalCount, response.data.resultSet);
+                        },
+                        errorCallback: function (response) {
+                            message.warn(response.msg, 2)
+                        },
+                        finallyCallback: function () {
+                            _react.removeLoadingEvent();
                         }
                     });
                     break;
                 case "2":
                     // alert("非技术板块" + this.props.notTechnologyBoardNo);
-                    actualCurrentPage = currentPage == null ? this.state.notTechnologyCurrentPage : currentPage;
-                    APICaller.querySummaryByPage({
-                        boardNo: this.props.notTechnologyBoardNo,
+                    actualCurrentPage = currentPage == null ? _react.state.notTechnologyCurrentPage : currentPage;
+                    ArticleAPICaller.querySummaryByPageOfBoard({
+                        boardNo: _react.props.notTechnologyBoardNo,
                         currentPage: actualCurrentPage,
-                        pageSize: this.state.notTechnologyPageSize,
+                        pageSize: _react.state.notTechnologyPageSize,
+                        requestBefore: function () {
+                            _react.addLoadingEvent();
+                        },
                         successCallback: function (response) {
                             _react.refreshSummary(activeKey, actualCurrentPage, response.data.totalCount, response.data.resultSet);
                         },
                         errorCallback: function (response) {
-                            console.log(response);
+                            message.warn(response.msg, 2)
+                        },
+                        finallyCallback: function () {
+                            _react.removeLoadingEvent();
                         }
                     });
                     break;
@@ -101,6 +186,79 @@ class IndexContainer extends React.Component {
             }
         }.bind(this);
 
+        this.refreshSummaryOfSearch = function ({searchType, searchProperties, currentPage}) {
+            $("#searchTap").click();
+            let _react = this;
+            let actualCurrentPage = currentPage == null ? this.state.searchCurrentPage : currentPage;
+            // 根据 searchType 把 searchProperties 作为 keyword 或者 articleCategoryNo
+            switch (searchType) {
+                case "keyword":
+                    ArticleAPICaller.querySummaryByPageOfSearch({
+                        keyword: searchProperties,
+                        currentPage: actualCurrentPage,
+                        pageSize: _react.state.searchPageSize,
+                        requestBefore: function () {
+                            _react.addLoadingEvent();
+                        },
+                        successCallback: function (response) {
+                            let finalSummaryList;
+                            if (response.data.resultSet == null) {
+                                finalSummaryList = new Array(0);
+                            } else {
+                                finalSummaryList = response.data.resultSet;
+                            }
+                            _react.setState({
+                                searchType: searchType,
+                                searchProperties: searchProperties,
+                                searchCurrentPage: actualCurrentPage,
+                                searchTotalCount: response.data.totalCount,
+                                searchSummaryList: finalSummaryList
+                            });
+                        },
+                        errorCallback: function (response) {
+                            message.warn(response.msg, 2)
+                        },
+                        finallyCallback: function () {
+                            _react.removeLoadingEvent();
+                        }
+                    });
+                    break;
+                case "articleCategory":
+                    ArticleAPICaller.querySummaryByPageOfArticleCategory({
+                        articleCategoryNo: searchProperties,
+                        currentPage: actualCurrentPage,
+                        pageSize: _react.state.searchPageSize,
+                        requestBefore: function () {
+                            _react.addLoadingEvent();
+                        },
+                        successCallback: function (response) {
+                            let finalSummaryList;
+                            if (response.data.resultSet == null) {
+                                finalSummaryList = new Array(0);
+                            } else {
+                                finalSummaryList = response.data.resultSet;
+                            }
+                            _react.setState({
+                                searchType: searchType,
+                                searchProperties: searchProperties,
+                                searchCurrentPage: actualCurrentPage,
+                                searchTotalCount: response.data.totalCount,
+                                searchSummaryList: finalSummaryList
+                            });
+                        },
+                        errorCallback: function (response) {
+                            message.warn(response.msg, 2)
+                        },
+                        finallyCallback: function () {
+                            _react.removeLoadingEvent();
+                        }
+                    });
+                    break;
+                default:
+                    message.warn("未知的搜索类型", 1);
+            }
+        }.bind(this);
+
         this.refreshSummary = function (activeKey, actualCurrentPage, totalCount, summaryList) {
             let finalSummaryList;
             if (summaryList == null) {
@@ -108,13 +266,8 @@ class IndexContainer extends React.Component {
             } else {
                 finalSummaryList = summaryList;
             }
-            // console.log({
-            //     activeKey: activeKey,
-            //     actualCurrentPage: actualCurrentPage,
-            //     totalCount: totalCount,
-            //     summaryList: summaryList
-            // })
             switch (activeKey) {
+                // 技术板块更新
                 case "1":
                     this.setState({
                         technologyCurrentPage: actualCurrentPage,
@@ -122,6 +275,7 @@ class IndexContainer extends React.Component {
                         technologySummaryList: finalSummaryList
                     });
                     break;
+                // 非技术板块更新
                 case "2":
                     this.setState({
                         notTechnologyCurrentPage: actualCurrentPage,
@@ -136,6 +290,7 @@ class IndexContainer extends React.Component {
             }
         }.bind(this);
 
+        LogHelper.info({className: "IndexContainer", msg: "constructor----------"});
     }
 
     static getDerivedStateFromProps(nextProps, nextContext) {
@@ -175,12 +330,10 @@ class IndexContainer extends React.Component {
                                 inNewTab: true
                             });
                         }}>
-
                             <i className="anticon anticon-link">
                                 <Avatar size={14}
                                         src={csdnLogo}/>
                             </i>
-                            {/*<Icon type="edit"/>*/}
                             <span>CSDN(已停更)</span>
                         </Menu.Item>
                         <Menu.Item key="3" onClick={() => {
@@ -216,17 +369,88 @@ class IndexContainer extends React.Component {
                         "header": !this.state.mainMenuCollapsed,
                         "backgroundTransparent": this.state.headerTransparent
                     })}>
-                        {this.state.mainMenuCollapsed ?
-                            <MenuUnfoldOutlined style={{color: "#fff", fontSize: "20px", padding: "0 24px"}}
-                                                onClick={this.mainMenuToggle}/> :
-                            <MenuFoldOutlined style={{color: "#fff", fontSize: "20px", padding: "0 24px"}}
-                                              onClick={this.mainMenuToggle}/>
-                        }
+                        <div className={"floatLeft"} style={{"width": "68px"}}>
+                            {this.state.mainMenuCollapsed ?
+                                <MenuUnfoldOutlined
+                                    style={{color: "#fff", fontSize: "20px", padding: "0 24px", display: "inlineBlock"}}
+                                    onClick={this.mainMenuToggle}/> :
+                                <MenuFoldOutlined
+                                    style={{color: "#fff", fontSize: "20px", padding: "0 24px", display: "inlineBlock"}}
+                                    onClick={this.mainMenuToggle}/>
+                            }
+                        </div>
+                        <div className={"floatRight"}
+                             style={{"width": "20px", "marginRight": "220px"}}>
+                            {this.state.loadingCountArray.length > 0 ? <Spin/> : null}
+                        </div>
+                        <div className={"floatRight"}
+                             style={{"marginRight": this.state.loadingCountArray.length > 0 ? "20px" : "260px"}}>
+                            {this.state.loginUserInfo == null ?
+                                <Button type="success" onClick={(event) => {
+                                    URLHelper.openNewPage({
+                                        finalUrl: URLHelper.getJumpPrefix() + "login.html",
+                                        inNewTab: false
+                                    });
+                                }}>登录</Button> :
+                                <Dropdown overlay={userMenu} placement="bottomCenter" trigger={["click"]}>
+                                    <Avatar className={"pointer"} size={48} src={this.state.loginUserInfo.userAvatar}/>
+                                </Dropdown>}
+                        </div>
+                        <div className={"floatRight"} style={{"marginRight": "40px"}}>
+                            <Search style={{"marginTop": "16px"}} placeholder="关键字" enterButton="搜索" size="middle"
+                                    onSearch={(value) => {
+                                        this.refreshSummaryOfSearch({
+                                            searchType: "keyword",
+                                            searchProperties: value,
+                                            currentPage: 1
+                                        });
+                                        // console.log(value)
+                                    }}/>
+                        </div>
                     </Header>
                     <Content className={clsx({
                         "myContentCollapsed": this.state.mainMenuCollapsed,
                         "myContent": !this.state.mainMenuCollapsed
                     })}>
+                        <Title level={4}>文章类别</Title>
+                        {this.state.articleCountInfoOfBoardList.map((articleCountInfoOfBoard, index) => {
+                            return (
+                                <Collapse key={index}>
+                                    <Panel header={articleCountInfoOfBoard.boardArticleCountInfo.boardName}
+                                           key={articleCountInfoOfBoard.boardArticleCountInfo.boardId}>
+                                        <Card size={"small"}>
+                                            {articleCountInfoOfBoard.articleCategoryCountInfoList.map((articleCategoryCountInfo, index) => {
+                                                if (articleCategoryCountInfo.totalCount > 0) {
+                                                    return (
+                                                        <Card.Grid className={"pointer"} key={index}
+                                                                   style={{
+                                                                       width: '12.5%',
+                                                                       padding: "10px",
+                                                                       textAlign: 'center'
+                                                                   }} onClick={() => {
+                                                            this.refreshSummaryOfSearch({
+                                                                searchType: "articleCategory",
+                                                                searchProperties: articleCategoryCountInfo.articleCategoryNo,
+                                                                currentPage: 1
+                                                            });
+                                                            // alert(articleCategoryCountInfo.articleCategoryName);
+                                                        }}>
+                                                            <Badge count={articleCategoryCountInfo.totalCount}
+                                                                   overflowCount={999} offset={[15, 0]}>
+                                                                {articleCategoryCountInfo.articleCategoryName}
+                                                            </Badge>
+                                                        </Card.Grid>
+                                                    )
+                                                }
+                                            })}
+                                        </Card>
+                                    </Panel>
+                                </Collapse>
+                            )
+                        })}
+
+                        <Divider/>
+
                         <Tabs tabBarGutter={50} defaultActiveKey="1" onChange={(activeKey) => {
                             this.onTabChange({activeKey: activeKey});
                         }}>
@@ -270,38 +494,29 @@ class IndexContainer extends React.Component {
                             </TabPane>
                             <TabPane
                                 tab={
-                                    <span>
-                                      搜索
-                                    </span>
+                                    <Badge
+                                        overflowCount={99}
+                                        offset={[20, -5]}
+                                        count={this.state.searchTotalCount == null ? "?" : this.state.searchTotalCount}>
+                                        <span id={"searchTap"}>
+                                          搜索
+                                        </span>
+                                    </Badge>
                                 }
                                 key="3"
                             >
-                                <Empty description={"搜索功能未启用"}/>
+                                <SearchView searchType={this.state.searchType}
+                                            searchProperties={this.state.searchProperties}
+                                            searchSummaryList={this.state.searchSummaryList}
+                                            searchCurrentPage={this.state.searchCurrentPage}
+                                            searchPageSize={this.state.searchPageSize}
+                                            searchTotalCount={this.state.searchTotalCount}
+                                            refreshSummaryOfSearch={this.refreshSummaryOfSearch}/>
+                                {/*<Empty description={"搜索功能未启用"}/>*/}
                             </TabPane>
                         </Tabs>
                     </Content>
-                    <Footer className={clsx('myFooter')}>
-                        <div>
-                            <div>
-                                <span>©2019 Xavier </span><span>Power by</span> <a className="dependentLink"
-                                                                                   target="_blank"
-                                                                                   href="https://react.docschina.org">React</a>
-                                <span>&nbsp;&amp;&nbsp;</span> <a className="dependentLink" target="_blank"
-                                                                  href="https://ant.design/index-cn">Ant Design</a>
-                            </div>
-                        </div>
-
-                        <div><a
-                            className="textItem policeLink" target="_blank"
-                            href="http://www.beian.miit.gov.cn">津ICP备18004196号-1</a>
-                            <a target="_blank"
-                               href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
-                               className="textItem policeLink">
-                                <img src="https://www.xavierwang.cn/static/icon-police.png"/>
-                                <span>&nbsp;津公网安备12010402000667号</span>
-                            </a>
-                        </div>
-                    </Footer>
+                    <MyFooter id={"index"}/>
                 </Layout>
                 <BackTop>
                     <div id="ant-back-top-inner">Top</div>

@@ -18,9 +18,15 @@ export default class LoginAPICaller {
 
         if (currentUId == null || currentToken == null || currentRefreshKey == null) {
             _this.removeLoginInfo();
+            currentHeaders = {
+                secretKey: currentSecretKey
+            }
         } else {
             if (currentSecretKey != null) {
                 currentHeaders = {
+                    uid: currentUId,
+                    token: currentToken,
+                    refreshKey: currentRefreshKey,
                     secretKey: currentSecretKey
                 };
             } else {
@@ -75,7 +81,7 @@ export default class LoginAPICaller {
                     default:
                         // 默认失败回调
                         if (errorCallback != null) {
-                            errorCallback();
+                            errorCallback(response);
                         }
                 }
             }

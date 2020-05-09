@@ -3,9 +3,9 @@ import LogHelper from "../utils/LogHelper.jsx";
 import {Layout} from 'antd';
 // import 'antd/dist/antd.css'
 import EditorForm from "../component/EditorForm.jsx";
-import clsx from "clsx";
+import MyFooter from "../component/public/MyFooter.jsx";
 
-const {Header, Footer, Content} = Layout;
+const {Header,  Content} = Layout;
 
 class EditorContainer extends React.Component {
 
@@ -39,28 +39,7 @@ class EditorContainer extends React.Component {
                             </div>
                         </div>
                     </Content>
-                    <Footer className={clsx('myFooter')}>
-                        <div>
-                            <div>
-                                <span>©2019 Xavier </span><span>Power by</span> <a className="dependentLink"
-                                                                                   target="_blank"
-                                                                                   href="https://react.docschina.org">React</a>
-                                <span>&nbsp;&amp;&nbsp;</span> <a className="dependentLink" target="_blank"
-                                                                  href="https://ant.design/index-cn">Ant Design</a>
-                            </div>
-                        </div>
-
-                        <div><a
-                            className="textItem policeLink" target="_blank"
-                            href="http://www.beian.miit.gov.cn">津ICP备18004196号-1</a>
-                            <a target="_blank"
-                               href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
-                               className="textItem policeLink">
-                                <img src="https://www.xavierwang.cn/static/icon-police.png"/>
-                                <span>&nbsp;津公网安备12010402000667号</span>
-                            </a>
-                        </div>
-                    </Footer>
+                    <MyFooter id={"editor"}/>
                 </Layout>
             );
         }

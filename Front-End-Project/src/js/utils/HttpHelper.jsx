@@ -5,7 +5,7 @@ import PropertiesHelper from './PropertiesHelper.jsx';
 export default class HttpHelper {
     // 是否开启日志输出
     static isEnableLog() {
-        return true;
+        return false;
     }
 
     // url 默认前缀

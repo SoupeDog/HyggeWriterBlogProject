@@ -8,8 +8,9 @@ import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
 import clsx from "clsx";
 import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
 import IconText from "../component/IconText.jsx";
+import MyFooter from "../component/public/MyFooter.jsx";
 
-const {Header, Content, Footer} = Layout;
+const {Header, Content} = Layout;
 
 class BrowseContainer extends React.Component {
 
@@ -137,28 +138,7 @@ class BrowseContainer extends React.Component {
                             <div id="preview" style={{background: '#fff', padding: 24, minHeight: 300}}>
                             </div>
                         </Content>
-                        <Footer className={clsx('myFooter')}>
-                            <div>
-                                <div>
-                                    <span>©2019 Xavier </span><span>Power by</span> <a className="dependentLink"
-                                                                                       target="_blank"
-                                                                                       href="https://react.docschina.org">React</a>
-                                    <span>&nbsp;&amp;&nbsp;</span> <a className="dependentLink" target="_blank"
-                                                                      href="https://ant.design/index-cn">Ant Design</a>
-                                </div>
-                            </div>
-
-                            <div><a
-                                className="textItem policeLink" target="_blank"
-                                href="http://www.beian.miit.gov.cn">津ICP备18004196号-1</a>
-                                <a target="_blank"
-                                   href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010402000667"
-                                   className="textItem policeLink">
-                                    <img src="https://www.xavierwang.cn/static/icon-police.png"/>
-                                    <span>&nbsp;津公网安备12010402000667号</span>
-                                </a>
-                            </div>
-                        </Footer>
+                        <MyFooter id={"browse"}/>
                     </Layout>
                 </Layout>
             );
