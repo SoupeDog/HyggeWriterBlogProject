@@ -62,7 +62,6 @@ import SearchView from "../component/SearchView.jsx";
 
 const userMenu = (
     <Menu onClick={(event) => {
-        message.info('Click on menu item —> ' + event.key);
         switch (event.key) {
             case "logout":
                 ArticleAPICaller.removeLoginInfo();

@@ -46,9 +46,9 @@ export default class LoginAPICaller {
         localStorage.setItem('token', token);
         localStorage.setItem('refreshKey', refreshKey);
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
-        // window.setTimeout(function () {
-        //     URLHelper.openNewPage({finalUrl: URLHelper.getJumpPrefix(), inNewTab: false});
-        // }, 1000)
+        window.setTimeout(function () {
+            URLHelper.openNewPage({finalUrl: URLHelper.getJumpPrefix(), inNewTab: false});
+        }, 100);
     }
 
     // 清空登录信息
