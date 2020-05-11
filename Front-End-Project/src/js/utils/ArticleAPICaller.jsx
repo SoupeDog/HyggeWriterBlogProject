@@ -1,6 +1,5 @@
 import LogHelper from "./LogHelper.jsx";
 import HttpHelper from "./HttpHelper.jsx";
-import URLHelper from "./URLHelper.jsx";
 import LoginAPICaller from "./LoginAPICaller.jsx";
 
 
@@ -109,4 +108,26 @@ export default class ArticleAPICaller extends LoginAPICaller {
             finallyCallback: finallyCallback
         });
     }
+
+    // 查询特定文章全文
+    static queryArticleByArticleNo({articleNo,  requestBefore, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
+        let _this = this;
+        let currentHeaders = _this.getCurrentHeaders();
+        HttpHelper.httpGet({
+            headers: currentHeaders,
+            path: "blog-service/main/article/" + articleNo,
+            requestBefore: requestBefore,
+            successCallback: function (response) {
+                _this.defaultResponseCallback({
+                    response: response,
+                    successCallback: successCallback,
+                    errorCallback: errorCallback
+                });
+            },
+            errorCallback: errorCallback,
+            timeOutCallback: timeOutCallback,
+            finallyCallback: finallyCallback
+        });
+    }
+
 }

@@ -1,5 +1,5 @@
 // 根据项目页面有无 jquery 环境自行决定引入方式
-import $ from 'jquery'
+// import $ from 'jquery'
 import PropertiesHelper from './PropertiesHelper.jsx';
 
 export default class HttpHelper {

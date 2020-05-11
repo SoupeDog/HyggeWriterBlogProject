@@ -4,7 +4,7 @@ import '../../css/index.less';
 import csdnLogo from '../../img/csdnLogo.png';
 
 import clsx from 'clsx';
-import $ from 'jquery'
+// import $ from 'jquery'
 import {
     LinkOutlined,
     GithubOutlined,
