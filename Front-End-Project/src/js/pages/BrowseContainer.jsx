@@ -2,20 +2,18 @@ import React from 'react';
 
 import '../../css/browse.less';
 
-// import $ from 'jquery'
 import clsx from "clsx";
-// import Vditor from "vditor";
-import LogHelper from "../utils/LogHelper.jsx";
 import {Card, Layout, Menu, Sider} from "antd";
 
 const {Header, Content} = Layout;
 
 import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
+import LogHelper from "../utils/LogHelper.jsx";
+
 import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
 import IconText from "../component/IconText.jsx";
 import MyFooter from "../component/public/MyFooter.jsx";
-
-
+import MDHelper from "../utils/MDHelper.jsx";
 
 class BrowseContainer extends React.Component {
 
@@ -37,6 +35,9 @@ class BrowseContainer extends React.Component {
                     nodeName: nodeName
                 });
             });
+            console.log(currentTOC);
+            MDHelper.getTocTree({currentTOCArray:currentTOC});
+
             if (currentTOC.length > 0) {
                 this.setState({
                     toc: currentTOC
