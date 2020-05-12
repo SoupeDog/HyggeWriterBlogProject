@@ -3,8 +3,10 @@ import React from 'react';
 import '../../css/browse.less';
 
 import clsx from "clsx";
-import {Card, Layout, Menu, Sider} from "antd";
+import {Card, Layout, Menu, Tree} from "antd";
+import {DownOutlined} from '@ant-design/icons';
 
+const {TreeNode} = Tree;
 const {Header, Content} = Layout;
 
 import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
@@ -22,6 +24,8 @@ class BrowseContainer extends React.Component {
         this.state = {
             hasError: false,
             toc: [],
+            rootTocTreeList: [],
+            allTocNodeMap: new Map(),
             headerTransparent: true
         }
         this.initTOC = function () {
@@ -35,12 +39,24 @@ class BrowseContainer extends React.Component {
                     nodeName: nodeName
                 });
             });
+            // 初始化全部节点的 map 容器
+            let allTocNodeMap = new Map();
+            currentTOC.map((item, index) => {
+                item.nodeId = index;
+                allTocNodeMap.set(index, item);
+            });
+
             console.log(currentTOC);
-            MDHelper.getTocTree({currentTOCArray:currentTOC});
+            let currentRootTocTreeList = MDHelper.getTocTree({
+                currentTOCArray: currentTOC,
+                allTocNodeMap: allTocNodeMap
+            });
 
             if (currentTOC.length > 0) {
                 this.setState({
-                    toc: currentTOC
+                    toc: currentTOC,
+                    rootTocTreeList: currentRootTocTreeList,
+                    allTocNodeMap: allTocNodeMap
                 });
             }
             // 清除代码高度限制
@@ -49,6 +65,26 @@ class BrowseContainer extends React.Component {
                 currentTarget.css("max-height", "");
             });
         }.bind(this);
+
+        this.jumpToToc = function (selectedKeys, info) {
+            // 强转成数字类型
+            let nodeId = selectedKeys[0] * 1;
+            let tocNode = this.state.allTocNodeMap.get(nodeId);
+            console.log(nodeId);
+            console.log(tocNode);
+            console.log(this.state.allTocNodeMap);
+            if (tocNode != null) {
+                $("#preview").find(tocNode.nodeName).each(function () {
+                    let currentTarget = $(this);
+                    let text = currentTarget.text();
+                    if (text == tocNode.text) {
+                        $('html, body').animate({scrollTop: currentTarget.offset().top - 64}, 300);
+                    }
+                });
+            }
+
+        }.bind(this);
+
         LogHelper.info({className: "BrowseContainer", msg: "constructor----------"});
     }
 
@@ -69,7 +105,7 @@ class BrowseContainer extends React.Component {
                     <Layout className="layout">
                         <Header className={clsx({
                             "backgroundTransparent": this.state.headerTransparent
-                        })} style={{position: 'fixed', zIndex: 1, width: '100%'}}>
+                        })} style={{position: 'fixed', zIndex: 99999, width: '100%'}}>
                             <div className="logo"/>
                             <Menu
                                 className={clsx({
@@ -122,6 +158,20 @@ class BrowseContainer extends React.Component {
                         }
 
                         <Content style={{marginTop: '0px', padding: '0 50px'}}>
+                            {this.state.rootTocTreeList.length ? (
+                                <Tree
+                                    showLine
+                                    treeData={[{key: 1, title: "测试", children: []}]}
+                                    switcherIcon={<DownOutlined/>}
+                                    defaultExpandedKeys={['0-0-0']}
+                                    onSelect={this.jumpToToc}
+                                >
+                                    {/*{this.state.rootTocTreeList.map((rootItem) => {*/}
+                                        {/*return (this.renderTocItem({item: rootItem}))*/}
+                                    {/*})}*/}
+                                </Tree>
+                            ) : null}
+
                             <Card title={this.props.article.title} bordered={false}
                                   style={{marginTop: '20px', marginBottom: "10px"}}>
                                 <ArticleCategoryBreadcrumb articleInfo={this.props.article}/>
@@ -148,6 +198,23 @@ class BrowseContainer extends React.Component {
                     </Layout>
                 </Layout>
             );
+        }
+    }
+
+    renderTocItem({item}) {
+        let _react = this;
+        if (item.childList.length < 1) {
+            return (<TreeNode title={item.text} key={item.nodeId}/>);
+        } else {
+            return (
+                <TreeNode title={item.text} key={item.nodeId}>
+                    {
+                        item.childList.map((childItem) => {
+                            return (_react.renderTocItem({item: childItem}))
+                        })
+                    }
+                </TreeNode>
+            )
         }
     }
 

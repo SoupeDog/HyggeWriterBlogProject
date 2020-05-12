@@ -3,14 +3,7 @@ import LogHelper from "./LogHelper.jsx";
 
 export default class MDHelper {
     // 根据目录数组生成目录树
-    static getTocTree({currentTOCArray, errorCallback}) {
-        // 初始化全部节点的 map 容器
-        let allNodeMap = new Map();
-        currentTOCArray.map((item, index) => {
-            item.nodeId = index;
-            allNodeMap.set(index, item);
-        });
-
+    static getTocTree({currentTOCArray,allTocNodeMap, errorCallback}) {
         let tocTree = new Array();
         let rootNodeLevel = 1;
         // 初始化上一个节点对象
@@ -47,7 +40,7 @@ export default class MDHelper {
                     // 当前节点是子节点
                     if (item.level == prevNode.level) {
                         // 当前节点是上一个节点的兄弟节点，分支同辈扩散
-                        let parentOfPrevNode = allNodeMap.get(prevNode.parentNode);
+                        let parentOfPrevNode = allTocNodeMap.get(prevNode.parentNode);
                         item.parentNode = parentOfPrevNode.nodeId;
                         parentOfPrevNode.childList.push(item);
                         prevNode = item;
@@ -61,12 +54,12 @@ export default class MDHelper {
                         let prevNodeSeniorNodeId = MDHelper.getNodeIdByLevel({
                             startNode: prevNode,
                             targetLevel: item.level,
-                            allNodeMap: allNodeMap
+                            allTocNodeMap: allTocNodeMap
                         });
                         if (prevNodeSeniorNodeId != null) {
-                            let prevNodeSeniorNode = allNodeMap.get(prevNodeSeniorNodeId);
+                            let prevNodeSeniorNode = allTocNodeMap.get(prevNodeSeniorNodeId);
                             let parentOfPrevNodeSeniorNodeId = prevNodeSeniorNode.parentNode;
-                            let parentOfPrevNodeSeniorNode = allNodeMap.get(parentOfPrevNodeSeniorNodeId);
+                            let parentOfPrevNodeSeniorNode = allTocNodeMap.get(parentOfPrevNodeSeniorNodeId);
                             item.parentNode = parentOfPrevNodeSeniorNode.nodeId;
                             parentOfPrevNodeSeniorNode.childList.push(item);
                             prevNode = parentOfPrevNodeSeniorNode;
@@ -90,20 +83,20 @@ export default class MDHelper {
     }
 
     // 从起始节点向根节点遍历，寻找目标级别的节点位移标识
-    static getNodeIdByLevel({startNode, targetLevel, allNodeMap}) {
+    static getNodeIdByLevel({startNode, targetLevel, allTocNodeMap}) {
         let parentNodeId = startNode.parentNode;
         if (parentNodeId == null) {
             // 未找到结果
             return null;
         } else {
-            let parentNode = allNodeMap.get(parentNodeId);
+            let parentNode = allTocNodeMap.get(parentNodeId);
             if (parentNode.level == targetLevel) {
                 return parentNode.nodeId;
             } else {
                 return MDHelper.getNodeIdByLevel({
                     startNode: parentNode,
                     targetLevel: targetLevel,
-                    allNodeMap: allNodeMap
+                    allTocNodeMap: allTocNodeMap
                 });
             }
         }
