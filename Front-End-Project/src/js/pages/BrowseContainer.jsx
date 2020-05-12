@@ -3,19 +3,53 @@ import React from 'react';
 import '../../css/browse.less';
 
 import clsx from "clsx";
-import {Card, Layout, Menu, Tree} from "antd";
-import {DownOutlined} from '@ant-design/icons';
+import {Card, Layout, Affix, Tree, message, Avatar, Dropdown, Menu, Tooltip} from "antd";
+import {DownOutlined, EditOutlined, CloseCircleOutlined} from '@ant-design/icons';
+
+message.config({
+    top: 80,
+    maxCount: 3
+});
 
 const {TreeNode} = Tree;
 const {Header, Content} = Layout;
 
 import WindowsEventHelper from "../utils/WindowsEventHelper.jsx";
 import LogHelper from "../utils/LogHelper.jsx";
+import MDHelper from "../utils/MDHelper.jsx";
+import ArticleAPICaller from "../utils/ArticleAPICaller.jsx";
+import URLHelper from "../utils/URLHelper.jsx";
 
 import ArticleCategoryBreadcrumb from "../component/ArticleCategoryBreadcrumb.jsx";
 import IconText from "../component/IconText.jsx";
 import MyFooter from "../component/public/MyFooter.jsx";
-import MDHelper from "../utils/MDHelper.jsx";
+
+const userMenu = (
+    <Menu onClick={(event) => {
+        switch (event.key) {
+            case "logout":
+                ArticleAPICaller.removeLoginInfo();
+                URLHelper.openNewPage({finalUrl: URLHelper.getJumpPrefix(), inNewTab: false})
+                break;
+            case "editor":
+                let finalUrl = URLHelper.getJumpPrefix() + "editor.html";
+                let currentArticleNo = URLHelper.getQueryString("articleNo");
+                if (currentArticleNo != null) {
+                    finalUrl = finalUrl + "?articleNo=" + currentArticleNo;
+                }
+                URLHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
+                break;
+        }
+    }}>
+        <Menu.Item key="editor" icon={<EditOutlined/>}>
+            编辑文章
+        </Menu.Item>
+        <Menu.Item key="logout" icon={<CloseCircleOutlined/>}>
+            登出
+        </Menu.Item>
+    </Menu>
+);
+
 
 class BrowseContainer extends React.Component {
 
@@ -23,40 +57,36 @@ class BrowseContainer extends React.Component {
         super(props);
         this.state = {
             hasError: false,
-            toc: [],
             rootTocTreeList: [],
-            allTocNodeMap: new Map(),
+            loginUserInfo: JSON.parse(localStorage.getItem('userInfo')),
             headerTransparent: true
         }
         this.initTOC = function () {
             let currentTOC = new Array();
             $("#preview").find("h1,h2,h3,h4,h5").each(function () {
                 let currentTarget = $(this);
-                let text = currentTarget.text();
+                let title = currentTarget.text();
                 let nodeName = currentTarget.prop("nodeName");
                 currentTOC.push({
-                    text: text,
+                    title: title,
                     nodeName: nodeName
                 });
             });
             // 初始化全部节点的 map 容器
             let allTocNodeMap = new Map();
             currentTOC.map((item, index) => {
-                item.nodeId = index;
+                item.key = index;
                 allTocNodeMap.set(index, item);
             });
 
-            console.log(currentTOC);
             let currentRootTocTreeList = MDHelper.getTocTree({
                 currentTOCArray: currentTOC,
                 allTocNodeMap: allTocNodeMap
             });
 
-            if (currentTOC.length > 0) {
+            if (currentRootTocTreeList.length > 0) {
                 this.setState({
-                    toc: currentTOC,
-                    rootTocTreeList: currentRootTocTreeList,
-                    allTocNodeMap: allTocNodeMap
+                    rootTocTreeList: currentRootTocTreeList
                 });
             }
             // 清除代码高度限制
@@ -67,22 +97,13 @@ class BrowseContainer extends React.Component {
         }.bind(this);
 
         this.jumpToToc = function (selectedKeys, info) {
-            // 强转成数字类型
-            let nodeId = selectedKeys[0] * 1;
-            let tocNode = this.state.allTocNodeMap.get(nodeId);
-            console.log(nodeId);
-            console.log(tocNode);
-            console.log(this.state.allTocNodeMap);
-            if (tocNode != null) {
-                $("#preview").find(tocNode.nodeName).each(function () {
-                    let currentTarget = $(this);
-                    let text = currentTarget.text();
-                    if (text == tocNode.text) {
-                        $('html, body').animate({scrollTop: currentTarget.offset().top - 64}, 300);
-                    }
-                });
-            }
-
+            $("#preview").find(info.node.nodeName).each(function () {
+                let currentTarget = $(this);
+                let title = currentTarget.text();
+                if (title == info.node.title) {
+                    $('html, body').animate({scrollTop: currentTarget.offset().top - 64}, 300);
+                }
+            });
         }.bind(this);
 
         LogHelper.info({className: "BrowseContainer", msg: "constructor----------"});
@@ -102,76 +123,70 @@ class BrowseContainer extends React.Component {
         } else {
             return (
                 <Layout id={"myPage"}>
-                    <Layout className="layout">
-                        <Header className={clsx({
-                            "backgroundTransparent": this.state.headerTransparent
-                        })} style={{position: 'fixed', zIndex: 99999, width: '100%'}}>
-                            <div className="logo"/>
-                            <Menu
-                                className={clsx({
-                                    "backgroundTransparent": this.state.headerTransparent
-                                })}
-                                theme={this.state.headerTransparent ? "light" : "dark"}
-                                mode="horizontal"
-                                defaultSelectedKeys={['0']}
-                                style={{lineHeight: '64px'}}
-                            >
-                                {this.state.toc.map((item, index) => {
-                                    return (
-                                        <Menu.Item key={index} onClick={() => {
-                                            $("#preview").find(item.nodeName).each(function () {
-                                                let currentTarget = $(this);
-                                                let text = currentTarget.text();
-                                                if (text == item.text) {
-                                                    $('html, body').animate({scrollTop: currentTarget.offset().top - 64}, 300);
-                                                }
-                                            });
-                                        }}>{item.text}</Menu.Item>
-                                    );
-                                })}
-                            </Menu>
-                        </Header>
-                        <div id="mainImage" style={{
-                            width: "100%",
-                            background: "url(" + this.props.article.properties.bgi + ") no-repeat center"
-                        }}>
+                    <Header className={clsx({
+                        "backgroundTransparent": this.state.headerTransparent
+                    })} style={{position: 'fixed', zIndex: 99999, width: '100%'}}>
+                        <div className={"floatLeft"} style={{"marginLeft": "0px"}}>
+                            <Tooltip placement="bottom" title={"返回首页"}>
+                                <i className="pointer iconfont" style={{color: "#fff", fontSize: 24}} onClick={() => {
+                                    URLHelper.openNewPage({finalUrl: URLHelper.getJumpPrefix()});
+                                }}>&#xe67a;</i>
+                            </Tooltip>
                         </div>
-                        {this.props.article.properties.bgmConfig.src == null ? null :
-                            <div id="bgmPlayer">
-                                {this.props.article.properties.bgmConfig.bgmType != 1 ? null :
-                                    // 网易音乐播放
-                                    <div id={"wyPlayer"}>
-                                        <iframe frameBorder="no" border="0" marginWidth="0" width={"100%"}
-                                                height={"100px"}
-                                                marginHeight="0"
-                                                src={this.props.article.properties.bgmConfig.src}></iframe>
-                                    </div>}
-                                {this.props.article.properties.bgmConfig.bgmType != 2 ? null :
-                                    // 音频直连播放
-                                    <div id={"txPlayer"}>
-                                        <audio id="h5audio_media" controls
-                                               style={{margin: "0 auto 0 auto", width: "100%"}} autoPlay={true}
-                                               src={this.props.article.properties.bgmConfig.src}>
-                                        </audio>
-                                    </div>}
-                            </div>
-                        }
-
-                        <Content style={{marginTop: '0px', padding: '0 50px'}}>
-                            {this.state.rootTocTreeList.length ? (
-                                <Tree
-                                    showLine
-                                    treeData={[{key: 1, title: "测试", children: []}]}
-                                    switcherIcon={<DownOutlined/>}
-                                    defaultExpandedKeys={['0-0-0']}
-                                    onSelect={this.jumpToToc}
-                                >
-                                    {/*{this.state.rootTocTreeList.map((rootItem) => {*/}
-                                        {/*return (this.renderTocItem({item: rootItem}))*/}
-                                    {/*})}*/}
-                                </Tree>
-                            ) : null}
-
+                        {this.state.loginUserInfo != null ?
+                            <div className={"floatRight"} style={{"marginRight": "20px"}}>
+                                <Dropdown overlay={userMenu} placement="bottomCenter" trigger={["click"]}>
+                                    <Avatar className={"pointer"} size={48} src={this.state.loginUserInfo.userAvatar}/>
+                                </Dropdown>
+                            </div> :
+                            null}
+                    </Header>
+                    <div id="mainImage" style={{
+                        width: "100%",
+                        background: "url(" + this.props.article.properties.bgi + ") no-repeat center"
+                    }}>
+                    </div>
+                    {this.props.article.properties.bgmConfig.src == null ? null :
+                        <div id="bgmPlayer">
+                            {this.props.article.properties.bgmConfig.bgmType != 1 ? null :
+                                // 网易音乐播放
+                                <div id={"wyPlayer"}>
+                                    <iframe frameBorder="no" border="0" marginWidth="0" width={"100%"}
+                                            height={"100px"}
+                                            marginHeight="0"
+                                            src={this.props.article.properties.bgmConfig.src}></iframe>
+                                </div>}
+                            {this.props.article.properties.bgmConfig.bgmType != 2 ? null :
+                                // 音频直连播放
+                                <div id={"txPlayer"}>
+                                    <audio id="h5audio_media" controls
+                                           style={{margin: "0 auto 0 auto", width: "100%"}} autoPlay={true}
+                                           src={this.props.article.properties.bgmConfig.src}>
+                                    </audio>
+                                </div>}
+                        </div>
+                    }
+                    <Layout className="layout">
+                        {this.state.rootTocTreeList.length > 0 ? (
+                            <Affix style={{zIndex: 9999, position: 'absolute', top: 664, right: 20}} offsetTop={164}>
+                                <div className="tocBox">
+                                    <div className="tocTitle">目录</div>
+                                    <Tree
+                                        className="tocBody"
+                                        showLine
+                                        treeData={this.state.rootTocTreeList}
+                                        switcherIcon={<DownOutlined/>}
+                                        defaultExpandedKeys={['0-0-0']}
+                                        onSelect={this.jumpToToc}
+                                    >
+                                    </Tree>
+                                </div>
+                            </Affix>
+                        ) : null}
+                        <Content style={{
+                            marginTop: '0px',
+                            padding: '0 ' + (this.state.rootTocTreeList.length > 0 ? '300px' : '50px') + ' 0 50px'
+                        }}>
                             <Card title={this.props.article.title} bordered={false}
                                   style={{marginTop: '20px', marginBottom: "10px"}}>
                                 <ArticleCategoryBreadcrumb articleInfo={this.props.article}/>
@@ -204,10 +219,10 @@ class BrowseContainer extends React.Component {
     renderTocItem({item}) {
         let _react = this;
         if (item.childList.length < 1) {
-            return (<TreeNode title={item.text} key={item.nodeId}/>);
+            return (<TreeNode title={item.title} key={item.key}/>);
         } else {
             return (
-                <TreeNode title={item.text} key={item.nodeId}>
+                <TreeNode title={item.title} key={item.key}>
                     {
                         item.childList.map((childItem) => {
                             return (_react.renderTocItem({item: childItem}))

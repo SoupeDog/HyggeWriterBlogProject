@@ -17,7 +17,7 @@ export default class MDHelper {
                 nodeName: currentNodeName,
                 errorCallback: errorCallback
             });
-            item.childList = new Array();
+            item.children = new Array();
 
             // 如果是首个节点，初始化根节点级别
             if (index == 0) {
@@ -27,7 +27,6 @@ export default class MDHelper {
                 prevNode = item;
                 currentParentNode = item;
                 tocTree.push(item);
-                console.log("index == 0");
             } else {
                 // 非首个节点
                 // 当前节是根节点
@@ -41,13 +40,13 @@ export default class MDHelper {
                     if (item.level == prevNode.level) {
                         // 当前节点是上一个节点的兄弟节点，分支同辈扩散
                         let parentOfPrevNode = allTocNodeMap.get(prevNode.parentNode);
-                        item.parentNode = parentOfPrevNode.nodeId;
-                        parentOfPrevNode.childList.push(item);
+                        item.parentNode = parentOfPrevNode.key;
+                        parentOfPrevNode.children.push(item);
                         prevNode = item;
                     } else if (item.level > prevNode.level) {
                         // 当前节点是上一个节点的子节点，分支继续深入
-                        item.parentNode = prevNode.nodeId;
-                        prevNode.childList.push(item);
+                        item.parentNode = prevNode.key;
+                        prevNode.children.push(item);
                         prevNode = item;
                     } else {
                         // 当前节点是上一个节点的长辈节点，分支按长辈扩散
@@ -60,8 +59,8 @@ export default class MDHelper {
                             let prevNodeSeniorNode = allTocNodeMap.get(prevNodeSeniorNodeId);
                             let parentOfPrevNodeSeniorNodeId = prevNodeSeniorNode.parentNode;
                             let parentOfPrevNodeSeniorNode = allTocNodeMap.get(parentOfPrevNodeSeniorNodeId);
-                            item.parentNode = parentOfPrevNodeSeniorNode.nodeId;
-                            parentOfPrevNodeSeniorNode.childList.push(item);
+                            item.parentNode = parentOfPrevNodeSeniorNode.key;
+                            parentOfPrevNodeSeniorNode.children.push(item);
                             prevNode = parentOfPrevNodeSeniorNode;
                         } else {
                             MDHelper.defaultCallErrorCallback({
@@ -78,7 +77,6 @@ export default class MDHelper {
                 }
             }
         });
-        console.log(JSON.stringify(tocTree));
         return tocTree;
     }
 
@@ -91,7 +89,7 @@ export default class MDHelper {
         } else {
             let parentNode = allTocNodeMap.get(parentNodeId);
             if (parentNode.level == targetLevel) {
-                return parentNode.nodeId;
+                return parentNode.key;
             } else {
                 return MDHelper.getNodeIdByLevel({
                     startNode: parentNode,
