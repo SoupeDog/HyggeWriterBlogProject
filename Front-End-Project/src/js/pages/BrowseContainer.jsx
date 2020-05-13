@@ -254,6 +254,7 @@ class BrowseContainer extends React.Component {
                     lineNumber: true
                 },
                 markdown: {
+                    sanitize: false,
                     toc: true
                 }
             });

@@ -19,7 +19,10 @@ let notTechnologyBoardNo = "b9cc9df574b448b088303f8056198d91";
 // 全部板块数量信息
 let articleCountInfoOfBoardList = null;
 
-message.info('依赖加载完成',1);
+if (sessionStorage.getItem("loadFlag") == null) {
+    sessionStorage.setItem("loadFlag", "true");
+    message.info('依赖加载完成', 1);
+}
 
 ArticleAPICaller.queryAllArticleCategoryArticleCount({
     successCallback: function (response) {

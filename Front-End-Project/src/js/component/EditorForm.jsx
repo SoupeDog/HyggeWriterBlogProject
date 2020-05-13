@@ -251,7 +251,11 @@ class EditorForm extends React.Component {
                                 Vditor.preview(document.getElementById('preview'),
                                     $("#content").text(), {
                                         className: 'preview vditor-reset vditor-reset--anchor',
-                                        anchor: false
+                                        anchor: false,
+                                        markdown: {
+                                            sanitize: false,
+                                            toc: true
+                                        }
                                     });
                             }}
                             placeholder="文章内容"
