@@ -61,7 +61,7 @@ export default class MDHelper {
                             let parentOfPrevNodeSeniorNode = allTocNodeMap.get(parentOfPrevNodeSeniorNodeId);
                             item.parentNode = parentOfPrevNodeSeniorNode.key;
                             parentOfPrevNodeSeniorNode.children.push(item);
-                            prevNode = parentOfPrevNodeSeniorNode;
+                            prevNode = item;
                         } else {
                             MDHelper.defaultCallErrorCallback({
                                 errorCallback: errorCallback,
@@ -77,6 +77,9 @@ export default class MDHelper {
                 }
             }
         });
+
+        console.log(currentTOCArray)
+        console.log(tocTree)
         return tocTree;
     }
 
