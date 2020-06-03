@@ -78,8 +78,6 @@ export default class MDHelper {
             }
         });
 
-        console.log(currentTOCArray)
-        console.log(tocTree)
         return tocTree;
     }
 
