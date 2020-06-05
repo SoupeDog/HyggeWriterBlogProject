@@ -45,7 +45,7 @@ public class DateBaseConfig {
         dataSource.setUrl("jdbc:mysql://" + dbProperties.getHost() + "/" + dbProperties.getDbName() + "?serverTimezone=UTC&useSSL=false&allowMultiQueries=true");
         dataSource.setUsername(dbProperties.getAc());
         dataSource.setPassword(dbProperties.getPw());
-        dataSource.setMaxActive(10);
+        dataSource.setMaxActive(50);
         dataSource.setMinIdle(2);
 //        dataSource.setTestOnBorrow(true);
 //        dataSource.setTestOnReturn(true);
