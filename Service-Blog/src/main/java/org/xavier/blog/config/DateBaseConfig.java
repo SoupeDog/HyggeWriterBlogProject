@@ -16,6 +16,9 @@ import org.xavier.blog.common.enums.*;
 import org.xavier.blog.config.properties.DateBaseProperties;
 import org.xavier.common.logging.core.HyggeLogger;
 
+import java.sql.SQLException;
+import java.util.Properties;
+
 /**
  * 描述信息：<br/>
  * 数据库配置
@@ -36,7 +39,7 @@ public class DateBaseConfig {
     HyggeLogger logger;
 
     @Bean(name = "mySQLDataSource")
-    public DruidDataSource mySQLDataSource() {
+    public DruidDataSource mySQLDataSource() throws SQLException {
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://" + dbProperties.getHost() + "/" + dbProperties.getDbName() + "?serverTimezone=UTC&useSSL=false&allowMultiQueries=true");
@@ -48,6 +51,13 @@ public class DateBaseConfig {
 //        dataSource.setTestOnReturn(true);
 //        dataSource.setTestWhileIdle(true);
         dataSource.setMaxWait(5000);
+
+        // 配置监控 Filter
+        dataSource.setFilters("stat,wall");
+        Properties properties = new Properties();
+        properties.setProperty("druid.stat.mergeSql", "true");
+        properties.setProperty("druid.stat.slowSqlMillis", "500");
+        dataSource.setConnectProperties(properties);
         return dataSource;
     }
 
