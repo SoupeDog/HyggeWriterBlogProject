@@ -104,7 +104,7 @@ public class ArticleServiceImpl extends DefaultUtils {
         if (rawData.containsKey("properties")) {
             String properties = jsonHelper.format(rawData.get("properties"));
             if (properties != null) {
-                JsonHelper<ObjectMapper> jsonHelper = UtilsCreator.getDefaultJsonHelperInstance(false);
+                JsonHelper<ObjectMapper> jsonHelper = (JsonHelper<ObjectMapper>) UtilsCreator.getDefaultJsonHelperInstance(false);
                 ArticleJsonProperties articleJsonProperties = null;
                 try {
                     articleJsonProperties = jsonHelper.getDependence().readValue(properties, ArticleJsonProperties.class);
