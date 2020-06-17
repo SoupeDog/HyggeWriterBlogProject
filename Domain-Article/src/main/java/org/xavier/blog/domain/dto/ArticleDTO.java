@@ -1,6 +1,7 @@
 package org.xavier.blog.domain.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.xavier.blog.common.enums.DefaultStateEnum;
 import org.xavier.blog.domain.bo.ArticleJsonProperties;
 import org.xavier.blog.domain.po.Article;
@@ -103,7 +104,8 @@ public class ArticleDTO {
         this.pageViews = article.getPageViews();
         this.content = article.getContent();
         try {
-            this.properties = UtilsCreator.getDefaultJsonHelperInstance(false).getMapper().readValue(article.getProperties(), ArticleJsonProperties.class);
+            ObjectMapper objectMapper = (ObjectMapper) UtilsCreator.getDefaultJsonHelperInstance(false).getDependence();
+            this.properties = objectMapper.readValue(article.getProperties(), ArticleJsonProperties.class);
         } catch (JsonProcessingException e) {
             throw new PropertiesRuntimeException("Fail to read:" + article.getProperties());
         }

@@ -1,6 +1,7 @@
 package org.xavier.blog.domain.bo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.xavier.blog.common.enums.DefaultStateEnum;
 import org.xavier.blog.domain.po.Article;
 import org.xavier.blog.domain.po.ArticleCategory;
@@ -88,7 +89,7 @@ public class ArticleSummaryQueryBO {
     public ArticleSummaryQueryBO() {
     }
 
-    public ArticleSummaryQueryBO( Article article, Board board, ArticleCategory articleCategory, ArrayList<ArticleCategoryInfoPO> parentArticleCategoryList) {
+    public ArticleSummaryQueryBO(Article article, Board board, ArticleCategory articleCategory, ArrayList<ArticleCategoryInfoPO> parentArticleCategoryList) {
         this.articleNo = article.getArticleNo();
         this.boardNo = board.getBoardNo();
         this.boardName = board.getBoardName();
@@ -101,7 +102,8 @@ public class ArticleSummaryQueryBO {
         this.wordCount = article.getWordCount();
         this.pageViews = article.getPageViews();
         try {
-            this.properties = UtilsCreator.getDefaultJsonHelperInstance(false).getMapper().readValue(article.getProperties(), ArticleJsonProperties.class);
+            ObjectMapper objectMapper = (ObjectMapper) UtilsCreator.getDefaultJsonHelperInstance(false).getDependence();
+            this.properties = objectMapper.readValue(article.getProperties(), ArticleJsonProperties.class);
         } catch (JsonProcessingException e) {
             throw new PropertiesRuntimeException("Fail to read:" + article.getProperties());
         }
