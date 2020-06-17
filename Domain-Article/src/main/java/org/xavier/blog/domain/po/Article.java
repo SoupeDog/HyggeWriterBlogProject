@@ -133,7 +133,7 @@ public class Article {
         propertiesHelper.stringNotNull(content, 1, 100000, "[content] can't be null,and its length should within 100000.");
         propertiesHelper.stringNotNull(summary, 1, 500, "[summary] can't be null,and its length should within 500.");
         if (properties == null) {
-            JsonHelper<ObjectMapper> jsonHelper = UtilsCreator.getDefaultJsonHelperInstance(false);
+            JsonHelper<ObjectMapper> jsonHelper = (JsonHelper<ObjectMapper>) UtilsCreator.getDefaultJsonHelperInstance(false);
             ArticleJsonProperties articleJsonProperties = new ArticleJsonProperties();
             articleJsonProperties.setDefaultConfigIfAbsent();
             this.properties = jsonHelper.format(articleJsonProperties);
