@@ -129,7 +129,7 @@ public class ArticleServiceImpl extends DefaultUtils {
             Integer wordCount = rawData.get("content").toString().trim().length();
             rawData.put("wordCount", wordCount);
         }
-        HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(upTs, rawData, checkInfo);
+        HashMap<String, Object> data = sqlHelper.createFinalUpdateDataWithDefaultTsColumn(System.currentTimeMillis(), rawData, checkInfo);
         Integer updateArticleAffectedRow = articleMapper.updateArticleByArticleNo(articleNo, data, upTs);
         Boolean updateArticleFlag = updateArticleAffectedRow == 1;
         if (!updateArticleFlag) {
