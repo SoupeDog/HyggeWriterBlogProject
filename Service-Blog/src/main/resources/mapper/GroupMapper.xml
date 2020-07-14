@@ -41,7 +41,7 @@
         SELECT
         <include refid="AllColumnList"/>
         FROM `group` WHERE gno IN
-        <foreach collection="gidList" index="index" item="item" open="(" separator="," close=")">
+        <foreach collection="gnoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
