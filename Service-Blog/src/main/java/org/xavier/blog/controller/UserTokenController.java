@@ -38,7 +38,6 @@ public class UserTokenController extends HyggeWriterController {
     public ResponseEntity<?> login(@RequestBody UserLoginBO userLoginBO) {
         try {
             UserTokenDTO result = userTokenService.login(userLoginBO, System.currentTimeMillis());
-
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

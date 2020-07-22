@@ -1,9 +1,11 @@
 package org.xavier.blog.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.domain.po.Board;
 import org.xavier.blog.service.BoardServiceImpl;
@@ -26,8 +28,7 @@ public class BoardController extends HyggeWriterController {
     BoardServiceImpl boardService;
 
     @GetMapping(value = "/main/board/all")
-    public ResponseEntity<?> queryBoardAll(@RequestHeader HttpHeaders headers,
-                                           @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
+    public ResponseEntity<?> queryBoardAll(@RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") Integer pageSize,
                                            @RequestParam(value = "orderKey", required = false, defaultValue = "ts") String orderKey,
                                            @RequestParam(value = "isDESC", required = false, defaultValue = "false") Boolean isDESC) {

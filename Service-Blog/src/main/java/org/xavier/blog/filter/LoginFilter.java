@@ -3,7 +3,11 @@ package org.xavier.blog.filter;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.xavier.blog.common.filter.FilterHelper;
 import org.xavier.blog.common.enums.UserTokenScopeEnum;
+import org.xavier.blog.domain.po.User;
+import org.xavier.blog.service.UserServiceImpl;
 import org.xavier.blog.service.UserTokenServiceImpl;
+import org.xavier.blog.utils.HyggeRequestContext;
+import org.xavier.blog.utils.RequestProcessTrace;
 import org.xavier.common.exception.base.RequestException;
 import org.xavier.common.exception.base.RequestRuntimeException;
 import org.xavier.common.exception.base.ServiceRuntimeException;
@@ -27,18 +31,20 @@ import java.io.PrintWriter;
  */
 public class LoginFilter extends OncePerRequestFilter {
     private UserTokenServiceImpl userTokenService;
+    private UserServiceImpl userService;
 
     public LoginFilter() {
     }
 
-    public LoginFilter(UserTokenServiceImpl userTokenService) {
+    public LoginFilter(UserTokenServiceImpl userTokenService, UserServiceImpl userService) {
         this.userTokenService = userTokenService;
+        this.userService = userService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
-        String uid, token;
+        String uid, token, secretKey;
         UserTokenScopeEnum scope;
         try {
             switch (request.getMethod().toUpperCase()) {
@@ -48,11 +54,20 @@ public class LoginFilter extends OncePerRequestFilter {
                 case "DELETE":
                     uid = propertiesHelper.stringOfNullable(request.getHeader("uid"), "U00000000");
                     token = propertiesHelper.stringOfNullable(request.getHeader("token"), "0000");
-                    FilterHelper.addValueToHeaders(request, "uid", uid);
-                    FilterHelper.addValueToHeaders(request, "token", token);
+                    secretKey = propertiesHelper.string(request.getHeader("secretKey"));
                     scope = UserTokenScopeEnum.getUserTypeEnum(propertiesHelper.stringOfNullable(request.getHeader("scope"), "web"));
                     userTokenService.validateUserToken(uid, token, scope, System.currentTimeMillis());
+                    // 进程上下文中注入登录信息
+                    User currentLoginUser = userService.queryUserNotNull(uid);
+                    HyggeRequestContext hyggeRequestContext = RequestProcessTrace.getContext();
+                    hyggeRequestContext.setCurrentLoginUid(uid);
+                    hyggeRequestContext.setCurrentLoginToken(token);
+                    hyggeRequestContext.setScope(scope);
+                    hyggeRequestContext.setSecretKey(secretKey);
+                    hyggeRequestContext.setCurrentLoginUser(currentLoginUser);
                     filterChain.doFilter(request, response);
+                    // 清理进程上下文
+                    RequestProcessTrace.clean();
                     break;
                 default:
             }

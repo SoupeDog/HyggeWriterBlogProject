@@ -2,7 +2,6 @@ package org.xavier.blog.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +14,7 @@ import org.xavier.blog.domain.po.Article;
 import org.xavier.blog.domain.po.User;
 import org.xavier.blog.service.ArticleServiceImpl;
 import org.xavier.blog.service.UserServiceImpl;
+import org.xavier.blog.utils.RequestProcessTrace;
 import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;
@@ -40,12 +40,11 @@ public class ArticleController extends HyggeWriterController {
     UserServiceImpl userService;
 
     @PostMapping(value = "/main/article")
-    public ResponseEntity<?> saveArticle(@RequestHeader HttpHeaders headers, @RequestBody Article article) {
-        String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+    public ResponseEntity<?> saveArticle(@RequestBody Article article) {
+        User loginUser = RequestProcessTrace.getContext().getCurrentLoginUser();
         try {
-            User loginUser = userService.queryUserNotNull(loginUid);
             userService.checkRight(loginUser, UserTypeEnum.ROOT);
-            article.setUid(loginUid);
+            article.setUid(loginUser.getUid());
             Long serviceTs = System.currentTimeMillis();
             articleService.saveArticle(article, serviceTs);
             return success(article);
@@ -61,10 +60,11 @@ public class ArticleController extends HyggeWriterController {
     }
 
     @PutMapping(value = "/main/article/{articleId}")
-    public ResponseEntity<?> updateArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleId") String articleId, @RequestBody Map data) {
+    public ResponseEntity<?> updateArticle(@PathVariable("articleId") String articleId, @RequestBody Map data) {
+        User loginUser = RequestProcessTrace.getContext().getCurrentLoginUser();
         try {
-            String operatorUId = headers.getFirst("uid");
-            if (!articleService.updateArticle(operatorUId, articleId, data)) {
+            String operatorUid = loginUser.getUid();
+            if (!articleService.updateArticle(operatorUid, articleId, data)) {
                 throw new Universal409Exception(ErrorCode.ARTICLE_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
             return success();
@@ -80,9 +80,9 @@ public class ArticleController extends HyggeWriterController {
     }
 
     @GetMapping(value = "/main/article/{articleNo}")
-    public ResponseEntity<?> queryArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleNo") String articleNo) {
-        String loginUid = propertiesHelper.string(headers.getFirst("uid"));
-        String secretKey = propertiesHelper.string(headers.getFirst("secretKey"));
+    public ResponseEntity<?> queryArticle(@PathVariable("articleNo") String articleNo) {
+        String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
+        String secretKey = RequestProcessTrace.getContext().getSecretKey();
         try {
             ArticleDTO result = articleService.querySingleArticleByArticleNoForUser(loginUid, articleNo, secretKey);
             return success(result);
@@ -94,13 +94,13 @@ public class ArticleController extends HyggeWriterController {
     }
 
     @GetMapping(value = "/main/article/summary/{boardId}")
-    public ResponseEntity<?> queryArticleSummary(@RequestHeader HttpHeaders headers, @PathVariable("boardId") String boardId,
+    public ResponseEntity<?> queryArticleSummary(@PathVariable("boardId") String boardId,
                                                  @RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                                  @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
                                                  @RequestParam(value = "orderKey", required = false, defaultValue = "ts") String orderKey,
                                                  @RequestParam(value = "isDESC", required = false, defaultValue = "true") Boolean isDESC) {
-        String loginUid = propertiesHelper.string(headers.getFirst("uid"));
-        String secretKey = headers.getFirst("secretKey");
+        String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
+        String secretKey = RequestProcessTrace.getContext().getSecretKey();
         try {
             PageResult<ArticleSummaryQueryBO> result = articleService.queryArticleSummaryOfBoard(loginUid, boardId, secretKey, currentPage, pageSize, orderKey, isDESC);
             return success(result);

@@ -2,7 +2,6 @@ package org.xavier.blog.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +11,7 @@ import org.xavier.blog.domain.bo.GroupValidateBO;
 import org.xavier.blog.domain.po.GroupRelationship;
 import org.xavier.blog.service.GroupRelationshipServiceImpl;
 import org.xavier.blog.service.UserServiceImpl;
+import org.xavier.blog.utils.RequestProcessTrace;
 import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;
@@ -35,9 +35,9 @@ public class GroupRelationshipController extends HyggeWriterController {
     UserServiceImpl userService;
 
     @PostMapping(value = "/main/group/record")
-    public ResponseEntity<?> addGroupRelationship(@RequestHeader HttpHeaders headers, @RequestBody GroupRelationship groupRelationship) {
+    public ResponseEntity<?> addGroupRelationship(@RequestBody GroupRelationship groupRelationship) {
         try {
-            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
             groupJoinRecordService.saveGroupRelationship(loginUid, groupRelationship, System.currentTimeMillis());
             return success();
         } catch (PropertiesRuntimeException e) {
@@ -52,10 +52,11 @@ public class GroupRelationshipController extends HyggeWriterController {
     }
 
     @DeleteMapping(value = "/main/group/record")
-    public ResponseEntity<?> removeGroupJoinRecord(@RequestHeader HttpHeaders headers, @RequestBody GroupRelationship groupRelationship) {
+    public ResponseEntity<?> removeGroupJoinRecord(@RequestParam(value = "upTs", required = false) String upTsTemp,
+                                                   @RequestBody GroupRelationship groupRelationship) {
         try {
-            Long upTs = propertiesHelper.longRangeNotNull(headers.getFirst("ts"), "[ts] can't be null.");
-            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            Long upTs = propertiesHelper.longRangeOfNullable(upTsTemp, System.currentTimeMillis(), "[ts] can't be null.");
+            String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
             groupRelationship.validate();
             groupJoinRecordService.removeGroupRelationship(loginUid, groupRelationship.getGno(), groupRelationship.getUid(), upTs);
             return success();
@@ -71,9 +72,9 @@ public class GroupRelationshipController extends HyggeWriterController {
     }
 
     @PostMapping(value = "/main/group/validate")
-    public ResponseEntity<?> groupValidate(@RequestHeader HttpHeaders headers, @RequestBody GroupValidateBO groupValidateBO) {
+    public ResponseEntity<?> groupValidate(@RequestBody GroupValidateBO groupValidateBO) {
         try {
-            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
             groupValidateBO.validate();
             Boolean result = groupJoinRecordService.isUserInTargetGroup(loginUid, groupValidateBO.getUid(), groupValidateBO.getGno());
             return success(result);
@@ -87,11 +88,10 @@ public class GroupRelationshipController extends HyggeWriterController {
     }
 
     @GetMapping(value = "/main/group/list")
-    public ResponseEntity<?> quarryGroupInfoOfUser(@RequestHeader HttpHeaders headers,
-                                                   @RequestParam(value = "uid") String uid,
+    public ResponseEntity<?> quarryGroupInfoOfUser(@RequestParam(value = "uid") String uid,
                                                    @RequestParam(value = "type", required = false, defaultValue = "id") String type) {
         try {
-            String loginUid = propertiesHelper.string(headers.getFirst("uid"));
+            String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
             switch (type) {
                 default:
                     ArrayList<String> result = groupJoinRecordService.queryGroupIdListOfUser(loginUid, uid);
