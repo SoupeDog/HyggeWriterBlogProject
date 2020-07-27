@@ -32,6 +32,10 @@ public class BgmConfig {
      * 艺术家
      */
     private String artist;
+    /**
+     * 歌词文件路径
+     */
+    private String lrc;
 
     /**
      * 是否启用 0 禁用 1 启用
@@ -93,5 +97,13 @@ public class BgmConfig {
 
     public void setState(Boolean state) {
         this.state = state;
+    }
+
+    public String getLrc() {
+        return lrc;
+    }
+
+    public void setLrc(String lrc) {
+        this.lrc = lrc;
     }
 }
