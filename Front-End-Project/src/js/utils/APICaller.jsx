@@ -166,7 +166,7 @@ export default class APICaller {
         });
     }
 
-    static updateArticle({articleNo, boardNo, articleCategoryNo, title, summary, content, bgi, bgmType, bgmCover, bgmSrc, bgmName, bgmArtist, ts, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
+    static updateArticle({articleNo, boardNo, articleCategoryNo, title, summary, content, bgi, bgmType, bgmCover, bgmSrc, bgmName, bgmArtist, bgmLrc, ts, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
         let finalRequestBody = {};
         if (boardNo != null) {
             finalRequestBody.boardNo = boardNo;
@@ -200,6 +200,9 @@ export default class APICaller {
             }
             if (bgmArtist != null && bgmArtist != "") {
                 bgmConfig.artist = bgmArtist;
+            }
+            if (bgmLrc != null && bgmLrc != "") {
+                bgmConfig.lrc = bgmLrc;
             }
             if (bgmType != "0") {
                 bgmConfig.state = true;
@@ -225,7 +228,7 @@ export default class APICaller {
         });
     }
 
-    static addArticle({boardNo, articleCategoryNo, title, summary, content, bgi, bgmType, bgmCover, bgmSrc, bgmName, bgmArtist, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
+    static addArticle({boardNo, articleCategoryNo, title, summary, content, bgi, bgmType, bgmCover, bgmSrc, bgmName, bgmArtist, bgmLrc, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
         let finalRequestBody = {};
         if (boardNo != null) {
             finalRequestBody.boardNo = boardNo;
@@ -260,7 +263,9 @@ export default class APICaller {
             if (bgmArtist != null && bgmArtist != "") {
                 bgmConfig.artist = bgmArtist;
             }
-
+            if (bgmLrc != null && bgmLrc != "") {
+                bgmConfig.lrc = bgmLrc;
+            }
             if (bgmType != "0") {
                 bgmConfig.state = true;
             } else {

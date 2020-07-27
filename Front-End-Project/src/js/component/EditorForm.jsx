@@ -34,6 +34,7 @@ class EditorForm extends React.Component {
                     bgmType: values.bgmType,
                     bgmName: values.bgmName,
                     bgmArtist: values.bgmArtist,
+                    bgmLrc: values.bgmLrc,
                     ts: new Date().getTime(),
                     successCallback: function (response) {
                         if (response != null && response.code == 200) {
@@ -58,6 +59,7 @@ class EditorForm extends React.Component {
                     bgmType: values.bgmType,
                     bgmName: values.bgmName,
                     bgmArtist: values.bgmArtist,
+                    bgmLrc: values.bgmLrc,
                     successCallback: function (response) {
                         if (response != null && response.code == 200) {
                             message.success(`添加成功`);
@@ -115,6 +117,9 @@ class EditorForm extends React.Component {
                             }
                             if (article.properties.bgmConfig.artist != null) {
                                 finalValues.bgmArtist = article.properties.bgmConfig.artist;
+                            }
+                            if (article.properties.bgmConfig.lrc != null) {
+                                finalValues.bgmLrc = article.properties.bgmConfig.lrc;
                             }
                             _react.state.form.setFieldsValue(finalValues);
                         } else {
@@ -265,6 +270,10 @@ class EditorForm extends React.Component {
                     <Form.Item label="背景音乐艺术家" name="bgmArtist"
                                rules={[{required: false, message: '请输入背景音乐艺术家'}]}>
                         <Input placeholder="请输入背景音乐艺术家"/>
+                    </Form.Item>
+                    <Form.Item label="背景音乐歌词文件" name="bgmLrc"
+                               rules={[{required: false, message: '请输背景音乐歌词文件路径'}]}>
+                        <Input placeholder="请输入背景音乐歌词文件路径"/>
                     </Form.Item>
                     <Form.Item label="摘要" name="summary" rules={[{required: false, message: '请输入摘要'}]}>
                         <TextArea

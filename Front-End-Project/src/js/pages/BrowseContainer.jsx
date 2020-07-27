@@ -300,16 +300,34 @@ class BrowseContainer extends React.Component {
                 musicSinger = _react.props.article.properties.bgmConfig.artist;
             }
 
-            let myMusicPlayer = new APlayer({
-                container: document.getElementById('txPlayer'),
-                autoplay: true,
-                audio: [{
-                    name: musicName,
-                    artist: musicSinger,
-                    url: _react.props.article.properties.bgmConfig.src,
-                    cover: musicCover
-                }]
-            });
+            let musicLrc = _react.props.article.properties.bgmConfig.lrc;
+            if (musicLrc != null && musicLrc != "") {
+                let myMusicPlayer = new APlayer({
+                    container: document.getElementById('txPlayer'),
+                    autoplay: true,
+                    lrcType: 3,
+                    audio: [{
+                        name: musicName,
+                        artist: musicSinger,
+                        url: _react.props.article.properties.bgmConfig.src,
+                        cover: musicCover,
+                        lrc: _react.props.article.properties.bgmConfig.lrc
+                    }]
+                });
+            } else {
+                let myMusicPlayer = new APlayer({
+                    container: document.getElementById('txPlayer'),
+                    autoplay: true,
+                    audio: [{
+                        name: musicName,
+                        artist: musicSinger,
+                        url: _react.props.article.properties.bgmConfig.src,
+                        cover: musicCover,
+                    }]
+                });
+            }
+
+
         }
 
         LogHelper.debug({className: "BrowseContainer", msg: "componentDidMount----------"});
