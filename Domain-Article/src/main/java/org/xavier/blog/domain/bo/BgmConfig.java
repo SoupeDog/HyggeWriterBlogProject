@@ -12,21 +12,31 @@ import org.xavier.common.util.UtilsCreator;
  * @since Jdk 1.8
  */
 public class BgmConfig {
-
     /**
      * 0 本地音乐 1 网易云音乐外链
      */
     private Integer bgmType;
-
     /**
      * 音乐路径
      */
     private String src;
+    /**
+     * 音乐封面
+     */
+    private String cover;
+    /**
+     * 歌曲名
+     */
+    private String name;
+    /**
+     * 艺术家
+     */
+    private String artist;
 
     /**
      * 是否启用 0 禁用 1 启用
      */
-    private boolean state;
+    private Boolean state;
 
     public void setDefaultConfigIfAbsent() {
         PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
@@ -51,5 +61,37 @@ public class BgmConfig {
 
     public void setSrc(String src) {
         this.src = src;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public Boolean getState() {
+        return state;
+    }
+
+    public void setState(Boolean state) {
+        this.state = state;
     }
 }
