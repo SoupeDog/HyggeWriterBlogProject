@@ -1,6 +1,7 @@
 import LogHelper from "./LogHelper.jsx";
 import HttpHelper from "./HttpHelper.jsx";
 import URLHelper from "./URLHelper.jsx";
+import PropertiesHelper from "./PropertiesHelper.jsx";
 
 
 export default class APICaller {
@@ -165,7 +166,7 @@ export default class APICaller {
         });
     }
 
-    static updateArticle({articleNo, boardNo, articleCategoryNo, title, summary, content, bgi, bgmType, bgmSrc, ts, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
+    static updateArticle({articleNo, boardNo, articleCategoryNo, title, summary, content, bgi, bgmType, bgmCover, bgmSrc, bgmName, bgmArtist, ts, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
         let finalRequestBody = {};
         if (boardNo != null) {
             finalRequestBody.boardNo = boardNo;
@@ -188,9 +189,23 @@ export default class APICaller {
         }
         let bgmConfig = {};
 
-        if (bgmSrc != null && bgmType != "3") {
+        if (bgmSrc != null && bgmSrc != "") {
             bgmConfig.bgmType = bgmType;
             bgmConfig.src = bgmSrc;
+            if (bgmName != null && bgmName != "") {
+                bgmConfig.name = bgmName;
+            }
+            if (bgmCover != null && bgmCover != "") {
+                bgmConfig.cover = bgmCover;
+            }
+            if (bgmArtist != null && bgmArtist != "") {
+                bgmConfig.artist = bgmArtist;
+            }
+            if (bgmType != "0") {
+                bgmConfig.state = true;
+            } else {
+                bgmConfig.state = false;
+            }
         }
         propertiesConfig.bgmConfig = bgmConfig;
         finalRequestBody.ts = ts;
@@ -210,7 +225,7 @@ export default class APICaller {
         });
     }
 
-    static addArticle({boardNo, articleCategoryNo, title, summary, content, bgi, bgmType, bgmSrc, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
+    static addArticle({boardNo, articleCategoryNo, title, summary, content, bgi, bgmType, bgmCover, bgmSrc, bgmName, bgmArtist, successCallback, errorCallback, timeOutCallback, finallyCallback}) {
         let finalRequestBody = {};
         if (boardNo != null) {
             finalRequestBody.boardNo = boardNo;
@@ -233,9 +248,24 @@ export default class APICaller {
         }
         let bgmConfig = {};
 
-        if (bgmSrc != null && bgmType != "3") {
+        if (bgmSrc != null && bgmSrc != "") {
             bgmConfig.bgmType = bgmType;
             bgmConfig.src = bgmSrc;
+            if (bgmName != null && bgmName != "") {
+                bgmConfig.name = bgmName;
+            }
+            if (bgmCover != null && bgmCover != "") {
+                bgmConfig.cover = bgmCover;
+            }
+            if (bgmArtist != null && bgmArtist != "") {
+                bgmConfig.artist = bgmArtist;
+            }
+
+            if (bgmType != "0") {
+                bgmConfig.state = true;
+            } else {
+                bgmConfig.state = false;
+            }
         }
         propertiesConfig.bgmConfig = bgmConfig;
         finalRequestBody.properties = JSON.stringify(propertiesConfig);

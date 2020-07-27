@@ -29,8 +29,11 @@ class EditorForm extends React.Component {
                     summary: values.summary,
                     content: values.content,
                     bgi: values.bgi,
-                    bgmType: values.bgmType,
                     bgmSrc: values.bgmSrc,
+                    bgmCover: values.bgmCover,
+                    bgmType: values.bgmType,
+                    bgmName: values.bgmName,
+                    bgmArtist: values.bgmArtist,
                     ts: new Date().getTime(),
                     successCallback: function (response) {
                         if (response != null && response.code == 200) {
@@ -50,8 +53,11 @@ class EditorForm extends React.Component {
                     summary: values.summary,
                     content: values.content,
                     bgi: values.bgi,
-                    bgmType: values.bgmType,
                     bgmSrc: values.bgmSrc,
+                    bgmCover: values.bgmCover,
+                    bgmType: values.bgmType,
+                    bgmName: values.bgmName,
+                    bgmArtist: values.bgmArtist,
                     successCallback: function (response) {
                         if (response != null && response.code == 200) {
                             message.success(`添加成功`);
@@ -100,6 +106,15 @@ class EditorForm extends React.Component {
                             }
                             if (article.properties.bgmConfig.bgmType != null) {
                                 finalValues.bgmType = article.properties.bgmConfig.bgmType + "";
+                            }
+                            if (article.properties.bgmConfig.cover != null) {
+                                finalValues.bgmCover = article.properties.bgmConfig.cover;
+                            }
+                            if (article.properties.bgmConfig.name != null) {
+                                finalValues.bgmName = article.properties.bgmConfig.name;
+                            }
+                            if (article.properties.bgmConfig.artist != null) {
+                                finalValues.bgmArtist = article.properties.bgmConfig.artist;
                             }
                             _react.state.form.setFieldsValue(finalValues);
                         } else {
@@ -236,8 +251,20 @@ class EditorForm extends React.Component {
                         </Radio.Group>
                     </Form.Item>
                     <Form.Item label="背景音乐资源路径" name="bgmSrc"
-                               rules={[{required: false, message: '请选择背景音乐资源路径'}]}>
-                        <Input placeholder="请输入音频资源路径"/>
+                               rules={[{required: false, message: '请输入背景音乐资源路径'}]}>
+                        <Input placeholder="请输入背景音乐资源路径"/>
+                    </Form.Item>
+                    <Form.Item label="背景音乐资源封面" name="bgmCover"
+                               rules={[{required: false, message: '请输入背景音乐资源封面'}]}>
+                        <Input placeholder="请输入背景音乐资源封面"/>
+                    </Form.Item>
+                    <Form.Item label="背景音乐名称" name="bgmName"
+                               rules={[{required: false, message: '请输入背景音乐名称'}]}>
+                        <Input placeholder="请输入背景音乐名称"/>
+                    </Form.Item>
+                    <Form.Item label="背景音乐艺术家" name="bgmArtist"
+                               rules={[{required: false, message: '请输入背景音乐艺术家'}]}>
+                        <Input placeholder="请输入背景音乐艺术家"/>
                     </Form.Item>
                     <Form.Item label="摘要" name="summary" rules={[{required: false, message: '请输入摘要'}]}>
                         <TextArea

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import '../../css/browse.less';
+import '../../css/musicPlayer.css';
 
 import clsx from "clsx";
 import {Card, Layout, Affix, Tree, message, Avatar, Dropdown, Menu, Tooltip} from "antd";
@@ -159,10 +160,10 @@ class BrowseContainer extends React.Component {
                             {this.props.article.properties.bgmConfig.bgmType != 2 ? null :
                                 // 音频直连播放
                                 <div id={"txPlayer"}>
-                                    <audio id="h5audio_media" controls
-                                           style={{margin: "0 auto 0 auto", width: "100%"}} autoPlay={true}
-                                           src={this.props.article.properties.bgmConfig.src}>
-                                    </audio>
+                                    {/*<audio id="h5audio_media" controls*/}
+                                    {/*       style={{margin: "0 auto 0 auto", width: "100%"}} autoPlay={true}*/}
+                                    {/*       src={this.props.article.properties.bgmConfig.src}>*/}
+                                    {/*</audio>*/}
                                 </div>}
                         </div>
                     }
@@ -274,6 +275,43 @@ class BrowseContainer extends React.Component {
             }
         });
         WindowsEventHelper.start_OnScroll();
+        if (_react.props.article.properties.bgmConfig.src != null &&
+            // 为直连音频时
+            _react.props.article.properties.bgmConfig.bgmType == 2) {
+            let musicURL = _react.props.article.properties.bgmConfig.src;
+            let musicName;
+            let musicSinger;
+            let musicCover = _react.props.article.properties.bgmConfig.cover == null ? "https://www.xavierwang.cn/static/defaultCover.png" : _react.props.article.properties.bgmConfig.cover;
+
+            if (_react.props.article.properties.bgmConfig.name == null ||
+                _react.props.article.properties.bgmConfig.artist == null) {
+                // 样例 優しい嘘-上原れな.mp3
+                let index = _react.props.article.properties.bgmConfig.src.lastIndexOf("/");
+                // 不包括 “/” 本身所以 +1
+                let singerAndName = musicURL.slice(index + 1);
+                index = singerAndName.indexOf(".");
+                // 去除扩展名
+                singerAndName = singerAndName.slice(0, index);
+                index = singerAndName.indexOf("-");
+                musicName = singerAndName.slice(0, index);
+                musicSinger = singerAndName.slice(index + 1);
+            } else {
+                musicName = _react.props.article.properties.bgmConfig.name;
+                musicSinger = _react.props.article.properties.bgmConfig.artist;
+            }
+
+            let myMusicPlayer = new APlayer({
+                container: document.getElementById('txPlayer'),
+                autoplay: true,
+                audio: [{
+                    name: musicName,
+                    artist: musicSinger,
+                    url: _react.props.article.properties.bgmConfig.src,
+                    cover: musicCover
+                }]
+            });
+        }
+
         LogHelper.debug({className: "BrowseContainer", msg: "componentDidMount----------"});
         LogHelper.debug({msg: ""});
     }
