@@ -30,6 +30,14 @@ export default class URLHelper {
     }
 
     static openNewPage({finalUrl, inNewTab, delayTime}) {
+        let secretKey = this.getQueryString("secretKey");
+        if (secretKey != null) {
+            if (finalUrl.indexOf("?") > 0) {
+                finalUrl = finalUrl + "&secretKey=" + secretKey;
+            } else {
+                finalUrl = finalUrl + "?secretKey=" + secretKey;
+            }
+        }
         if (inNewTab == null || inNewTab == false) {
             if (PropertiesHelper.isNumberNotNull(delayTime) && delayTime != null) {
                 window.setTimeout(function () {
