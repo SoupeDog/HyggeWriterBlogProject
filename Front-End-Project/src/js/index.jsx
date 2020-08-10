@@ -11,7 +11,7 @@ message.config({
 });
 
 let currentPageInit = 1;
-let pageSizeInit = 5;
+let pageSizeInit = 10;
 // 技术板块
 let technologyBoardNo = "ae81801808f8485384b66da526169da2";
 // 非技术板块

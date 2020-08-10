@@ -46,6 +46,7 @@ class TechnologyBoardView extends React.Component {
                         onChange: page => {
                             this.props.onTabChange({activeKey: "1", currentPage: page});
                         },
+                        showSizeChanger: false,
                         current: this.props.technologyCurrentPage,
                         pageSize: this.props.technologyPageSize,
                         total: this.props.technologyTotalCount

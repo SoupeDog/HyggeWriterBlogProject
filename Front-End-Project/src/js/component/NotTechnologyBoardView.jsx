@@ -46,6 +46,7 @@ class NotTechnologyBoardView extends React.Component {
                         onChange: page => {
                             this.props.onTabChange({activeKey: "2", currentPage: page});
                         },
+                        showSizeChanger: false,
                         current: this.props.notTechnologyCurrentPage,
                         pageSize: this.props.notTechnologyPageSize,
                         total: this.props.notTechnologyTotalCount
@@ -73,7 +74,7 @@ class NotTechnologyBoardView extends React.Component {
                         >
                             <List.Item.Meta
                                 title={<a target="_blank"
-                                    href={this.getBrowseURL(summaryItem.articleNo)}>{summaryItem.title}</a>}
+                                          href={this.getBrowseURL(summaryItem.articleNo)}>{summaryItem.title}</a>}
                                 // 这个组件有此处 bug
                                 description={<ArticleCategoryBreadcrumb articleInfo={summaryItem}/>}
                             />
