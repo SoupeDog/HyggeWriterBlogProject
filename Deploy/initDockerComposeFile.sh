@@ -27,6 +27,7 @@ services:
         init: true
         depends_on:
             - "Mysql"
+            - "Nginx"
         volumes:
             - "/home/nginx/root/static:/home/nginx/root/static"
             - "/home/log/:/logFile/"
