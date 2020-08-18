@@ -10,8 +10,8 @@ containerId=$(docker ps -a | grep ${CONTAINER_NAME} |awk '{print $1}')
 
 if [ "${containerId}" != "" ]
 then
-  docker-compose stop ${containerId}
-	docker-compose rm ${containerId}
+  docker-compose stop "${containerId}"
+	docker-compose rm "${containerId}"
 	echo "Remove Container ${CONTAINER_NAME}-${containerId}"
 fi
 }
@@ -21,9 +21,9 @@ tryToCleanImage(){
 #完整样例 → mysql               5.7                 718a6da099d8        13 days ago         448MB
 imageId=$(docker images | grep ${IMAGE_NAME} |awk '{print $3}')
 
-if [ "${containerId}" != "" ]
+if [ "${imageId}" != "" ]
 then
-	docker-compose rmi ${imageId}
+	docker-compose rmi "${imageId}"
 	echo "Remove image ${IMAGE_NAME}-${imageId}"
 fi
 }
