@@ -10,8 +10,8 @@ containerId=$(docker ps -a | grep "${CONTAINER_NAME}" |awk '{print $1}')
 
 if [ "${containerId}" != "" ]
 then
-  docker-compose stop "${containerId}"
-	docker-compose rm "${containerId}"
+  docker-compose stop "${CONTAINER_NAME}"
+	docker rm "${containerId}"
 	echo "Remove Container ${CONTAINER_NAME}-${containerId}"
 fi
 }
@@ -23,8 +23,8 @@ imageId=$(docker images | grep "${IMAGE_NAME}" |awk '{print $3}')
 
 if [ "${imageId}" != "" ]
 then
-	docker-compose rmi "${imageId}"
-	echo "Remove image ${IMAGE_NAME}-${imageId}"
+	docker rmi "${IMAGE_NAME}"
+	echo "Remove Image ${IMAGE_NAME}-${imageId}"
 fi
 }
 
