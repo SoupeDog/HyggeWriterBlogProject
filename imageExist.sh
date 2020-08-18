@@ -14,10 +14,8 @@ fi
 #完整样例 → mysql               5.7                 718a6da099d8        13 days ago         448MB
 containerId=$(docker images | grep ${IMAGE_NAME} |awk '{print $3}')
 
-if [ "${containerId}" = "" ]  
+if [ "${containerId}" != "" ]
 then  
-	echo "cid is empty"
-else
 	docker rmi ${containerId}
 	echo "Remove image ${IMAGE_NAME}-${containerId}"
 fi
