@@ -31,6 +31,7 @@ services:
             - "/home/log/:/logFile/"
         links:
             - "Mysql:mysql"
+            - "Nginx:nginx"
         networks:
             Hygge:
                 ipv4_address: 172.18.0.3
