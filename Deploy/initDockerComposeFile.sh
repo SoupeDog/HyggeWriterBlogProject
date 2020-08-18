@@ -41,6 +41,7 @@ services:
         restart: always
         environment:
             MYSQL_ROOT_PASSWORD: "${DB_PW}"
+        command: "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
         ports:
             - "3306:3306"
         volumes:
