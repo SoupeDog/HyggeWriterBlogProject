@@ -15,9 +15,6 @@ services:
         volumes:
             - "/home/nginx/config:/etc/nginx"
             - "/home/nginx/root:/usr/share/nginx/html"
-        links:
-            - "Service-Blog:service-blog"
-            - "Mysql:mysql"
         networks:
             Hygge:
                 ipv4_address: 172.18.0.2
