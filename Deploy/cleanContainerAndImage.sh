@@ -6,7 +6,7 @@ IMAGE_NAME=$2
 tryToCleanContainer(){
 #docker 容器 Id，筛选 包含 IMAGE_NAME 的项，并打印返回该项的第 1 个参数
 #完整样例 → 147371c73384        mysql:5.7           "docker-entrypoint.s…"   3 hours ago         Up 3 hours          0.0.0.0:3306->3306/tcp, 33060/tcp   Mysql
-containerId=$(docker ps -a | grep ${CONTAINER_NAME} |awk '{print $1}')
+containerId=$(docker ps -a | grep "${CONTAINER_NAME}" |awk '{print $1}')
 
 if [ "${containerId}" != "" ]
 then
@@ -19,7 +19,7 @@ fi
 tryToCleanImage(){
 #docker 镜像 Id，筛选包含 IMAGE_NAME 的项，并打印返回该项的第 3 个参数
 #完整样例 → mysql               5.7                 718a6da099d8        13 days ago         448MB
-imageId=$(docker images | grep ${IMAGE_NAME} |awk '{print $3}')
+imageId=$(docker images | grep "${IMAGE_NAME}" |awk '{print $3}')
 
 if [ "${imageId}" != "" ]
 then
