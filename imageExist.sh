@@ -17,8 +17,7 @@ containerId=$(docker images | grep ${IMAGE_NAME} |awk '{print $3}')
 if [ "${containerId}" = "" ]  
 then  
 	echo "cid is empty"
-	exit 0
-else    
-	echo "cid is ${containerId}"
-	exit 1
+else
+	docker rmi ${containerId}
+	echo "Remove image ${IMAGE_NAME}-${containerId}"
 fi
