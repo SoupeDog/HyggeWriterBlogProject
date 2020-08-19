@@ -75,32 +75,6 @@ public class IndexController extends HyggeWriterController {
         }
     }
 
-    @GetMapping(value = "/main/test")
-    public ResponseEntity<?> forTest() {
-        String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
-        String secretKey = RequestProcessTrace.getContext().getSecretKey();
-        try {
-            ArrayList<BoardArticleCategoryArticleCountInfo> result = articleService.queryArticleCountInfoOfArticleCategory(loginUid, secretKey);
-            // 根据板块编号从小到大排序
-            result.sort(((o1, o2) -> {
-                Integer boardId1 = o1.getBoardArticleCountInfo().getBoardId();
-                Integer boardId2 = o2.getBoardArticleCountInfo().getBoardId();
-                if (boardId1.equals(o2)) {
-                    return 0;
-                } else if (boardId1 > boardId2) {
-                    return 1;
-                } else {
-                    return -1;
-                }
-            }));
-            return success(1);
-        } catch (PropertiesRuntimeException e) {
-            return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
-        } catch (Universal404Exception e) {
-            return fail(HttpStatus.NOT_FOUND, e.getStateCode(), e.getMessage());
-        }
-    }
-
     @GetMapping(value = "/main/index/article/search")
     public ResponseEntity<?> articleSearch(@RequestParam(value = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
