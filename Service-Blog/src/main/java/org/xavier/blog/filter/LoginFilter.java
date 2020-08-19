@@ -66,8 +66,6 @@ public class LoginFilter extends OncePerRequestFilter {
                     hyggeRequestContext.setSecretKey(secretKey);
                     hyggeRequestContext.setCurrentLoginUser(currentLoginUser);
                     filterChain.doFilter(request, response);
-                    // 清理进程上下文
-                    RequestProcessTrace.clean();
                     break;
                 default:
             }
@@ -81,6 +79,9 @@ public class LoginFilter extends OncePerRequestFilter {
             onError(response, e);
         } catch (IOException e) {
             onError(response, e);
+        } finally {
+            // 清理进程上下文
+            RequestProcessTrace.clean();
         }
     }
 
