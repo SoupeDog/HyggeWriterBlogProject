@@ -90,11 +90,6 @@ class BrowseContainer extends React.Component {
                     rootTocTreeList: currentRootTocTreeList
                 });
             }
-            // 清除代码高度限制
-            $("#preview").find(".hljs").each(function () {
-                let currentTarget = $(this);
-                currentTarget.css("max-height", "");
-            });
         }.bind(this);
 
         this.jumpToToc = function (selectedKeys, info) {
@@ -257,6 +252,13 @@ class BrowseContainer extends React.Component {
                 markdown: {
                     sanitize: false,
                     toc: true
+                },
+                after:()=>{
+                    // 清除代码高度限制
+                    $("#preview").find("code").each(function () {
+                        let currentTarget = $(this);
+                        currentTarget.css("max-height", "");
+                    });
                 }
             });
         let _react = this;

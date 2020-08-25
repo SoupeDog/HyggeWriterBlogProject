@@ -288,9 +288,12 @@ class EditorForm extends React.Component {
                                     $("#content").text(), {
                                         className: 'preview vditor-reset vditor-reset--anchor',
                                         anchor: false,
-                                        markdown: {
-                                            sanitize: false,
-                                            toc: true
+                                        after:()=>{
+                                            // 清除代码高度限制
+                                            $("#preview").find("code").each(function () {
+                                                let currentTarget = $(this);
+                                                currentTarget.css("max-height", "");
+                                            });
                                         }
                                     });
                             }}
@@ -314,7 +317,14 @@ class EditorForm extends React.Component {
                                     Vditor.preview(document.getElementById('preview'),
                                         $("#content").text(), {
                                             className: 'preview vditor-reset vditor-reset--anchor',
-                                            anchor: false
+                                            anchor: false,
+                                            after:()=>{
+                                                // 清除代码高度限制
+                                                $("#preview").find("code").each(function () {
+                                                    let currentTarget = $(this);
+                                                    currentTarget.css("max-height", "");
+                                                });
+                                            }
                                         });
                                 }}>
                             预览文章
