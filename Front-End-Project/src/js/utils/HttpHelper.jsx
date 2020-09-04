@@ -10,8 +10,8 @@ export default class HttpHelper {
 
     // url 默认前缀
     static getPrefix() {
-        return "https://www.xavierwang.cn/";
-        // return "http://127.0.0.1:8080/";
+        // return "https://www.xavierwang.cn/";
+        return "http://127.0.0.1:8080/";
     }
 
     // ajax 请求缓存是否开启标识(false:不开启)

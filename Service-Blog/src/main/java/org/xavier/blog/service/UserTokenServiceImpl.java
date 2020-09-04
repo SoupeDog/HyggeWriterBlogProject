@@ -43,7 +43,7 @@ public class UserTokenServiceImpl extends DefaultUtils {
         if (!targetUser.getPw().equals(loginBO.getPw())) {
             throw new Universal403Exception(ErrorCode.UNEXPECTED_PASSWORD_OR_UID.getErrorCod(), "Unexpected password or unexpected uid.");
         }
-        UserToken currentUserToken = userTokenMapper.queryUserByUidAndScope(loginBO.getUid(), currentUserTokenScope.getScope());
+        UserToken currentUserToken = userTokenMapper.queryUserByUidAndScope(loginBO.getUid(), currentUserTokenScope.getIndex());
         if (currentUserToken == null) {
             currentUserToken = new UserToken();
             currentUserToken.firstInit(targetUser.getUid(), currentUserTokenScope, currentTs);
@@ -61,7 +61,7 @@ public class UserTokenServiceImpl extends DefaultUtils {
     }
 
     public UserToken keepAlive(String uid, String token, String refreshKey, UserTokenScopeEnum scope, Long currentTs) throws Universal404Exception, Universal409Exception, Universal403Exception {
-        UserToken userToken = queryUserByUidAndScopeNotNull(uid, scope.getScope());
+        UserToken userToken = queryUserByUidAndScopeNotNull(uid, scope.getIndex());
         if (userToken.getDeadLine() > currentTs) {
             if (!userToken.getToken().equals(token) || !userToken.getScope().equals(scope)) {
                 // 新令牌失效
@@ -82,7 +82,7 @@ public class UserTokenServiceImpl extends DefaultUtils {
     }
 
     public void validateUserToken(String uid, String token, UserTokenScopeEnum scope, Long currentTs) throws Universal404Exception, Universal403Exception {
-        UserToken userToken = queryUserByUidAndScopeNotNull(uid, scope.getScope());
+        UserToken userToken = queryUserByUidAndScopeNotNull(uid, scope.getIndex());
         if (currentTs > userToken.getDeadLine()) {
             throw new Universal403Exception(ErrorCode.TOKEN_OVERDUE.getErrorCod(), "Token(" + token + ") of User(" + uid + ") was overdue.");
         } else {
@@ -116,7 +116,7 @@ public class UserTokenServiceImpl extends DefaultUtils {
 
     private UserToken refreshToken(Long currentTs, String uid, UserTokenScopeEnum currentUserTokenScope, UserToken currentUserToken) {
         currentUserToken.refresh(currentTs);
-        Integer updateAffectedRow = userTokenMapper.refreshToken(uid, currentUserTokenScope.getScope(),
+        Integer updateAffectedRow = userTokenMapper.refreshToken(uid, currentUserTokenScope.getIndex(),
                 currentUserToken.getToken(), currentUserToken.getDeadLine(),
                 currentUserToken.getLastToken(), currentUserToken.getLastDeadLine(), currentUserToken.getRefreshKey(), currentTs);
         Boolean updateFlag = updateAffectedRow == 1;

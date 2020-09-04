@@ -58,14 +58,16 @@ public class FileController extends HyggeWriterController {
             ArrayList<FileInfo> files = new ArrayList();
             File file = new File(filePath);
             File[] tempList = file.listFiles();
-            for (int i = 0; i < tempList.length; i++) {
-                File currentFile = tempList[i];
-                if (currentFile.isFile()) {
-                    FileInfo item = new FileInfo();
-                    String fileFullPath = tempList[i].toString();
-                    item.setFileName(fileFullPath.substring(filePath.length()));
-                    item.setFileSize(new BigDecimal(currentFile.length()).divide(FileInfo.byteToMb));
-                    files.add(item);
+            if (tempList != null) {
+                for (int i = 0; i < tempList.length; i++) {
+                    File currentFile = tempList[i];
+                    if (currentFile.isFile()) {
+                        FileInfo item = new FileInfo();
+                        String fileFullPath = tempList[i].toString();
+                        item.setFileName(fileFullPath.substring(filePath.length()));
+                        item.setFileSize(new BigDecimal(currentFile.length()).divide(FileInfo.byteToMb));
+                        files.add(item);
+                    }
                 }
             }
             return success(files);

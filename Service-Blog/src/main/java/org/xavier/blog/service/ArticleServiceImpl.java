@@ -15,6 +15,7 @@ import org.xavier.blog.dao.GroupRelationshipMapper;
 import org.xavier.blog.domain.bo.*;
 import org.xavier.blog.domain.dto.ArticleDTO;
 import org.xavier.blog.domain.po.*;
+import org.xavier.blog.utils.RequestProcessTrace;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal403Exception;
@@ -167,7 +168,7 @@ public class ArticleServiceImpl extends DefaultUtils {
      * @return 文章对象
      */
     public ArticleDTO querySingleArticleByArticleNoForUser(String loginUid, String articleNo, String secretKey) throws Universal404Exception {
-        User loginUser = userService.queryUserNotNull(loginUid);
+        User loginUser = RequestProcessTrace.getContext().getCurrentLoginUser();
         Article article = querySingleArticleByArticleNoNotNull(articleNo);
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNo(article.getArticleCategoryNo());
         ArrayList<String> allJoinedGroupTemp = groupRelationshipMapper.queryGroupIdListOfUser(loginUid);

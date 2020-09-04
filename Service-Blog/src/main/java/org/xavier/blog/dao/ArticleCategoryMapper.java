@@ -52,7 +52,7 @@ public interface ArticleCategoryMapper {
      * @param articleCategoryNo 文章类别唯一标识
      * @return 查询结果
      */
-    @Select("select articleCategoryId,articleCategoryNo,articleCategoryName,boardNo,uid,description,state,createTs,lastUpdateTs from `articleCategory` where articleCategoryNo=#{articleCategoryNo} and state=1 limit 1")
+    @Select("select articleCategoryId,articleCategoryNo,articleCategoryName,boardNo,uid,description,state,createTs,lastUpdateTs from `articleCategory` where articleCategoryNo=#{articleCategoryNo} and state=2 limit 1")
     ArticleCategory queryArticleCategoryNoByArticleCategoryNo(@Param("articleCategoryNo") String articleCategoryNo);
     /**
      * 根据 accessPermitRangeList 查询文章类别信息

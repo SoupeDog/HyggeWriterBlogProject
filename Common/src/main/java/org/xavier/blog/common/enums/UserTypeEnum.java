@@ -14,20 +14,20 @@ import org.xavier.common.exception.PropertiesRuntimeException;
 public enum UserTypeEnum {
     ROOT((byte) 1, "超级管理员"),
     NORMAL((byte) 2, "普通用户");
-    private Byte authority;
+    private Byte index;
     private String description;
 
-    UserTypeEnum(Byte authority, String description) {
-        this.authority = authority;
+    UserTypeEnum(Byte index, String description) {
+        this.index = index;
         this.description = description;
     }
 
-    public Byte getAuthority() {
-        return authority;
+    public Byte getIndex() {
+        return index;
     }
 
-    public void setAuthority(Byte authority) {
-        this.authority = authority;
+    public void setIndex(Byte index) {
+        this.index = index;
     }
 
     public String getDescription() {
@@ -43,6 +43,17 @@ public enum UserTypeEnum {
             case (byte) 1:
                 return UserTypeEnum.ROOT;
             case (byte) 2:
+                return UserTypeEnum.NORMAL;
+            default:
+                throw new PropertiesRuntimeException("Unexpected authority of UserTypeEnum.");
+        }
+    }
+
+    public static UserTypeEnum getUserTypeEnum(String authority) {
+        switch (authority.toUpperCase()) {
+            case "ROOT":
+                return UserTypeEnum.ROOT;
+            case "NORMAL":
                 return UserTypeEnum.NORMAL;
             default:
                 throw new PropertiesRuntimeException("Unexpected authority of UserTypeEnum.");

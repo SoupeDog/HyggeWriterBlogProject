@@ -10,13 +10,34 @@ package org.xavier.blog.common.enums;
  * @since Jdk 1.8
  */
 public enum ArticleAccessPermitEnum {
-    PERSONAL((byte) 1, "仅自己可见"),
-    SECRET_KEY((byte) 2, "秘钥访问"),
-    GROUP((byte) 3, "特定群组可见"),
-    MALE((byte) 4, "仅男性可见"),
-    FEMALE((byte) 5, "仅女性可见"),
-    CRON((byte) 6, "周期性可见"),
-    PUBLIC((byte) 7, "公开可见");
+    /**
+     * 仅自己可见
+     */
+    PERSONAL((byte) 1, "PERSONAL"),
+    /**
+     * 秘钥访问
+     */
+    SECRET_KEY((byte) 2, "SECRET_KEY"),
+    /**
+     * 特定群组可见
+     */
+    GROUP((byte) 3, "GROUP"),
+    /**
+     * 仅男性可见
+     */
+    MALE((byte) 4, "MALE"),
+    /**
+     * 仅女性可见
+     */
+    FEMALE((byte) 5, "FEMALE"),
+    /**
+     * 周期性可见
+     */
+    CRON((byte) 6, "CRON"),
+    /**
+     * 公开可见
+     */
+    PUBLIC((byte) 7, "PUBLIC");
 
     private Byte index;
     private String description;
@@ -60,6 +81,27 @@ public enum ArticleAccessPermitEnum {
                 return ArticleAccessPermitEnum.PUBLIC;
             default:
                 throw new IllegalArgumentException("Unexpected index of ArticleAccessPermitEnum.");
+        }
+    }
+
+    public static ArticleAccessPermitEnum getArticleAccessPermitEnum(String articleAccessPermit) {
+        switch (articleAccessPermit.toUpperCase()) {
+            case "PERSONAL":
+                return ArticleAccessPermitEnum.PERSONAL;
+            case "SECRET_KEY":
+                return ArticleAccessPermitEnum.SECRET_KEY;
+            case "GROUP":
+                return ArticleAccessPermitEnum.GROUP;
+            case "MALE":
+                return ArticleAccessPermitEnum.MALE;
+            case "FEMALE":
+                return ArticleAccessPermitEnum.FEMALE;
+            case "CRON":
+                return ArticleAccessPermitEnum.CRON;
+            case "PUBLIC":
+                return ArticleAccessPermitEnum.PUBLIC;
+            default:
+                throw new IllegalArgumentException("Unexpected authority of UserTokenScopeEnum.");
         }
     }
 }

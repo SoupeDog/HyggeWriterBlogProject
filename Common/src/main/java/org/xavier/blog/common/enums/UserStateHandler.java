@@ -24,24 +24,24 @@ import java.sql.SQLException;
 public class UserStateHandler extends BaseTypeHandler<UserStateEnum> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, UserStateEnum parameter, JdbcType jdbcType) throws SQLException {
-        ps.setByte(i, parameter.getUserState());
+        ps.setByte(i, parameter.getIndex());
     }
 
     @Override
     public UserStateEnum getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        Byte value = rs.getByte(columnName);
+        String value = rs.getString(columnName);
         return rs.wasNull() ? null : UserStateEnum.getUserStateEnum(value);
     }
 
     @Override
     public UserStateEnum getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        Byte value = rs.getByte(columnIndex);
+        String value = rs.getString(columnIndex);
         return rs.wasNull() ? null : UserStateEnum.getUserStateEnum(value);
     }
 
     @Override
     public UserStateEnum getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        Byte value = cs.getByte(columnIndex);
+        String value = cs.getString(columnIndex);
         return cs.wasNull() ? null : UserStateEnum.getUserStateEnum(value);
     }
 }

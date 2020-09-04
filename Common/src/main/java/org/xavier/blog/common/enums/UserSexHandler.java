@@ -29,19 +29,19 @@ public class UserSexHandler extends BaseTypeHandler<UserSexEnum> {
 
     @Override
     public UserSexEnum getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        Byte value = rs.getByte(columnName);
+        String value = rs.getString(columnName);
         return rs.wasNull() ? null : UserSexEnum.getUserSexEnum(value);
     }
 
     @Override
     public UserSexEnum getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        Byte value = rs.getByte(columnIndex);
+        String value = rs.getString(columnIndex);
         return rs.wasNull() ? null : UserSexEnum.getUserSexEnum(value);
     }
 
     @Override
     public UserSexEnum getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        Byte value = cs.getByte(columnIndex);
+        String value = cs.getString(columnIndex);
         return cs.wasNull() ? null : UserSexEnum.getUserSexEnum(value);
     }
 }

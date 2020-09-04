@@ -26,19 +26,19 @@ public class DefaultStateTypeHandler extends BaseTypeHandler<DefaultStateEnum> {
 
     @Override
     public DefaultStateEnum getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        Byte value = rs.getByte(columnName);
+        String value = rs.getString(columnName);
         return rs.wasNull() ? null : DefaultStateEnum.getDefaultStateEnum(value);
     }
 
     @Override
     public DefaultStateEnum getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        Byte value = rs.getByte(columnIndex);
+        String value = rs.getString(columnIndex);
         return rs.wasNull() ? null : DefaultStateEnum.getDefaultStateEnum(value);
     }
 
     @Override
     public DefaultStateEnum getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        Byte value = cs.getByte(columnIndex);
+        String value = cs.getNString(columnIndex);
         return cs.wasNull() ? null : DefaultStateEnum.getDefaultStateEnum(value);
     }
 }

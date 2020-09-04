@@ -25,19 +25,19 @@ public class ArticleAccessPermitHandler extends BaseTypeHandler<ArticleAccessPer
 
     @Override
     public ArticleAccessPermitEnum getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        Byte value = rs.getByte(columnName);
+        String value = rs.getString(columnName);
         return rs.wasNull() ? null : ArticleAccessPermitEnum.getArticleAccessPermitEnum(value);
     }
 
     @Override
     public ArticleAccessPermitEnum getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        Byte value = rs.getByte(columnIndex);
+        String value = rs.getString(columnIndex);
         return rs.wasNull() ? null : ArticleAccessPermitEnum.getArticleAccessPermitEnum(value);
     }
 
     @Override
     public ArticleAccessPermitEnum getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        Byte value = cs.getByte(columnIndex);
+        String value = cs.getString(columnIndex);
         return cs.wasNull() ? null : ArticleAccessPermitEnum.getArticleAccessPermitEnum(value);
     }
 }

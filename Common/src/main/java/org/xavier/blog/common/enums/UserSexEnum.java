@@ -10,9 +10,18 @@ package org.xavier.blog.common.enums;
  * @since Jdk 1.8
  */
 public enum UserSexEnum {
-    SECRET((byte) 1, "秘"),
-    FEMALE((byte) 2, "女"),
-    MALE((byte) 3, "男");
+    /**
+     * 秘
+     */
+    SECRET((byte) 1, "SECRET"),
+    /**
+     * 女
+     */
+    FEMALE((byte) 2, "FEMALE"),
+    /**
+     * 男
+     */
+    MALE((byte) 3, "MALE");
     private Byte index;
     private String description;
 
@@ -52,12 +61,12 @@ public enum UserSexEnum {
 
 
     public static UserSexEnum getUserSexEnum(String description) {
-        switch (description) {
-            case "秘":
+        switch (description.toUpperCase()) {
+            case "SECRET":
                 return UserSexEnum.SECRET;
-            case "男":
+            case "MALE":
                 return UserSexEnum.MALE;
-            case "女":
+            case "FEMALE":
                 return UserSexEnum.FEMALE;
             default:
                 throw new IllegalArgumentException("Unexpected index of UserSexEnum.");
