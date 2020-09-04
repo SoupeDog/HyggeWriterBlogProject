@@ -6,6 +6,12 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = {
+    externals: {
+        "react": "React",
+        "react-dom": "ReactDOM",
+        "vditor": "Vditor",
+        "antd": "antd"
+    },
     entry: {
         index: "./src/js/index.jsx",
         browse: "./src/js/browse.jsx",
@@ -32,14 +38,7 @@ module.exports = {
                     {
                         loader: "babel-loader",
                         options: {
-                            presets: ["@babel/preset-env", "@babel/react"],
-                            plugins: [
-                                ["import", {
-                                    "libraryName": "antd",
-                                    "libraryDirectory": "es",
-                                    "style": true // `style: true` 会加载 less 文件
-                                }]
-                            ]
+                            presets: ["@babel/preset-env", "@babel/react"]
                         }
                     }
                 ],
@@ -101,7 +100,7 @@ module.exports = {
             filename: "index.html",
             title: "主页-我的小宅子",
             favicon: "./src/img/favicon.ico",
-            template: "./src/html/template.html",
+            template: "./src/html/defaultTemplate.html",
             chunks: ["index", "commons"],
             inject: "body",
             minify: {
@@ -113,7 +112,7 @@ module.exports = {
             filename: "browse.html",
             title: "浏览页-我的小宅子",
             favicon: "./src/img/favicon.ico",
-            template: "./src/html/template.html",
+            template: "./src/html/browseTemplate.html",
             chunks: ["browse", "commons"],
             inject: "body",
             minify: {
@@ -125,7 +124,7 @@ module.exports = {
             filename: "editor.html",
             title: "编辑页-我的小宅子",
             favicon: "./src/img/favicon.ico",
-            template: "./src/html/template.html",
+            template: "./src/html/browseTemplate.html",
             chunks: ["editor", "commons"],
             inject: "body",
             minify: {
@@ -137,7 +136,7 @@ module.exports = {
             filename: "login.html",
             title: "登录页-我的小宅子",
             favicon: "./src/img/favicon.ico",
-            template: "./src/html/template.html",
+            template: "./src/html/defaultTemplate.html",
             chunks: ["login", "commons"],
             inject: "body",
             minify: {

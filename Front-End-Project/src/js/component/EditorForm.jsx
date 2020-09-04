@@ -4,7 +4,7 @@ import {Button, Form, Input, message, Radio, Select} from "antd";
 // import $ from 'jquery'
 import APICaller from "../utils/APICaller.jsx";
 import URLHelper from "../utils/URLHelper.jsx";
-// import Vditor from "vditor";
+import Vditor from "vditor";
 import PropertiesHelper from "../utils/PropertiesHelper.jsx";
 
 const {TextArea} = Input;

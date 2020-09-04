@@ -1,9 +1,9 @@
 import React from 'react';
 
 import '../../css/browse.less';
-import '../../css/musicPlayer.css';
 
 import clsx from "clsx";
+import Vditor from 'vditor'
 import {Card, Layout, Affix, Tree, message, Avatar, Dropdown, Menu, Tooltip} from "antd";
 import {DownOutlined, EditOutlined, CloseCircleOutlined} from '@ant-design/icons';
 
