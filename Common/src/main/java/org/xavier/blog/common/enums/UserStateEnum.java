@@ -12,8 +12,8 @@ import org.xavier.common.exception.PropertiesRuntimeException;
  * @since Jdk 1.8
  */
 public enum UserStateEnum {
-    FROZEN((byte) 0, "冻结的"),
-    ACTIVE((byte) 1, "激活的");
+    FROZEN((byte) 1, "冻结的"),
+    ACTIVE((byte) 2, "激活的");
     private Byte userState;
     private String description;
 
@@ -32,9 +32,9 @@ public enum UserStateEnum {
 
     public static UserStateEnum getUserStateEnum(Number userState) {
         switch (userState.byteValue()) {
-            case (byte) 0:
-                return UserStateEnum.FROZEN;
             case (byte) 1:
+                return UserStateEnum.FROZEN;
+            case (byte) 2:
                 return UserStateEnum.ACTIVE;
             default:
                 throw new PropertiesRuntimeException("Unexpected userState of UserStateEnum.");

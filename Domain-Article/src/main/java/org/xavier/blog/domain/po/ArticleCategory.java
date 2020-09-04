@@ -40,7 +40,7 @@ public class ArticleCategory {
      */
     private String description;
     /**
-     * 是否激活标识 0 禁用 1 启用
+     * 是否激活标识 1 禁用 2 启用
      */
     private DefaultStateEnum state;
 

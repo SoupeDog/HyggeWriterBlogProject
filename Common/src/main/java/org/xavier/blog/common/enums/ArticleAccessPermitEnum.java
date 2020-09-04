@@ -10,13 +10,13 @@ package org.xavier.blog.common.enums;
  * @since Jdk 1.8
  */
 public enum ArticleAccessPermitEnum {
-    PERSONAL((byte) 0, "仅自己可见"),
-    SECRET_KEY((byte) 1, "秘钥访问"),
-    GROUP((byte) 2, "特定群组可见"),
-    MALE((byte) 3, "仅男性可见"),
-    FEMALE((byte) 4, "仅女性可见"),
-    CRON((byte) 5, "周期性可见"),
-    PUBLIC((byte) 6, "公开可见");
+    PERSONAL((byte) 1, "仅自己可见"),
+    SECRET_KEY((byte) 2, "秘钥访问"),
+    GROUP((byte) 3, "特定群组可见"),
+    MALE((byte) 4, "仅男性可见"),
+    FEMALE((byte) 5, "仅女性可见"),
+    CRON((byte) 6, "周期性可见"),
+    PUBLIC((byte) 7, "公开可见");
 
     private Byte index;
     private String description;
@@ -44,19 +44,19 @@ public enum ArticleAccessPermitEnum {
 
     public static ArticleAccessPermitEnum getArticleAccessPermitEnum(Number number) {
         switch (number.byteValue()) {
-            case (byte) 0:
-                return ArticleAccessPermitEnum.PERSONAL;
             case (byte) 1:
-                return ArticleAccessPermitEnum.SECRET_KEY;
+                return ArticleAccessPermitEnum.PERSONAL;
             case (byte) 2:
-                return ArticleAccessPermitEnum.GROUP;
+                return ArticleAccessPermitEnum.SECRET_KEY;
             case (byte) 3:
-                return ArticleAccessPermitEnum.MALE;
+                return ArticleAccessPermitEnum.GROUP;
             case (byte) 4:
-                return ArticleAccessPermitEnum.FEMALE;
+                return ArticleAccessPermitEnum.MALE;
             case (byte) 5:
-                return ArticleAccessPermitEnum.CRON;
+                return ArticleAccessPermitEnum.FEMALE;
             case (byte) 6:
+                return ArticleAccessPermitEnum.CRON;
+            case (byte) 7:
                 return ArticleAccessPermitEnum.PUBLIC;
             default:
                 throw new IllegalArgumentException("Unexpected index of ArticleAccessPermitEnum.");

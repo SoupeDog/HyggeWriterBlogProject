@@ -10,9 +10,9 @@ package org.xavier.blog.common.enums;
  * @since Jdk 1.8
  */
 public enum UserTokenScopeEnum {
-    WEB((byte) 0, "web"),
-    ANDROID((byte) 1, "android"),
-    IOS((byte) 2, "ios");
+    WEB((byte) 1, "web"),
+    ANDROID((byte) 2, "android"),
+    IOS((byte) 3, "ios");
     private Byte scope;
     private String description;
 
@@ -39,11 +39,11 @@ public enum UserTokenScopeEnum {
 
     public static UserTokenScopeEnum getUserTypeEnum(Number scope) {
         switch (scope.byteValue()) {
-            case (byte) 0:
-                return UserTokenScopeEnum.WEB;
             case (byte) 1:
-                return UserTokenScopeEnum.ANDROID;
+                return UserTokenScopeEnum.WEB;
             case (byte) 2:
+                return UserTokenScopeEnum.ANDROID;
+            case (byte) 3:
                 return UserTokenScopeEnum.IOS;
             default:
                 throw new IllegalArgumentException("Unexpected authority of UserTokenScopeEnum.");

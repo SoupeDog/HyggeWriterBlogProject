@@ -10,9 +10,9 @@ package org.xavier.blog.common.enums;
  * @since Jdk 1.8
  */
 public enum UserSexEnum {
-    SECRET((byte) 0, "秘"),
-    MALE((byte) 1, "男"),
-    FEMALE((byte) 2, "女");
+    SECRET((byte) 1, "秘"),
+    FEMALE((byte) 2, "女"),
+    MALE((byte) 3, "男");
     private Byte index;
     private String description;
 
@@ -39,17 +39,16 @@ public enum UserSexEnum {
 
     public static UserSexEnum getUserSexEnum(Number index) {
         switch (index.byteValue()) {
-            case (byte) 0:
-                return UserSexEnum.SECRET;
             case (byte) 1:
-                return UserSexEnum.MALE;
+                return UserSexEnum.SECRET;
             case (byte) 2:
                 return UserSexEnum.FEMALE;
+            case (byte) 3:
+                return UserSexEnum.MALE;
             default:
                 throw new IllegalArgumentException("Unexpected index of UserSexEnum.");
         }
     }
-
 
 
     public static UserSexEnum getUserSexEnum(String description) {

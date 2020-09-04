@@ -28,7 +28,7 @@
 
     <update id="removeArticleMultipleByArticleCategoryNoLogically">
         UPDATE `articleCategory`
-        SET state = 0,
+        SET state = 1,
         lastUpdateTs = #{lastUpdateTs}
         WHERE articleCategoryNo IN
         <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
@@ -47,7 +47,7 @@
     <select id="queryAllArticleCategory" resultType="ArticleCategory">
         SELECT
         <include refid="All_Column_List"/>
-        FROM `articleCategory` WHERE state=1
+        FROM `articleCategory` WHERE state=2
         <if test="accessPermitRangeList != null">
             AND accessPermit IN
             <foreach collection="accessPermitRangeList" index="index" item="item" open="(" separator="," close=")">

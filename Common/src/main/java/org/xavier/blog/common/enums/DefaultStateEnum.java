@@ -9,8 +9,8 @@ package org.xavier.blog.common.enums;
  * @since Jdk 1.8
  */
 public enum DefaultStateEnum {
-    INACTIVE((byte) 0, "禁用"),
-    ACTIVE((byte) 1, "启用");
+    INACTIVE((byte) 1, "禁用"),
+    ACTIVE((byte) 2, "启用");
     private Byte index;
     private String description;
 
@@ -37,9 +37,9 @@ public enum DefaultStateEnum {
 
     public static DefaultStateEnum getDefaultStateEnum(Number index) {
         switch (index.byteValue()) {
-            case (byte) 0:
-                return DefaultStateEnum.INACTIVE;
             case (byte) 1:
+                return DefaultStateEnum.INACTIVE;
+            case (byte) 2:
                 return DefaultStateEnum.ACTIVE;
             default:
                 throw new IllegalArgumentException("Unexpected index of DefaultStateEnum.");

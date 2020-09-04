@@ -24,13 +24,13 @@
 
     <update id="removeBoardMultipleByBoardNoLogically">
         UPDATE `board`
-        SET state = 0,
+        SET state = 1,
         lastUpdateTs = #{lastUpdateTs}
         WHERE boardNo IN
         <foreach collection="boardNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
-        AND state = 1
+        AND state = 2
     </update>
 
     <update id="updateBoard">
@@ -44,7 +44,7 @@
     <select id="queryBoardListByBoardNo" resultType="Board">
         SELECT
         <include refid="AllColumnList"/>
-        FROM `board` WHERE state=1 AND boardNo IN
+        FROM `board` WHERE state=2 AND boardNo IN
         <foreach collection="boardNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -53,7 +53,7 @@
     <select id="queryAllBoardList" resultType="Board">
         SELECT
         <include refid="AllColumnList"/>
-        FROM `board` WHERE state=1 ORDER BY #{orderKey} ${order}
+        FROM `board` WHERE state=2 ORDER BY #{orderKey} ${order}
         Limit #{startPoint},#{size}
     </select>
 </mapper>

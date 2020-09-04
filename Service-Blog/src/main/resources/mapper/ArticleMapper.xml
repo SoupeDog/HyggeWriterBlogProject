@@ -38,7 +38,7 @@
 
     <update id="removeArticleMultipleByArticleNoLogically">
         UPDATE `article`
-        SET state = 0, lastUpdateTs = #{lastUpdateTs}
+        SET state = 1, lastUpdateTs = #{lastUpdateTs}
         WHERE articleNo IN
         <foreach collection="articleNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
@@ -57,7 +57,7 @@
         SELECT
         <include refid="AllColumnList"/>
         FROM `article`
-        WHERE state = 1
+        WHERE state = 2
         AND articleNo IN
         <foreach collection="articleNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
@@ -70,7 +70,7 @@
         <include refid="SummaryColumnList"/>
         FROM
         `article`
-        WHERE state=1 AND boardNo=#{boardNo} AND articleCategoryNo IN
+        WHERE state=2 AND boardNo=#{boardNo} AND articleCategoryNo IN
         <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -83,7 +83,7 @@
         count(*)
         FROM
         `article`
-        WHERE state=1 AND boardNo=#{boardNo} AND articleCategoryNo IN
+        WHERE state=2 AND boardNo=#{boardNo} AND articleCategoryNo IN
         <foreach collection="articleCategoryNoList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
