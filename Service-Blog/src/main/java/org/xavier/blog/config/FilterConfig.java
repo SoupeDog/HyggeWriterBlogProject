@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.xavier.blog.common.filter.CrossOriginFilter;
 import org.xavier.blog.filter.LoginFilter;
-import org.xavier.blog.service.UserServiceImpl;
-import org.xavier.blog.service.UserTokenServiceImpl;
+import org.xavier.blog.service.impl.UserServiceImpl;
+import org.xavier.blog.service.impl.UserTokenServiceImpl;
 
 /**
  * 描述信息：<br/>

@@ -1,142 +1,134 @@
-package org.xavier.blog.domain.po;
+package org.xavier.blog.task.bo;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.xavier.blog.common.enums.DefaultStateEnum;
-import org.xavier.blog.domain.bo.ArticleJsonProperties;
-import org.xavier.blog.domain.bo.RequestBOSaveArticle;
-import org.xavier.common.util.JsonHelper;
-import org.xavier.common.util.PropertiesHelper;
-import org.xavier.common.util.UtilsCreator;
+import org.xavier.blog.domain.po.Article;
 
 /**
  * 描述信息：<br/>
- * 文章 基类
  *
  * @author Xavier
  * @version 1.0
- * @date 2017.10.27
+ * @date 2020/9/4
  * @since Jdk 1.8
  */
-
-public class Article {
+@Document(indexName = "article", createIndex = true, shards = 1, replicas = 1)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ArticleForElasticSearch {
     /**
      * 唯一标示
      */
+    @Id
     private Integer articleId;
     /**
      * 文章显示标示
      */
+    @Field(type = FieldType.Keyword)
     private String articleNo;
     /**
      * 板块显示标示
      */
+    @Field(type = FieldType.Keyword)
     private String boardNo;
-
     /**
      * 文章类别显示编号
      */
+    @Field(type = FieldType.Keyword)
     private String articleCategoryNo;
     /**
      * 文章标题
      */
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String title;
     /**
      * 作者唯一标识
      */
+    @Field(type = FieldType.Keyword)
     private String uid;
     /**
      * 摘要内容
      */
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String summary;
     /**
      * 字数统计
      */
+    @Field(type = FieldType.Integer)
     private Integer wordCount;
     /**
      * 浏览量
      */
+    @Field(type = FieldType.Integer)
     private Integer pageViews;
     /**
      * 文章内容
      */
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String content;
     /**
      * 文章额外参数(Json)
      */
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String properties;
     /**
      * 是否激活标识 1 禁用 2 启用
      */
+    @Field(type = FieldType.Keyword)
     private DefaultStateEnum state;
 
     /**
      * 创建时间 utc 毫秒级时间戳
      */
+    @Field(type = FieldType.Date)
     private Long createTs;
 
     /**
      * 最后修改时间 utc 毫秒级时间戳
      */
+    @Field(type = FieldType.Date)
     private Long lastUpdateTs;
 
-    public Article() {
+    public ArticleForElasticSearch() {
     }
 
-    public Article(RequestBOSaveArticle requestBOSaveArticle, String uid) {
-        this.boardNo = requestBOSaveArticle.getBoardNo();
-        this.articleCategoryNo = requestBOSaveArticle.getArticleCategoryNo();
-        this.title = requestBOSaveArticle.getTitle();
-        this.summary = requestBOSaveArticle.getSummary();
-        this.content = requestBOSaveArticle.getContent();
-        this.properties = requestBOSaveArticle.getProperties();
-        this.state = DefaultStateEnum.ACTIVE;
-        this.uid = uid;
+    public ArticleForElasticSearch(Article article) {
+        this.articleId = article.getArticleId();
+        this.articleNo = article.getArticleNo();
+        this.boardNo = article.getBoardNo();
+        this.articleCategoryNo = article.getArticleCategoryNo();
+        this.title = article.getTitle();
+        this.uid = article.getUid();
+        this.summary = article.getSummary();
+        this.wordCount = article.getWordCount();
+        this.pageViews = article.getPageViews();
+        this.content = article.getContent();
+        this.properties = article.getProperties();
+        this.state = article.getState();
+        this.createTs = article.getCreateTs();
+        this.lastUpdateTs = article.getLastUpdateTs();
     }
 
-    /**
-     * 字数统计方法
-     */
-    @JsonIgnore
-    public void setWordCount(Article targetArticle) {
-        if (targetArticle == null || targetArticle.getContent() == null || "".equals(targetArticle.getContent().trim())) {
-            wordCount = 0;
-        } else {
-            wordCount = targetArticle.getContent().trim().length();
-        }
-    }
-
-    /**
-     * 字数统计方法
-     */
-    @JsonIgnore
-    public void initWordCount() {
-        if (content == null || "".equals(content.trim())) {
-            wordCount = 0;
-        } else {
-            wordCount = content.trim().length();
-        }
-    }
-
-    /**
-     * 参数校验
-     */
-    public void validate() {
-        PropertiesHelper propertiesHelper = UtilsCreator.getDefaultPropertiesHelperInstance();
-        propertiesHelper.stringNotNull(title, 1, 50, "[title] can't be null,and its length should within 50.");
-        propertiesHelper.stringNotNull(boardNo, "[boardNo] can't be null.");
-        propertiesHelper.stringNotNull(articleCategoryNo, "[articleCategoryNo] can't be null.");
-        propertiesHelper.stringNotNull(uid, 0, 32, "[uid] can't be null,and its length should be between 9~10.");
-        propertiesHelper.stringNotNull(content, 1, 100000, "[content] can't be null,and its length should within 100000.");
-        propertiesHelper.stringNotNull(summary, 1, 500, "[summary] can't be null,and its length should within 500.");
-        if (properties == null) {
-            JsonHelper<ObjectMapper> jsonHelper = (JsonHelper<ObjectMapper>) UtilsCreator.getDefaultJsonHelperInstance(false);
-            ArticleJsonProperties articleJsonProperties = new ArticleJsonProperties();
-            articleJsonProperties.setDefaultConfigIfAbsent();
-            this.properties = jsonHelper.format(articleJsonProperties);
-        }
-        initWordCount();
+    public Article toArticle() {
+        Article result = new Article();
+        result.setArticleId(this.articleId);
+        result.setArticleNo(this.articleNo);
+        result.setBoardNo(this.boardNo);
+        result.setArticleCategoryNo(this.articleCategoryNo);
+        result.setTitle(this.title);
+        result.setUid(this.uid);
+        result.setSummary(this.summary);
+        result.setWordCount(this.wordCount);
+        result.setPageViews(this.pageViews);
+        result.setContent(this.content);
+        result.setProperties(this.properties);
+        result.setState(this.state);
+        result.setCreateTs(this.createTs);
+        result.setLastUpdateTs(this.lastUpdateTs);
+        return result;
     }
 
     public Integer getArticleId() {

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.domain.po.Board;
-import org.xavier.blog.service.BoardServiceImpl;
+import org.xavier.blog.service.impl.BoardServiceImpl;
 
 import java.util.ArrayList;
 

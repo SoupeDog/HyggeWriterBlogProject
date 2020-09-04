@@ -13,8 +13,8 @@ import org.xavier.blog.domain.dto.user.UserDTO;
 import org.xavier.blog.domain.dto.user.UserTokenDTO;
 import org.xavier.blog.domain.po.User;
 import org.xavier.blog.domain.po.UserToken;
-import org.xavier.blog.service.UserServiceImpl;
-import org.xavier.blog.service.UserTokenServiceImpl;
+import org.xavier.blog.service.impl.UserServiceImpl;
+import org.xavier.blog.service.impl.UserTokenServiceImpl;
 import org.xavier.common.exception.*;
 
 /**

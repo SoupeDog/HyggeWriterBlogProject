@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.domain.po.UserOperationLog;
-import org.xavier.blog.service.UserOperationLogServiceImpl;
+import org.xavier.blog.service.impl.UserOperationLogServiceImpl;
 import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;

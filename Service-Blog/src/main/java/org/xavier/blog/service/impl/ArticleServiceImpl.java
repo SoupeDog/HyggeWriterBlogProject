@@ -1,10 +1,9 @@
-package org.xavier.blog.service;
+package org.xavier.blog.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.enums.DefaultStateEnum;
 import org.xavier.blog.common.enums.UserTypeEnum;
@@ -15,6 +14,7 @@ import org.xavier.blog.dao.GroupRelationshipMapper;
 import org.xavier.blog.domain.bo.*;
 import org.xavier.blog.domain.dto.ArticleDTO;
 import org.xavier.blog.domain.po.*;
+import org.xavier.blog.service.ArticleService;
 import org.xavier.blog.utils.RequestProcessTrace;
 import org.xavier.common.enums.ColumnType;
 import org.xavier.common.exception.PropertiesRuntimeException;
@@ -39,7 +39,7 @@ import java.util.concurrent.CompletableFuture;
  * @since Jdk 1.8
  */
 @Service
-public class ArticleServiceImpl extends DefaultUtils {
+public class ArticleServiceImpl extends DefaultUtils implements ArticleService {
     @Autowired
     ArticleMapper articleMapper;
     @Autowired
@@ -184,37 +184,6 @@ public class ArticleServiceImpl extends DefaultUtils {
         increasePageViewsAsynchronous(articleNo);
         return result;
     }
-
-    private boolean checkAccessRuleOfOneArticleCategoryNo(String secretKey, User loginUser, List<AccessRule> accessRuleList, HashMap<String, Object> allJoinedGroup) {
-        boolean pass = false;
-        for (AccessRule accessRule : accessRuleList) {
-            if (accessRule.getRequirement()) {
-                pass = pass && checkAccessRule(loginUser, accessRule, allJoinedGroup, secretKey);
-                if (!pass) {
-                    break;
-                }
-            } else {
-                pass = checkAccessRule(loginUser, accessRule, allJoinedGroup, secretKey) || pass;
-            }
-        }
-        return pass;
-    }
-
-    private boolean checkAccessRule(User loginUser, AccessRule accessRule, HashMap<String, Object> allJoinedGroup, String secretKey) {
-        switch (accessRule.getAccessPermit()) {
-            case PUBLIC:
-                return true;
-            case PERSONAL:
-                return loginUser.getUid().equals(accessRule.getExtendProperties());
-            case SECRET_KEY:
-                return accessRule.getExtendProperties().equals(secretKey);
-            case GROUP:
-                return allJoinedGroup.containsKey(accessRule.getExtendProperties());
-            default:
-                return false;
-        }
-    }
-
 
     /**
      * 根据文章唯一标识查询文章
@@ -492,21 +461,5 @@ public class ArticleServiceImpl extends DefaultUtils {
                 });
 
         return result;
-    }
-
-
-    private ArrayList<String> getAllowableArticleCategoryNoList(String secretKey, User loginUser, HashMap<String, Object> allJoinedGroup, ArrayList<AccessRule> accessRuleList) {
-        // key-value ArticleCategoryNo-AccessRule
-        LinkedMultiValueMap<String, AccessRule> accessRuleOrderMap = new LinkedMultiValueMap<>();
-        for (AccessRule accessRule : accessRuleList) {
-            accessRuleOrderMap.add(accessRule.getArticleCategoryNo(), accessRule);
-        }
-        ArrayList<String> allowableArticleCategoryNoList = new ArrayList<>();
-        for (Map.Entry<String, List<AccessRule>> entry : accessRuleOrderMap.entrySet()) {
-            if (checkAccessRuleOfOneArticleCategoryNo(secretKey, loginUser, entry.getValue(), allJoinedGroup)) {
-                allowableArticleCategoryNoList.add(entry.getKey());
-            }
-        }
-        return allowableArticleCategoryNoList;
     }
 }

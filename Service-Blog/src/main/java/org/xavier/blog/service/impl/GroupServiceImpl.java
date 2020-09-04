@@ -1,4 +1,4 @@
-package org.xavier.blog.service;
+package org.xavier.blog.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

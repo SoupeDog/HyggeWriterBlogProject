@@ -76,6 +76,22 @@ public interface ArticleMapper {
     Integer queryArticleCategoryArticleCount(@Param("articleCategoryNo") String articleCategoryNo);
 
     /**
+     * 查询全部文章数量
+     *
+     * @return 文章数量
+     */
+    @Select("select count(*) from article")
+    Integer queryArticleTotalCount();
+
+    /**
+     * 查询全部文章数量
+     *
+     * @return 文章数量
+     */
+    @Select("select * from article order by articleId ASC limit #{startPoint},#{size}")
+    ArrayList<Article> queryArticleByPage(@Param("startPoint") Integer startPoint, @Param("size") Integer size);
+
+    /**
      * 根据 articleNo List 批量查询文章信息
      *
      * @param articleNoList articleNo List

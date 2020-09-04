@@ -10,8 +10,8 @@ import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.domain.po.Group;
 import org.xavier.blog.domain.po.User;
-import org.xavier.blog.service.GroupServiceImpl;
-import org.xavier.blog.service.UserServiceImpl;
+import org.xavier.blog.service.impl.GroupServiceImpl;
+import org.xavier.blog.service.impl.UserServiceImpl;
 import org.xavier.blog.utils.RequestProcessTrace;
 import org.xavier.common.exception.*;
 

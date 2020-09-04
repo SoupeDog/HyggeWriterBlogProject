@@ -1,11 +1,10 @@
 package org.xavier.blog.filter;
 
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.xavier.blog.common.filter.FilterHelper;
 import org.xavier.blog.common.enums.UserTokenScopeEnum;
 import org.xavier.blog.domain.po.User;
-import org.xavier.blog.service.UserServiceImpl;
-import org.xavier.blog.service.UserTokenServiceImpl;
+import org.xavier.blog.service.impl.UserServiceImpl;
+import org.xavier.blog.service.impl.UserTokenServiceImpl;
 import org.xavier.blog.utils.HyggeRequestContext;
 import org.xavier.blog.utils.RequestProcessTrace;
 import org.xavier.common.exception.base.RequestException;

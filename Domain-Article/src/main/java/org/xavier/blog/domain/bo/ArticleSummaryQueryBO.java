@@ -101,11 +101,13 @@ public class ArticleSummaryQueryBO {
         this.summary = article.getSummary();
         this.wordCount = article.getWordCount();
         this.pageViews = article.getPageViews();
-        try {
-            ObjectMapper objectMapper = (ObjectMapper) UtilsCreator.getDefaultJsonHelperInstance(false).getDependence();
-            this.properties = objectMapper.readValue(article.getProperties(), ArticleJsonProperties.class);
-        } catch (JsonProcessingException e) {
-            throw new PropertiesRuntimeException("Fail to read:" + article.getProperties());
+        if (article.getProperties() != null) {
+            try {
+                ObjectMapper objectMapper = (ObjectMapper) UtilsCreator.getDefaultJsonHelperInstance(false).getDependence();
+                this.properties = objectMapper.readValue(article.getProperties(), ArticleJsonProperties.class);
+            } catch (JsonProcessingException e) {
+                throw new PropertiesRuntimeException("Fail to read:" + article.getProperties());
+            }
         }
         this.state = article.getState();
         this.createTs = article.getCreateTs();

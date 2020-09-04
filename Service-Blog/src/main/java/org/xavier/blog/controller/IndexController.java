@@ -11,7 +11,8 @@ import org.xavier.blog.common.HyggeWriterController;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.domain.bo.BoardArticleCategoryArticleCountInfo;
 import org.xavier.blog.domain.bo.BoardArticleCountInfo;
-import org.xavier.blog.service.ArticleServiceImpl;
+import org.xavier.blog.service.impl.ArticleElasticSearchServiceImpl;
+import org.xavier.blog.service.impl.ArticleServiceImpl;
 import org.xavier.blog.utils.RequestProcessTrace;
 import org.xavier.common.exception.PropertiesRuntimeException;
 import org.xavier.common.exception.Universal404Exception;
@@ -34,6 +35,8 @@ import java.util.LinkedHashMap;
 public class IndexController extends HyggeWriterController {
     @Autowired
     ArticleServiceImpl articleService;
+    @Autowired
+    ArticleElasticSearchServiceImpl articleElasticSearchService;
 
     @GetMapping(value = "/main/index/article/count/board")
     public ResponseEntity<?> queryArticleCountOfAllBoard() {
@@ -82,7 +85,7 @@ public class IndexController extends HyggeWriterController {
         String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
         String secretKey = RequestProcessTrace.getContext().getSecretKey();
         try {
-            PageResult<ArticleSummaryQueryBO> result = articleService.articleSearch(loginUid, secretKey, keyword, currentPage, pageSize);
+            PageResult<ArticleSummaryQueryBO> result = articleElasticSearchService.articleSearch(loginUid, secretKey, keyword, currentPage, pageSize);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());
