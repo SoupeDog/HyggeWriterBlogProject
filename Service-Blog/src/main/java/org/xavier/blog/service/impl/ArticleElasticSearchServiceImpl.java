@@ -77,12 +77,13 @@ public class ArticleElasticSearchServiceImpl extends DefaultUtils implements Art
     }
 
     public void updateArticleInElasticSearchAsync(String articleNo) {
-        AtomicReference<Article> article = null;
+        AtomicReference<Article> articleContainer = null;
         CompletableFuture.runAsync(() -> {
-            article.set(articleMapper.queryArticleByArticleNo(articleNo));
-            elasticsearchRestTemplate.save(article);
+            articleContainer.set(articleMapper.queryArticleByArticleNo(articleNo));
+            elasticsearchRestTemplate.save(articleContainer.get());
+            logger.always("Update es Article(" + articleContainer.get().getTitle() + ") success.");
         }).exceptionally((throwable) -> {
-            logger.error("Fail to update es Article:" + jsonHelper.format(article), throwable);
+            logger.error("Fail to update es Article:" + jsonHelper.format(articleContainer.get()), throwable);
             return null;
         });
     }
