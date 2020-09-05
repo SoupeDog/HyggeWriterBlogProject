@@ -26,6 +26,7 @@ services:
         depends_on:
             - "Mysql"
             - "Nginx"
+            - "Elasticsearch_Single"
         environment:
             - "dbPw=${DB_Pw}"
         volumes:
