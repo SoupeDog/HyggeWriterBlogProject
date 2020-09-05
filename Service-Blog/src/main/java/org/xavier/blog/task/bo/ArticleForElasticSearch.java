@@ -16,7 +16,7 @@ import org.xavier.blog.domain.po.Article;
  * @date 2020/9/4
  * @since Jdk 1.8
  */
-@Document(indexName = "article", createIndex = true, shards = 1, replicas = 1)
+@Document(indexName = "article", createIndex = false, shards = 1, replicas = 1)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ArticleForElasticSearch {
     /**

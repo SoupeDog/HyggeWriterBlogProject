@@ -66,6 +66,7 @@ services:
             hard: -1
         volumes:
           - elasticsearch_volume:/usr/share/elasticsearch/data
+          - /home/elk/elasticsearch_single/plugins:/usr/share/elasticsearch/plugins
         ports:
           - 9200:9200
         networks:
