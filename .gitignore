@@ -9,7 +9,8 @@ out
 gen
 /Front-End-Project/node_modules/
 /Front-End-Project/package-lock.json
-!/Deploy/Service-Blog/Dockerfile
-/Deploy/Service-Blog/Dockerfile
+
+
 /Deploy/docker-compose.yml
 /Deploy/Service-Blog/service-blog.jar
+
