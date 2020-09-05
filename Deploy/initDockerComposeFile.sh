@@ -44,7 +44,7 @@ services:
         image: "mysql:5.7"
         restart: always
         environment:
-          - "MYSQL_ROOT_PASSWORD: ${DB_Pw}"
+            MYSQL_ROOT_PASSWORD: ${DB_Pw}
         command: "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
         ports:
             - "3306:3306"
