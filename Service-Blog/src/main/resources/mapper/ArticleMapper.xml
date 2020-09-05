@@ -18,7 +18,7 @@
         articleId,uid,articleCategoryNo,statementId,title,summary,content,wordCount,pageViews,properties,legal_Flag,createTs,lastUpdateTs
     </sql>
 
-    <insert id="saveArticle" parameterType="Article">
+    <insert id="saveArticle" parameterType="Article" keyProperty="Article.articleId" useGeneratedKeys="true">
         INSERT INTO `article`(<include refid="BaseColumnList"/>)VALUES (
         #{Article.articleNo},
         #{Article.boardNo},

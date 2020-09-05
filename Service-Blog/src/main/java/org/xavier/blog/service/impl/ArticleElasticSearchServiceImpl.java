@@ -70,6 +70,7 @@ public class ArticleElasticSearchServiceImpl extends DefaultUtils implements Art
     public void updateArticleInElasticSearchAsync(Article article) {
         CompletableFuture.runAsync(() -> {
             elasticsearchRestTemplate.save(new ArticleForElasticSearch(article));
+            logger.always("Update es Article(" + article.getTitle() + ") success.");
         }).exceptionally((throwable) -> {
             logger.error("Fail to update es Article:" + jsonHelper.format(article), throwable);
             return null;
