@@ -14,6 +14,7 @@ import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.domain.dto.ArticleDTO;
 import org.xavier.blog.domain.po.Article;
 import org.xavier.blog.domain.po.User;
+import org.xavier.blog.service.impl.ArticleElasticSearchServiceImpl;
 import org.xavier.blog.service.impl.ArticleServiceImpl;
 import org.xavier.blog.service.impl.UserServiceImpl;
 import org.xavier.blog.utils.RequestProcessTrace;
@@ -40,6 +41,8 @@ public class ArticleController extends HyggeWriterController {
     ArticleServiceImpl articleService;
     @Autowired
     UserServiceImpl userService;
+    @Autowired
+    ArticleElasticSearchServiceImpl articleElasticSearchService;
 
     @PostMapping(value = "/main/article")
     public ResponseEntity<?> saveArticle(@RequestBody Article article) {
@@ -49,6 +52,7 @@ public class ArticleController extends HyggeWriterController {
             article.setUid(loginUser.getUid());
             Long serviceTs = System.currentTimeMillis();
             articleService.saveArticle(article, serviceTs);
+            articleElasticSearchService.updateArticleInElasticSearchAsync(article);
             return success(article);
         } catch (DuplicateKeyException e) {
             return fail(HttpStatus.CONFLICT, ErrorCode.ARTICLE_EXISTS.getErrorCod(), "Article(" + article.getTitle() + ") dose exist.");
@@ -61,14 +65,15 @@ public class ArticleController extends HyggeWriterController {
         }
     }
 
-    @PutMapping(value = "/main/article/{articleId}")
-    public ResponseEntity<?> updateArticle(@PathVariable("articleId") String articleId, @RequestBody Map data) {
+    @PutMapping(value = "/main/article/{articleNo}")
+    public ResponseEntity<?> updateArticle(@PathVariable("articleNo") String articleNo, @RequestBody Map data) {
         User loginUser = RequestProcessTrace.getContext().getCurrentLoginUser();
         try {
             String operatorUid = loginUser.getUid();
-            if (!articleService.updateArticle(operatorUid, articleId, data)) {
+            if (!articleService.updateArticle(operatorUid, articleNo, data)) {
                 throw new Universal409Exception(ErrorCode.ARTICLE_UPDATE_CONFLICT.getErrorCod(), "Update conflict,please try it again if target still exists.");
             }
+            articleElasticSearchService.updateArticleInElasticSearchAsync(articleNo);
             return success();
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

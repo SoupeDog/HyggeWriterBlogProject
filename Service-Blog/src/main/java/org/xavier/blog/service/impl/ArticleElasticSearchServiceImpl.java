@@ -25,6 +25,8 @@ import org.xavier.webtoolkit.domain.PageResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 描述信息：<br/>
@@ -64,6 +66,26 @@ public class ArticleElasticSearchServiceImpl extends DefaultUtils implements Art
     GroupServiceImpl groupService;
     @Autowired
     ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+    public void updateArticleInElasticSearchAsync(Article article) {
+        CompletableFuture.runAsync(() -> {
+            elasticsearchRestTemplate.save(article);
+        }).exceptionally((throwable) -> {
+            logger.error("Fail to update es Article:" + jsonHelper.format(article), throwable);
+            return null;
+        });
+    }
+
+    public void updateArticleInElasticSearchAsync(String articleNo) {
+        AtomicReference<Article> article = null;
+        CompletableFuture.runAsync(() -> {
+            article.set(articleMapper.queryArticleByArticleNo(articleNo));
+            elasticsearchRestTemplate.save(article);
+        }).exceptionally((throwable) -> {
+            logger.error("Fail to update es Article:" + jsonHelper.format(article), throwable);
+            return null;
+        });
+    }
 
     /**
      * 文章全文检索(从 title summary content 匹配)

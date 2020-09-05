@@ -50,6 +50,7 @@ class SearchView extends React.Component {
                                 currentPage: page
                             });
                         },
+                        showSizeChanger: false,
                         current: this.props.searchCurrentPage,
                         pageSize: this.props.searchPageSize,
                         total: this.props.searchTotalCount
