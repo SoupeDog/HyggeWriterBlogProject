@@ -58,6 +58,7 @@ public class DateBaseConfig {
         properties.setProperty("druid.stat.mergeSql", "true");
         properties.setProperty("druid.stat.slowSqlMillis", "500");
         dataSource.setConnectProperties(properties);
+        logger.always("配置数据库：" + dbProperties.getHost() + "/" + dbProperties.getDbName()+" [ac]→"+dbProperties.getAc());
         return dataSource;
     }
 

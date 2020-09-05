@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DB_Pw=$1
+DB_PW=$1
 
 cat > docker-compose.yml <<END_TEXT
 version: "3.8"
@@ -26,15 +26,12 @@ services:
         depends_on:
             - "Mysql"
             - "Nginx"
-        environment:
-            - "dbPw=${DB_Pw}"
         volumes:
             - "/home/nginx/root/static:/home/nginx/root/static"
             - "/home/log/:/logFile/"
         links:
             - "Mysql:mysql"
             - "Nginx:nginx"
-            - "Elasticsearch_Single:elasticsearch"
         networks:
             Hygge:
                 ipv4_address: 172.18.0.3
@@ -43,7 +40,7 @@ services:
         image: "mysql:5.7"
         restart: always
         environment:
-          - "MYSQL_ROOT_PASSWORD: ${DB_Pw}"
+            MYSQL_ROOT_PASSWORD: "${DB_PW}"
         command: "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
         ports:
             - "3306:3306"
@@ -52,29 +49,6 @@ services:
         networks:
             Hygge:
                 ipv4_address: 172.18.0.4
-    Elasticsearch_Single:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
-        container_name: "elasticsearch_single"
-        environment:
-          - "discovery.type=single-node"
-          - "bootstrap.memory_lock=true"
-          - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-        ulimits:
-          memlock:
-            soft: -1
-            hard: -1
-        volumes:
-          - elasticsearch_volume:/usr/share/elasticsearch/data
-        ports:
-          - 9200:9200
-        networks:
-            Hygge:
-                ipv4_address: 172.18.0.5
-
-volumes:
-  elasticsearch_volume:
-    driver: local
-
 networks:
     Hygge:
         external: true
