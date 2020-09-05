@@ -33,7 +33,7 @@ public class AdminController extends HyggeWriterController {
     @Autowired
     UserServiceImpl userService;
 
-    @GetMapping(value = "/main/es/syncdb")
+    @GetMapping(value = "/main/admin/es/syncdb")
     public ResponseEntity<?> saveArticle(@RequestParam(value = "batchSize", required = false, defaultValue = "10") Integer batchSize) {
         User loginUser = RequestProcessTrace.getContext().getCurrentLoginUser();
         try {
