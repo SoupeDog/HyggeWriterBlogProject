@@ -80,7 +80,7 @@ public class ArticleElasticSearchServiceImpl extends DefaultUtils implements Art
         AtomicReference<Article> articleContainer = null;
         CompletableFuture.runAsync(() -> {
             articleContainer.set(articleMapper.queryArticleByArticleNo(articleNo));
-            elasticsearchRestTemplate.save(articleContainer.get());
+            elasticsearchRestTemplate.save(new ArticleForElasticSearch(articleContainer.get()));
             logger.always("Update es Article(" + articleContainer.get().getTitle() + ") success.");
         }).exceptionally((throwable) -> {
             logger.error("Fail to update es Article:" + jsonHelper.format(articleContainer.get()), throwable);
