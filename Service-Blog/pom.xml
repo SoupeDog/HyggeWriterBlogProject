@@ -9,22 +9,24 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <java.version>1.8</java.version>
-        <spring-cloud.version>Hoxton.SR6</spring-cloud.version>
-        <spring-boot.version>2.3.1.RELEASE</spring-boot.version>
-        <maven-compiler.version>3.8.1</maven-compiler.version>
-        <maven.test.skip>true</maven.test.skip>
+        <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
+        <spring-boot.version>2.3.3.RELEASE</spring-boot.version>
         <!--应与 HyggeWriterBlogProject.pom 保持一致-->
-        <mybatis.starter.version>2.1.3</mybatis.starter.version>
+        <mybatis-starter.version>2.1.3</mybatis-starter.version>
         <!--连接池版本-->
         <druid-starter.version>1.1.23</druid-starter.version>
+        <!--指定 spring-boot-maven-plugin 编译版本-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <maven-compiler.version>3.8.1</maven-compiler.version>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>${mybatis.starter.version}</version>
+            <version>${mybatis-starter.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>spring-boot-starter-logging</artifactId>
@@ -36,10 +38,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.cloud</groupId>-->
+        <!--            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
@@ -130,14 +132,24 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler.version}</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <!-- 指定版本号 fork 为 true 才可用-->
+                    <fork>true</fork>
                 </configuration>
             </plugin>
         </plugins>
