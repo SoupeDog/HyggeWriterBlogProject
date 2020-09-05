@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.common.ErrorCode;
+import org.xavier.blog.common.enums.UserActionEnum;
 import org.xavier.blog.common.enums.UserTokenScopeEnum;
 import org.xavier.blog.dao.UserTokenMapper;
+import org.xavier.blog.domain.bo.UserLog;
 import org.xavier.blog.domain.bo.UserLoginBO;
 import org.xavier.blog.domain.dto.user.UserDTO;
 import org.xavier.blog.domain.dto.user.UserTokenDTO;
@@ -16,6 +18,7 @@ import org.xavier.common.exception.Universal403Exception;
 import org.xavier.common.exception.Universal404Exception;
 import org.xavier.common.exception.Universal409Exception;
 import org.xavier.common.logging.HyggeLoggerMsgBuilder;
+import org.xavier.common.logging.core.HyggeLogger;
 import org.xavier.webtoolkit.base.DefaultUtils;
 
 import java.util.LinkedHashMap;
@@ -36,8 +39,10 @@ public class UserTokenServiceImpl extends DefaultUtils {
     UserTokenMapper userTokenMapper;
     @Autowired
     UserServiceImpl userService;
+    @Autowired
+    HyggeLogger logger;
 
-    public UserTokenDTO login(UserLoginBO loginBO, Long currentTs) throws Universal403Exception, Universal409Exception, Universal400Exception, Universal404Exception {
+    public UserTokenDTO login(String ip, UserLoginBO loginBO, Long currentTs) throws Universal403Exception, Universal409Exception, Universal400Exception, Universal404Exception {
         User targetUser = userService.queryUserNotNull(loginBO.getUid());
         UserTokenScopeEnum currentUserTokenScope = loginBO.calculateScope();
         if (!targetUser.getPw().equals(loginBO.getPw())) {
@@ -57,6 +62,7 @@ public class UserTokenServiceImpl extends DefaultUtils {
         }
         UserTokenDTO result = new UserTokenDTO(currentUserToken);
         result.setUserInfo(new UserDTO(targetUser));
+        logger.always(new UserLog(ip, targetUser.getUid(), UserActionEnum.登录, null).toString());
         return result;
     }
 

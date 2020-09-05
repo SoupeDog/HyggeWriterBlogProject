@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.HyggeWriterController;
+import org.xavier.blog.common.PropertiesReminder;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.domain.bo.UserLoginBO;
 import org.xavier.blog.domain.bo.UserTokenBO;
@@ -35,9 +36,10 @@ public class UserTokenController extends HyggeWriterController {
     UserServiceImpl userService;
 
     @PostMapping("/extra/token/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginBO userLoginBO) {
+    public ResponseEntity<?> login(@RequestHeader HttpHeaders headers,@RequestBody UserLoginBO userLoginBO) {
+        String ip = headers.getFirst(PropertiesReminder.DESC_REAL_IP_NAME);
         try {
-            UserTokenDTO result = userTokenService.login(userLoginBO, System.currentTimeMillis());
+            UserTokenDTO result = userTokenService.login(ip,userLoginBO, System.currentTimeMillis());
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

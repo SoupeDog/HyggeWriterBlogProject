@@ -2,11 +2,13 @@ package org.xavier.blog.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.HyggeWriterController;
+import org.xavier.blog.common.PropertiesReminder;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.domain.bo.ArticleSummaryQueryBO;
 import org.xavier.blog.domain.dto.ArticleDTO;
@@ -80,11 +82,12 @@ public class ArticleController extends HyggeWriterController {
     }
 
     @GetMapping(value = "/main/article/{articleNo}")
-    public ResponseEntity<?> queryArticle(@PathVariable("articleNo") String articleNo) {
+    public ResponseEntity<?> queryArticle(@RequestHeader HttpHeaders headers, @PathVariable("articleNo") String articleNo) {
         String loginUid = RequestProcessTrace.getContext().getCurrentLoginUid();
         String secretKey = RequestProcessTrace.getContext().getSecretKey();
+        String ip = headers.getFirst(PropertiesReminder.DESC_REAL_IP_NAME);
         try {
-            ArticleDTO result = articleService.querySingleArticleByArticleNoForUser(loginUid, articleNo, secretKey);
+            ArticleDTO result = articleService.querySingleArticleByArticleNoForUser(ip,loginUid, articleNo, secretKey);
             return success(result);
         } catch (PropertiesRuntimeException e) {
             return fail(HttpStatus.BAD_REQUEST, e.getStateCode(), e.getMessage());

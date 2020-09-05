@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xavier.blog.common.ErrorCode;
 import org.xavier.blog.common.enums.DefaultStateEnum;
+import org.xavier.blog.common.enums.UserActionEnum;
 import org.xavier.blog.common.enums.UserTypeEnum;
 import org.xavier.blog.dao.AccessRuleMapper;
 import org.xavier.blog.dao.ArticleCategoryMapper;
@@ -167,7 +168,7 @@ public class ArticleServiceImpl extends DefaultUtils implements ArticleService {
      * @param articleNo 文章唯一标识
      * @return 文章对象
      */
-    public ArticleDTO querySingleArticleByArticleNoForUser(String loginUid, String articleNo, String secretKey) throws Universal404Exception {
+    public ArticleDTO querySingleArticleByArticleNoForUser(String ip, String loginUid, String articleNo, String secretKey) throws Universal404Exception {
         User loginUser = RequestProcessTrace.getContext().getCurrentLoginUser();
         Article article = querySingleArticleByArticleNoNotNull(articleNo);
         ArrayList<AccessRule> accessRuleList = accessRuleMapper.queryAccessRuleByArticleCategoryNo(article.getArticleCategoryNo());
@@ -181,6 +182,9 @@ public class ArticleServiceImpl extends DefaultUtils implements ArticleService {
         ArticleCategory articleCategory = articleCategoryService.queryArticleCategoryNoByArticleCategoryNoNotNull(article.getArticleCategoryNo());
         Board board = boardService.queryBoardByBoardNoNotNull(article.getBoardNo());
         ArticleDTO result = new ArticleDTO(article, board, articleCategory, ArticleCategoryServiceImpl.articleCategoryTreeInfo.get(article.getArticleCategoryNo()));
+        if (loginUser.getUserType().equals(UserTypeEnum.NORMAL)) {
+            logger.always(new UserLog(ip, loginUid, UserActionEnum.浏览, "题目：" + article.getTitle()).toString());
+        }
         increasePageViewsAsynchronous(articleNo);
         return result;
     }
