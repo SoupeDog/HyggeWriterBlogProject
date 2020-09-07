@@ -32,6 +32,8 @@ services:
         volumes:
             - "/home/nginx/root/static:/home/nginx/root/static"
             - "/home/log/:/logFile/"
+        ports:
+          - 8081:8080
         links:
             - "Mysql:mysql"
             - "Nginx:nginx"
