@@ -2,6 +2,7 @@ package org.xavier.blog.task;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Component;
  * @date 2020/9/5
  * @since Jdk 1.8
  */
+
 @Component
+@Profile("!test")
 public class ElasticCommand implements CommandLineRunner {
     @Autowired
     ESIndexCheckTask esIndexCheckTask;
